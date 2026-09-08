@@ -13,18 +13,29 @@
     }
     h2, h3 { margin-top: 0; }
     
-    /* Barre utilisateur & Navigation */
-    .user-bar {
-      display: flex; justify-content: space-between; align-items: center;
-      background: #e9ecef; padding: 8px 12px; border-radius: 8px; margin-bottom: 14px; font-size: 0.88em;
-    }
-    .nav-links { display: flex; gap: 10px; align-items: center; }
-    .nav-links a { color: #007bff; text-decoration: none; font-weight: 600; }
+   <!-- Barre supérieure utilisateur avec bouton Déconnexion -->
+  <div class="user-bar">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <span>Connecté : <strong id="userName">...</strong></span>
+      <button type="button" onclick="deconnexion()" style="background: none; border: 1px solid #ced4da; border-radius: 4px; padding: 2px 7px; font-size: 0.78em; color: #6c757d; cursor: pointer; font-weight: 600;">
+        🚪 Déconnexion
+      </button>
+    </div>
 
-    .card {
-      background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 14px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.06);
-    }
+    <div class="nav-links">
+      <a href="reservation.html">📅 Planning</a>
+      <span style="color:#bbb;">|</span>
+      <a href="dashboard.html">📊 Vue Parc</a>
+      <span id="lienAdminNav" style="display:none;">
+        <span style="color:#bbb;">|</span>
+        <a href="admin.html" style="color:#dc3545; font-weight:700;">⚙️ Admin</a>
+      </span>
+      <span id="lienExpressNav" style="display:none;">
+        <span style="color:#bbb;">|</span>
+        <a href="express.html" style="color:#ffc107; font-weight:700;">⚡ Camion</a>
+      </span>
+    </div>
+  </div>
 
     /* COHÉRENCE DASHBOARD : CARTES AVEC FOND PLEIN ET BORD GAUCHE */
     .card-dispo {
@@ -216,6 +227,16 @@
         alert("Veuillez remplir tous les champs.");
         return;
       }
+      function deconnexion() {
+      if (!confirm("Voulez-vous vraiment vous déconnecter ?")) return;
+      
+      // Nettoyage de la session locale
+      localStorage.removeItem("regie_user");
+      localStorage.removeItem("regie_role");
+
+      // Rechargement immédiat pour forcer l'affichage de la modale de connexion
+      location.reload();
+    }
 
       fetch(`${SCRIPT_URL}?action=login&nom=${encodeURIComponent(nom)}&pin=${encodeURIComponent(pin)}`)
         .then(r => r.json())

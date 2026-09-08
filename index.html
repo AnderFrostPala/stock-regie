@@ -343,15 +343,25 @@
         detailPanne: document.getElementById("inputPanne").value
       };
 
-      fetch(SCRIPT_URL, {
+     fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
       })
       .then(() => {
-        alert("Action enregistrée !");
-        location.reload();
+        btn.disabled = false;
+        btn.innerText = "Confirmer";
+
+        // Si l'action choisie est un retour en stock
+        if (payload.action === "RETOUR" || payload.action === "STOCK" || payload.nouveauStatut === "Dispo") {
+          const locCible = (typeof currentItem !== "undefined" && currentItem.locNominale) ? currentItem.locNominale : "Stock Régie";
+          afficherConfirmationRangement(locCible);
+        } else {
+          // Pour une sortie plateau ou une déclaration SAV
+          alert("Action enregistrée !");
+          location.reload();
+        }
       })
       .catch(err => {
         alert("Erreur réseau : " + err);

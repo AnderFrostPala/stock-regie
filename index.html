@@ -33,7 +33,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* HEADER PRO RÉGIE */
+    /* HEADER PRO */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
@@ -55,7 +55,7 @@
       display: block; font-size: 0.72em; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
     }
 
-    /* PASTILLE UTILISATEUR CLIQUABLE */
+    /* PASTILLE UTILISATEUR */
     .user-pill-btn {
       display: flex; align-items: center; gap: 7px;
       background: var(--bg-surface); border: 1px solid var(--border);
@@ -71,7 +71,7 @@
       background: var(--status-dispo); box-shadow: 0 0 6px var(--status-dispo);
     }
 
-    /* MENU DÉROULANT UTILISATEUR */
+    /* MENU UTILISATEUR */
     #userMenu {
       position: absolute; right: 14px; top: 62px; width: 220px;
       background: var(--bg-surface-elevated); border: 1px solid var(--border);
@@ -90,7 +90,7 @@
     .menu-item:hover { background: rgba(255,255,255,0.06); }
     .menu-item.danger { color: var(--status-sorti); }
 
-    /* NAVIGATION SECONDAIRE RAPIDE */
+    /* NAVIGATION RAPIDE */
     .quick-nav {
       display: flex; gap: 6px; margin-bottom: 14px;
     }
@@ -102,16 +102,15 @@
     }
     .quick-nav a:hover { color: #fff; border-color: #3f4758; }
 
-    /* CARTES & SURFACES */
+    /* CARTES & MODULES */
     .card {
       background: var(--bg-surface); border: 1px solid var(--border);
       border-radius: 12px; padding: 14px; margin-bottom: 12px;
     }
 
-    /* SCANNER & INPUTS */
     #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
     .search-row { display: flex; gap: 8px; margin-top: 10px; }
-    input[type="text"], input[type="password"], select {
+    input[type="text"], input[type="password"], input[type="number"], select {
       width: 100%; padding: 11px; border-radius: 8px; border: 1px solid var(--border);
       background: #0d0f12; color: #fff; font-size: 14px; font-family: inherit;
     }
@@ -121,14 +120,13 @@
       color: #fff; border-radius: 8px; font-weight: 700; cursor: pointer;
     }
 
-    /* IDENTIFIANTS TECHNIQUES */
     code, .code-tag {
       font-family: 'JetBrains Mono', monospace; font-weight: 700;
       background: #090a0d; border: 1px solid #232731; color: #38bdf8;
       padding: 2px 6px; border-radius: 4px; font-size: 0.85em;
     }
 
-    /* VARIATIONS D'ÉTAT CARTE MATÉRIEL */
+    /* ÉTATS FICHE MATÉRIEL */
     .card-dispo {
       border-left: 5px solid var(--status-dispo) !important;
       background: linear-gradient(90deg, rgba(16,185,129,0.08) 0%, var(--bg-surface) 60%) !important;
@@ -142,7 +140,6 @@
       background: linear-gradient(90deg, rgba(245,158,11,0.09) 0%, var(--bg-surface) 60%) !important;
     }
 
-    /* BADGES */
     .badge-static-resa {
       background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3);
       padding: 3px 8px; border-radius: 5px; font-size: 0.75em; font-weight: 700;
@@ -153,13 +150,11 @@
       padding: 4px 9px; border-radius: 6px; font-size: 0.78em; font-weight: 700;
     }
 
-    /* BOUTONS ACTIONS RETRO-ÉCLAIRÉS */
     .actions-grid { display: flex; gap: 8px; margin-top: 14px; }
     .btn-cmd {
       flex: 1; padding: 13px 4px; border: none; border-radius: 8px;
       font-weight: 800; font-size: 0.88em; color: #fff; cursor: pointer;
-      letter-spacing: 0.3px; transition: transform 0.08s ease, filter 0.15s ease;
-      font-family: inherit;
+      letter-spacing: 0.3px; transition: transform 0.08s ease; font-family: inherit;
     }
     .btn-cmd:active { transform: scale(0.97); }
     .btn-sortie { background: #059669; }
@@ -175,10 +170,9 @@
 </head>
 <body onclick="fermerMenuSiClicExterieur(event)">
 
-  <!-- HEADER AVEC LOGO & SUIVI DE STOCK DNMADE MARSEILLE -->
+  <!-- HEADER -->
   <header class="app-header">
     <div class="brand-group">
-      <!-- Logo DNMADe : place "logo-dnmade.png" à la racine de ton site -->
       <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
       <div id="logoFallback" class="brand-fallback" style="display:none;">DN<br>MADE</div>
       
@@ -188,7 +182,6 @@
       </div>
     </div>
 
-    <!-- Pastille Utilisateur Cliquable -->
     <button type="button" class="user-pill-btn" onclick="toggleUserMenu(event)">
       <span class="status-dot"></span>
       <span id="userName">...</span>
@@ -196,34 +189,26 @@
     </button>
   </header>
 
-  <!-- MENU DÉROULANT DE L'UTILISATEUR -->
+  <!-- MENU UTILISATEUR -->
   <div id="userMenu">
-    <div class="menu-header">
-      Profil : <strong id="userRoleTxt">Étudiant</strong>
-    </div>
-    <a href="reservation.html" class="menu-item">
-      <span>📅</span> Mes réservations
-    </a>
+    <div class="menu-header">Profil : <strong id="userRoleTxt">Étudiant</strong></div>
+    <a href="reservation.html" class="menu-item"><span>📅</span> Mes réservations</a>
     <div id="adminMenuOptions" style="display:none;">
-      <a href="admin.html" class="menu-item" style="color:#f87171;">
-        <span>⚙️</span> Panneau Admin
-      </a>
-      <a href="express.html" class="menu-item" style="color:#fbbf24;">
-        <span>⚡</span> Mode Camion Express
-      </a>
+      <a href="admin.html" class="menu-item" style="color:#f87171;"><span>⚙️</span> Panneau Admin</a>
+      <a href="express.html" class="menu-item" style="color:#fbbf24;"><span>⚡</span> Déchargement Rapide</a>
     </div>
     <button type="button" class="menu-item danger" onclick="deconnexion()" style="border-top:1px solid var(--border); margin-top:4px;">
       <span>🚪</span> Se déconnecter
     </button>
   </div>
 
-  <!-- BARRE DE NAVIGATION RAPIDE -->
+  <!-- NAVIGATION RAPIDE -->
   <nav class="quick-nav">
     <a href="reservation.html">Planning Résas</a>
     <a href="dashboard.html">Vue Parc & Sorties</a>
   </nav>
 
-  <!-- SCANNER & SAISIE MANUELLE -->
+  <!-- SCANNER & RECHERCHE -->
   <div class="card">
     <div id="reader"></div>
     <div class="search-row">
@@ -264,10 +249,19 @@
       <button type="button" class="btn-cmd btn-sav" onclick="declarerPanne()">Panne SAV</button>
     </div>
 
-    <!-- CHOIX LIEU SORTIE -->
+    <!-- FORMULAIRE SORTIE (AVEC LIEU + QUANTITÉ) -->
     <div id="zoneLieuSortie" style="display:none; margin-top:14px; border-top:1px solid var(--border); padding-top:12px;">
-      <label style="font-weight:700; font-size:0.85em; color:var(--text-muted);">Destination / Plateau :</label>
-      <select id="selectLieu" onchange="gererChangementLieu(this.value)" style="margin-top:6px; margin-bottom:8px;">
+      <!-- Sélecteur quantité si lot > 1 -->
+      <div id="zoneQuantiteSortie" style="display:none; margin-bottom:10px;">
+        <label style="font-weight:700; font-size:0.82em; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px; display:block;">Quantité sortie :</label>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <input type="number" id="inputQteSortie" min="1" value="1" style="width:90px; text-align:center; font-size:1.1em; font-weight:700; margin:0;">
+          <span id="txtQteMax" style="font-size:0.85em; color:var(--text-muted);">/ max</span>
+        </div>
+      </div>
+
+      <label style="font-weight:700; font-size:0.82em; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px; display:block;">Destination / Plateau :</label>
+      <select id="selectLieu" onchange="gererChangementLieu(this.value)" style="margin-bottom:8px;">
         <option value="Atelier A">Atelier A</option>
         <option value="Atelier B">Atelier B</option>
         <option value="Amphi Bas">Amphi Bas</option>
@@ -287,12 +281,12 @@
     </div>
   </div>
 
-  <!-- MODAL RAPPEL RANGEMENT NOMINAL (COLONNE P) -->
+  <!-- RAPPEL RANGEMENT NOMINAL (COLONNE P) -->
   <div id="modalRangement" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:3000; align-items:center; justify-content:center; padding:16px;">
     <div style="background:var(--bg-surface-elevated); border:1px solid var(--border); border-radius:14px; padding:24px; max-width:380px; width:100%; text-align:center;">
       <div style="font-size:2.8em; margin-bottom:6px;">📦</div>
       <h3 style="margin:0 0 6px 0; color:#fff;">Rangement Matériel</h3>
-      <p style="font-size:0.86em; color:var(--text-muted); margin:0 0 16px 0;">Emplacement assigné en stock :</p>
+      <p style="font-size:0.86em; color:var(--text-muted); margin:0 0 16px 0;">Emplacement assigné au stock :</p>
       
       <div style="background:rgba(16,185,129,0.1); border:2px dashed var(--status-dispo); border-radius:8px; padding:14px; margin-bottom:18px;">
         <div style="font-size:0.75em; text-transform:uppercase; color:#34d399; font-weight:700;">Emplacement nominal</div>
@@ -305,7 +299,7 @@
     </div>
   </div>
 
-  <!-- MODAL CONNEXION INITIALE -->
+  <!-- MODAL CONNEXION -->
   <div id="authModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg-body); z-index:2000; align-items:center; justify-content:center; padding:16px;">
     <div class="card" style="max-width:360px; width:100%; text-align:center; background:var(--bg-surface-elevated);">
       <h3 style="margin-top:0; color:#fff;">Connexion Régie</h3>
@@ -317,7 +311,7 @@
   </div>
 
   <script>
-    // COLLE TON URL OFFICIELLE APPS SCRIPT ICI
+    // COLLE TON URL APPS SCRIPT ICI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let currentItem = null;
@@ -332,7 +326,6 @@
       initialiserInterface();
     }
 
-    // GESTION DU MENU UTILISATEUR
     function toggleUserMenu(e) {
       e.stopPropagation();
       const menu = document.getElementById("userMenu");
@@ -389,7 +382,6 @@
       demarrerCamera();
     }
 
-    // SCANNER CAMERA
     function demarrerCamera() {
       html5QrCode = new Html5Qrcode("reader");
       html5QrCode.start(
@@ -445,7 +437,7 @@
       const estReserve = (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
       badgeResa.style.display = estReserve ? "inline-flex" : "none";
 
-      // Styles & Statuts
+      // Styles carte
       card.classList.remove("card-dispo", "card-sorti", "card-sav");
       const st = (item.statut || "").toLowerCase();
       const txtStatut = document.getElementById("itemStatutTxt");
@@ -460,7 +452,7 @@
         txtStatut.style.color = "var(--status-sav)";
       } else {
         card.classList.add("card-dispo");
-        txtStatut.innerText = "En stock";
+        txtStatut.innerText = "Au stock";
         txtStatut.style.color = "var(--status-dispo)";
       }
 
@@ -471,6 +463,21 @@
         lignePanne.style.display = "block";
       } else {
         lignePanne.style.display = "none";
+      }
+
+      // Gestion dynamique quantité multiple (> 1)
+      const totalDispo = parseInt(item.qte, 10) || 1;
+      const zoneQte = document.getElementById("zoneQuantiteSortie");
+      const inputQte = document.getElementById("inputQteSortie");
+
+      if (totalDispo > 1) {
+        zoneQte.style.display = "block";
+        inputQte.max = totalDispo;
+        inputQte.value = totalDispo;
+        document.getElementById("txtQteMax").innerText = `/ ${totalDispo} dispo(s)`;
+      } else {
+        zoneQte.style.display = "none";
+        inputQte.value = 1;
       }
 
       document.getElementById("zoneLieuSortie").style.display = "none";
@@ -503,7 +510,8 @@
         }
       }
 
-      executerAction("Sorti", lieuFinal);
+      const qteChoisie = parseInt(document.getElementById("inputQteSortie").value, 10) || 1;
+      executerAction("Sorti", lieuFinal, "-", qteChoisie);
     }
 
     function confirmerRetourDirect() {
@@ -517,7 +525,7 @@
       executerAction("SAV", "Atelier SAV", motif);
     }
 
-    function executerAction(statut, lieu, panne = "-") {
+    function executerAction(statut, lieu, panne = "-", qte = 1) {
       const btnSortie = document.getElementById("btnConfirmerSortie");
       if (btnSortie) {
         btnSortie.disabled = true;
@@ -530,7 +538,8 @@
         nouveauStatut: statut,
         lieu: lieu,
         user: user,
-        panne: panne
+        panne: panne,
+        qte: qte
       };
 
       fetch(SCRIPT_URL, {

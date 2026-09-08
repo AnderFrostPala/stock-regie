@@ -8,7 +8,7 @@
     * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 16px; margin: 0 auto; max-width: 980px; background: #f4f5f7; color: #212529;
+      padding: 16px; margin: 0 auto; max-width: 900px; background: #f0f2f5; color: #212529;
     }
     h2 { margin: 0 0 12px 0; }
     .nav-bar {
@@ -21,7 +21,7 @@
       display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px;
     }
     .kpi-card {
-      background: #fff; padding: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+      background: #fff; padding: 14px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
     }
     .kpi-card:hover { transform: translateY(-2px); }
@@ -29,55 +29,74 @@
     .kpi-num { font-size: 1.9em; font-weight: 800; margin-bottom: 2px; }
     .kpi-label { font-size: 0.8em; text-transform: uppercase; font-weight: 700; color: #6c757d; }
 
-    /* Filtres et recherche */
+    /* Contrôles et Filtres */
     .controls-card {
-      background: #fff; padding: 14px; border-radius: 8px; margin-bottom: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+      background: #fff; padding: 14px; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       display: flex; flex-direction: column; gap: 10px;
     }
     .chips-group { display: flex; gap: 6px; flex-wrap: wrap; }
     .chip-btn {
-      background: #e9ecef; border: none; padding: 6px 12px; border-radius: 16px;
+      background: #e9ecef; border: none; padding: 6px 12px; border-radius: 20px;
       font-size: 0.82em; font-weight: 600; cursor: pointer; color: #495057;
     }
     .chip-btn.active { background: #212529; color: #fff; }
     input[type="search"] {
-      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;
+      width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px;
     }
 
-    /* Tableau */
-    .table-container {
-      background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); overflow-x: auto;
+    /* CONTENEUR DES ÉTIQUETTES (PLUS DE TABLEAU CLASSIQUE) */
+    .items-container {
+      display: flex; flex-direction: column; gap: 10px;
     }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88em; }
-    th { background: #f8f9fa; padding: 12px 10px; border-bottom: 2px solid #dee2e6; color: #495057; }
-    td { padding: 12px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
-    tr:hover { background: #fbfcfd; }
 
-    /* VRAIES ÉTIQUETTES PLEINES (FULL COLOR) */
-    .tag-statut {
-      display: inline-block; padding: 5px 10px; border-radius: 6px; font-weight: 700;
-      font-size: 0.82em; text-transform: uppercase; letter-spacing: 0.5px; color: #fff; text-align: center;
+    /* ÉTIQUETTE BANDEAU ARRONDI */
+    .item-card {
+      border-radius: 12px; padding: 14px 16px; display: flex;
+      justify-content: space-between; align-items: center; gap: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04); transition: transform 0.15s ease;
+      border: 1px solid rgba(0,0,0,0.06);
     }
-    .tag-dispo { background: #28a745; } /* Vert plein */
-    .tag-sorti { background: #dc3545; } /* Rouge plein */
-    .tag-sav { background: #fd7e14; }   /* Orange SAV */
+    .item-card:hover { transform: scale(1.005); }
+
+    /* COULEURS DES ÉTIQUETTES PLEINES */
+    .card-dispo {
+      background: #e8f5e9; border-left: 6px solid #28a745;
+    }
+    .card-sorti {
+      background: #ffebee; border-left: 6px solid #dc3545;
+    }
+    .card-sav {
+      background: #fff3e0; border-left: 6px solid #fd7e14;
+    }
+
+    .item-info { flex: 1; }
+    .item-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+    .id-tag {
+      font-size: 0.82em; font-weight: 700; background: #fff; padding: 2px 8px;
+      border-radius: 6px; border: 1px solid rgba(0,0,0,0.15); color: #333; font-family: monospace;
+    }
+    .item-nom { font-size: 1.05em; font-weight: 700; }
+    .item-sub { font-size: 0.82em; color: #555; }
+    .item-details { font-size: 0.85em; margin-top: 6px; display: flex; gap: 16px; flex-wrap: wrap; }
+    .item-details span strong { color: #111; }
+    .panne-alerte { color: #dc3545; font-weight: 600; font-size: 0.85em; margin-top: 4px; }
 
     /* GROS BOUTON BLEU RÉSERVÉ */
     .btn-resa-tag {
-      background: #007bff; color: #fff; border: none; border-radius: 6px;
-      padding: 6px 12px; font-size: 0.82em; font-weight: 700; cursor: pointer;
-      display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,123,255,0.25);
-      transition: background 0.2s;
+      background: #007bff; color: #fff; border: none; border-radius: 8px;
+      padding: 8px 14px; font-size: 0.85em; font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,123,255,0.3);
+      white-space: nowrap;
     }
     .btn-resa-tag:hover { background: #0056b3; }
 
-    /* Modal Calendrier */
+    /* Modal Calendrier & Détails réservation */
     #calModal {
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 14px;
     }
     .cal-box {
-      background: #fff; border-radius: 8px; padding: 18px; width: 100%; max-width: 400px;
+      background: #fff; border-radius: 12px; padding: 20px; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto;
     }
     .cal-nav {
       display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold;
@@ -93,6 +112,11 @@
       background: #dc3545 !important; color: #fff !important; font-weight: bold;
     }
     .cal-empty { background: transparent; }
+
+    .resa-info-card {
+      background: #e7f1ff; border-left: 4px solid #007bff; padding: 10px 12px;
+      border-radius: 6px; margin-top: 14px; font-size: 0.85em; color: #004085;
+    }
   </style>
 </head>
 <body>
@@ -105,13 +129,14 @@
         <span id="calTitre"></span>
         <button type="button" onclick="changerMois(1)">&rarr;</button>
       </div>
-      <h4 id="calNomItem" style="font-size: 0.9em; margin-bottom: 8px; color: #007bff; text-align: center;"></h4>
+      <h4 id="calNomItem" style="font-size: 0.95em; margin-bottom: 10px; color: #007bff; text-align: center;"></h4>
+      
       <div class="cal-grid" id="calGrid"></div>
-      <div style="margin-top: 14px; font-size: 0.8em; display: flex; align-items: center; gap: 8px;">
-        <span style="display:inline-block; width:12px; height:12px; background:#dc3545; border-radius:2px;"></span>
-        <span>Jours réservés / indisponibles</span>
-      </div>
-      <button type="button" onclick="fermerCalendrier()" style="margin-top: 14px; width:100%; padding:8px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;">Fermer</button>
+
+      <!-- BLOC DÉTAILS DU DEMANDEUR & PROJET -->
+      <div id="calDetailsResa"></div>
+
+      <button type="button" onclick="fermerCalendrier()" style="margin-top: 16px; width:100%; padding:10px; background:#6c757d; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Fermer</button>
     </div>
   </div>
 
@@ -123,7 +148,7 @@
 
   <h2>État du Parc en Direct</h2>
 
-  <!-- Compteurs en haut cliquables -->
+  <!-- 4 Compteurs KPI en haut -->
   <div class="kpi-grid">
     <div class="kpi-card" id="cardSorti" onclick="filtrerParStatut('Sorti')">
       <div class="kpi-num" style="color: #dc3545;" id="numSorti">0</div>
@@ -143,7 +168,7 @@
     </div>
   </div>
 
-  <!-- Filtres par catégorie et Recherche -->
+  <!-- Filtres par département et Barre de recherche -->
   <div class="controls-card">
     <div class="chips-group">
       <button class="chip-btn active" onclick="filtrerParCat('TOUS', this)">Tous</button>
@@ -156,23 +181,9 @@
     <input type="search" id="inputSearch" placeholder="🔍 Filtrer par ID, modèle, lieu, emprunteur..." oninput="actualiserAffichage()">
   </div>
 
-  <!-- Tableau Réaménagé -->
-  <div class="table-container">
-    <table id="tableMat">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Matériel</th>
-          <th>État physique</th>
-          <th>Emplacement actuel</th>
-          <th>Détenu par</th>
-          <th>Réservation</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <tr><td colspan="6" style="text-align:center; padding:20px; color:#888;">Chargement de l'inventaire...</td></tr>
-      </tbody>
-    </table>
+  <!-- Conteneur d'étiquettes -->
+  <div id="listeMat" class="items-container">
+    <div style="text-align:center; padding:30px; color:#888;">Chargement de l'inventaire...</div>
   </div>
 
   <script>
@@ -187,7 +198,7 @@
       .then(r => r.json())
       .then(res => {
         if (!res.success) {
-          document.getElementById("tableBody").innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Erreur serveur.</td></tr>';
+          document.getElementById("listeMat").innerHTML = '<div style="text-align:center; color:red; padding:20px;">Erreur serveur.</div>';
           return;
         }
         parc = res.items || [];
@@ -195,7 +206,7 @@
         actualiserAffichage();
       })
       .catch(() => {
-        document.getElementById("tableBody").innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Impossible de joindre le serveur.</td></tr>';
+        document.getElementById("listeMat").innerHTML = '<div style="text-align:center; color:red; padding:20px;">Impossible de joindre le serveur.</div>';
       });
 
     function estEnReservation(item) {
@@ -249,7 +260,7 @@
     }
 
     function actualiserAffichage() {
-      const tbody = document.getElementById("tableBody");
+      const container = document.getElementById("listeMat");
       const recherche = document.getElementById("inputSearch").value.trim().toLowerCase();
 
       const itemsFiltres = parc.filter(it => {
@@ -273,49 +284,63 @@
       });
 
       if (itemsFiltres.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#888;">Aucun équipement trouvé avec ces critères.</td></tr>';
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:#888;">Aucun équipement ne correspond à ces critères.</div>';
         return;
       }
 
-      tbody.innerHTML = itemsFiltres.map(it => {
+      container.innerHTML = itemsFiltres.map(it => {
         const st = (it.statut || "").toLowerCase();
-        let etiquetteHtml = '';
+        let cardClass = 'card-dispo';
+        let statutTexte = 'En stock';
 
         if (st.includes("sorti")) {
-          etiquetteHtml = '<span class="tag-statut tag-sorti">Sorti</span>';
+          cardClass = 'card-sorti';
+          statutTexte = 'Sorti plateau';
         } else if (st.includes("sav")) {
-          etiquetteHtml = '<span class="tag-statut tag-sav">SAV</span>';
-        } else {
-          etiquetteHtml = '<span class="tag-statut tag-dispo">En stock</span>';
+          cardClass = 'card-sav';
+          statutTexte = 'En SAV / Panne';
         }
 
-        // Colonne Réservation : gros bouton bleu ou tiret
-        let resaHtml = '<span style="color:#aaa;">-</span>';
-        if (estEnReservation(it)) {
-          resaHtml = `<button type="button" class="btn-resa-tag" onclick="ouvrirCalendrier('${it.id}', '${it.nom.replace(/'/g, "\\'")}')">📅 RÉSERVÉ</button>`;
-        }
-
-        const emprunteur = (it.emprunteur && it.emprunteur !== "-") ? `<strong>${it.emprunteur}</strong>` : '<span style="color:#aaa;">-</span>';
+        const emprunteur = (it.emprunteur && it.emprunteur !== "-") ? it.emprunteur : "-";
         const localisation = it.localisation || "Stock";
 
+        // Bouton Réservation
+        let boutonResaHtml = '';
+        if (estEnReservation(it)) {
+          boutonResaHtml = `
+            <button type="button" class="btn-resa-tag" onclick="ouvrirCalendrier('${it.id}', '${it.nom.replace(/'/g, "\\'")}')">
+              📅 RÉSERVÉ
+            </button>
+          `;
+        }
+
         return `
-          <tr>
-            <td><code>${it.id}</code></td>
-            <td>
-              <strong>${it.nom}</strong>
-              <div style="font-size:0.78em; color:#666;">${it.categorie || ""} &bull; ${it.sousCategorie || ""}</div>
-              ${it.panne && it.panne !== "-" ? `<div style="font-size:0.75em; color:#dc3545; font-weight:600; margin-top:2px;">⚠️ ${it.panne}</div>` : ""}
-            </td>
-            <td>${etiquetteHtml}</td>
-            <td>${localisation}</td>
-            <td>${emprunteur}</td>
-            <td>${resaHtml}</td>
-          </tr>
+          <div class="item-card ${cardClass}">
+            <div class="item-info">
+              <div class="item-header">
+                <span class="id-tag">${it.id}</span>
+                <span class="item-nom">${it.nom}</span>
+                <span class="item-sub">&bull; ${it.categorie || ""} (${it.sousCategorie || ""})</span>
+              </div>
+              
+              <div class="item-details">
+                <span>État : <strong>${statutTexte}</strong></span>
+                <span>Lieu : <strong>${localisation}</strong></span>
+                <span>Détenteur : <strong>${emprunteur}</strong></span>
+              </div>
+
+              ${it.panne && it.panne !== "-" ? `<div class="panne-alerte">⚠️ ${it.panne}</div>` : ""}
+            </div>
+
+            <div class="item-actions">
+              ${boutonResaHtml}
+            </div>
+          </div>
         `;
       }).join("");
     }
 
-    // GESTION DU CALENDRIER MODAL (AVEC SAUT DIRECT AU MOIS RÉSERVÉ)
+    // GESTION DU CALENDRIER MODAL (AVEC DETAILS ET SAUT DE MOIS)
     let calDateCourante = new Date();
     let calItemIdEnCours = null;
     let calResasEnCours = [];
@@ -325,19 +350,32 @@
       document.getElementById("calNomItem").innerText = `${nom} (${id})`;
       document.getElementById("calModal").style.display = "flex";
       document.getElementById("calGrid").innerHTML = "Chargement des dates...";
+      document.getElementById("calDetailsResa").innerHTML = "";
 
       fetch(`${SCRIPT_URL}?action=getDatesResa&id=${encodeURIComponent(id)}`)
         .then(r => r.json())
         .then(res => {
           calResasEnCours = res.reservations || [];
 
-          // Détection automatique du mois de la réservation
+          // Saut automatique sur le mois de la réservation
           if (calResasEnCours.length > 0) {
-            // Prend la date de début de la première réservation
-            const parts = calResasEnCours[0].debut.split("-"); // YYYY, MM, DD
+            const parts = calResasEnCours[0].debut.split("-");
             if (parts.length === 3) {
               calDateCourante = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, 1);
             }
+
+            // Affichage du récapitulatif textuel sous le calendrier
+            let htmlResas = "";
+            calResasEnCours.forEach(r => {
+              htmlResas += `
+                <div class="resa-info-card">
+                  <strong>👤 Réservé par :</strong> ${r.demandeur}<br>
+                  <strong>🎭 Projet :</strong> ${r.projet}<br>
+                  <strong>📅 Période :</strong> du ${r.debut} au ${r.fin}
+                </div>
+              `;
+            });
+            document.getElementById("calDetailsResa").innerHTML = htmlResas;
           } else {
             calDateCourante = new Date();
           }

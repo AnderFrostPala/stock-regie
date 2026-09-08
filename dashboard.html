@@ -76,7 +76,7 @@
     }
     .quick-nav a.active { color: #fff; border-color: #4b5563; background: var(--bg-surface-elevated); }
 
-    /* TUILES KPI CLIQUABLES */
+    /* TUILES KPI */
     .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
     .kpi-card {
       background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;
@@ -135,6 +135,21 @@
       border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px;
     }
     .btn-manual:hover { background: rgba(255,255,255,0.06); color: #fff; }
+
+    /* SEGMENTS DE QUANTITÉ VISUELS */
+    .qte-bar {
+      display: inline-flex; gap: 3px; align-items: center; vertical-align: middle; margin-left: 6px;
+    }
+    .qte-pip {
+      width: 7px; height: 12px; border-radius: 2px;
+      background: #2a313d; display: inline-block;
+    }
+    .qte-pip.filled {
+      background: var(--status-dispo); box-shadow: 0 0 4px rgba(16,185,129,0.4);
+    }
+    .qte-pip.out {
+      background: var(--status-sorti);
+    }
   </style>
 </head>
 <body onclick="fermerMenuSiClicExterieur(event)">
@@ -160,7 +175,7 @@
     <a href="reservation.html" class="menu-item"><span>📅</span> Mes réservations</a>
     <div id="adminMenuOptions" style="display:none;">
       <a href="admin.html" class="menu-item" style="color:#f87171;"><span>⚙️</span> Panneau Admin</a>
-      <a href="express.html" class="menu-item" style="color:#fbbf24;"><span>⚡</span> Mode Camion Express</a>
+      <a href="express.html" class="menu-item" style="color:#fbbf24;"><span>⚡</span> Déchargement Rapide</a>
     </div>
     <button type="button" class="menu-item danger" onclick="deconnexion()" style="border-top:1px solid var(--border); margin-top:4px;">
       <span>🚪</span> Se déconnecter
@@ -173,7 +188,7 @@
     <a href="dashboard.html" class="active">Vue Parc</a>
   </nav>
 
-  <!-- TUILES KPI (RÉSERVÉS / AU STOCK / SORTIS / SAV) -->
+  <!-- TUILES KPI -->
   <div class="kpi-row">
     <div class="kpi-card" id="kpiCardResa" onclick="clicKpi('RESA')">
       <div class="kpi-num" style="color: var(--status-blue);" id="kpiResa">-</div>
@@ -193,7 +208,7 @@
     </div>
   </div>
 
-  <!-- BARRE DE RECHERCHE & CHIPS -->
+  <!-- RECHERCHE & CHIPS -->
   <div class="filter-card">
     <input type="text" id="searchInput" oninput="filtrerInventaire()" placeholder="Rechercher par nom, ID, référence...">
     <div class="filter-chips">
@@ -239,7 +254,7 @@
       location.href = "index.html";
     }
 
-    // RÉCUPÉRATION DU PARC COMPLET
+    // CHARGEMENT DU PARC COMPLET
     fetch(`${SCRIPT_URL}?action=getAll`)
       .then(r => r.json())
       .then(res => {
@@ -282,11 +297,9 @@
     function setFiltreStatut(filtre, el) {
       filtreStatutCourant = filtre;
 
-      // État visuel des chips
       document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
       if (el) el.classList.add("active");
 
-      // État visuel des tuiles KPI
       document.querySelectorAll(".kpi-card").forEach(k => k.classList.remove("active"));
       if (filtre === "RESA")   document.getElementById("kpiCardResa").classList.add("active");
       if (filtre === "STOCK")  document.getElementById("kpiCardDispo").classList.add("active");
@@ -342,12 +355,31 @@
         const manuelLink = (item.docUrl && item.docUrl.startsWith("http")) 
           ? `<a href="${item.docUrl}" target="_blank" class="btn-manual">📄 Manuel</a>` : '';
 
+        // Segments visuels pour quantité multiple (> 1)
+        const qteTotale = parseInt(item.qte, 10) || 1;
+        let qteVisuelleHtml = "";
+
+        if (qteTotale > 1) {
+          const pipClass = st.includes("sorti") ? "qte-pip out" : "qte-pip filled";
+          let pips = "";
+          const nbPips = Math.min(qteTotale, 10);
+          for (let p = 0; p < nbPips; p++) {
+            pips += `<span class="${pipClass}"></span>`;
+          }
+          qteVisuelleHtml = `
+            <span class="qte-bar" title="Lot de ${qteTotale} unités">
+              ${pips}
+              <span style="font-size:0.75em; font-family:'JetBrains Mono', monospace; margin-left:4px; color:var(--text-muted);">x${qteTotale}</span>
+            </span>
+          `;
+        }
+
         const div = document.createElement("div");
         div.className = `item-card ${carteClass}`;
         div.innerHTML = `
           <div class="item-top">
             <div>
-              <span class="item-name">${item.nom}</span>
+              <span class="item-name">${item.nom}</span> ${qteVisuelleHtml}
               <div style="margin-top:2px;"><span class="code-tag">${item.id}</span></div>
             </div>
             <div>${badgeHtml}${resaBadge}</div>

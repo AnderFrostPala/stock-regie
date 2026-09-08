@@ -4,6 +4,302 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Régie - Planning & Réservations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg-body: #0d0f12;
+      --bg-surface: #171a21;
+      --bg-surface-elevated: #20242e;
+      --border: #292e3b;
+      --text-main: #f1f3f7;
+      --text-muted: #8b949e;
+      --status-dispo: #10b981;
+      --status-sorti: #ef4444;
+      --status-blue: #3b82f6;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      margin: 0 auto; max-width: 580px; background-color: var(--bg-body);
+      color: var(--text-main); padding: 14px; -webkit-font-smoothing: antialiased;
+    }
+    .app-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
+    }
+    .brand-group { display: flex; align-items: center; gap: 10px; }
+    .brand-logo { height: 36px; max-width: 70px; object-fit: contain; }
+    .brand-fallback {
+      background: #fff; color: #000; font-weight: 900; font-size: 0.65em;
+      line-height: 1; padding: 5px 6px; border-radius: 4px;
+    }
+    .brand-text h1 { margin: 0; font-size: 0.95em; font-weight: 800; color: #fff; }
+    .brand-text span { display: block; font-size: 0.72em; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    .user-pill-btn {
+      display: flex; align-items: center; gap: 7px; background: var(--bg-surface);
+      border: 1px solid var(--border); padding: 6px 10px; border-radius: 20px;
+      color: var(--text-main); cursor: pointer; font-size: 0.82em; font-weight: 600; font-family: inherit;
+    }
+    #userMenu {
+      position: absolute; right: 14px; top: 62px; width: 220px;
+      background: var(--bg-surface-elevated); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 0; z-index: 1000; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .menu-header { padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 0.8em; color: var(--text-muted); }
+    .menu-item {
+      display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px;
+      background: none; border: none; color: var(--text-main); text-align: left;
+      font-size: 0.86em; cursor: pointer; text-decoration: none; font-family: inherit;
+    }
+    .menu-item:hover { background: rgba(255,255,255,0.06); }
+    .menu-item.danger { color: var(--status-sorti); }
+    .quick-nav { display: flex; gap: 6px; margin-bottom: 14px; }
+    .quick-nav a {
+      flex: 1; text-align: center; padding: 7px 4px; border-radius: 6px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      color: var(--text-muted); text-decoration: none; font-size: 0.78em; font-weight: 700;
+    }
+    .quick-nav a.active { color: #fff; border-color: #4b5563; background: var(--bg-surface-elevated); }
+    .card {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-bottom: 14px;
+    }
+    h3 { margin-top: 0; margin-bottom: 12px; font-size: 1em; color: #fff; }
+    input[type="text"], input[type="date"] {
+      width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border);
+      background: #0d0f12; color: #fff; font-size: 14px; font-family: inherit; margin-bottom: 10px;
+    }
+    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .picker-box {
+      max-height: 190px; overflow-y: auto; background: #0d0f12; border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .picker-item {
+      display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px;
+      font-size: 0.85em; cursor: pointer; user-select: none;
+    }
+    .picker-item:hover { background: #1c202a; }
+    .code-tag {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.8em; font-weight: 700;
+      color: #38bdf8; background: #000; padding: 1px 5px; border-radius: 3px;
+    }
+    .btn-submit {
+      width: 100%; padding: 12px; background: var(--status-blue); color: #fff;
+      border: none; border-radius: 8px; font-weight: 700; font-size: 0.95em; cursor: pointer; font-family: inherit;
+    }
+    .resa-row {
+      background: #0d0f12; border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .btn-del {
+      background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);
+      padding: 5px 8px; border-radius: 6px; font-size: 0.78em; font-weight: 700; cursor: pointer;
+    }
+  </style>
+</head>
+<body onclick="fermerMenuSiClicExterieur(event)">
+
+  <header class="app-header">
+    <div class="brand-group">
+      <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+      <div id="logoFallback" class="brand-fallback" style="display:none;">DN<br>MADE</div>
+      <div class="brand-text">
+        <h1>Suivi de Stock</h1>
+        <span>DNMADe Marseille</span>
+      </div>
+    </div>
+    <button type="button" class="user-pill-btn" onclick="toggleUserMenu(event)">
+      <span style="width:7px; height:7px; border-radius:50%; background:var(--status-dispo);"></span>
+      <span id="userName">...</span>
+      <span style="font-size:0.7em; color:var(--text-muted);">▼</span>
+    </button>
+  </header>
+
+  <div id="userMenu">
+    <div class="menu-header">Profil : <strong id="userRoleTxt">Étudiant</strong></div>
+    <a href="reservation.html" class="menu-item"><span>📅</span> Mes réservations</a>
+    <div id="adminMenuOptions" style="display:none;">
+      <a href="admin.html" class="menu-item" style="color:#f87171;"><span>⚙️</span> Panneau Admin</a>
+      <a href="express.html" class="menu-item" style="color:#fbbf24;"><span>⚡</span> Mode Camion Express</a>
+    </div>
+    <button type="button" class="menu-item danger" onclick="deconnexion()" style="border-top:1px solid var(--border); margin-top:4px;">
+      <span>🚪</span> Se déconnecter
+    </button>
+  </div>
+
+  <nav class="quick-nav">
+    <a href="index.html">Scan & Fiche</a>
+    <a href="reservation.html" class="active">Planning Résas</a>
+    <a href="dashboard.html">Vue Parc</a>
+  </nav>
+
+  <div class="card">
+    <h3>Nouvelle Demande de Réservation</h3>
+    <input type="text" id="inputProjet" placeholder="Nom du projet ou cours (ex: Captation Grand Plateau)...">
+    <div class="date-row">
+      <div>
+        <label style="font-size:0.75em; color:var(--text-muted); font-weight:700;">DU :</label>
+        <input type="date" id="inputDateDebut">
+      </div>
+      <div>
+        <label style="font-size:0.75em; color:var(--text-muted); font-weight:700;">AU :</label>
+        <input type="date" id="inputDateFin">
+      </div>
+    </div>
+
+    <label style="font-size:0.75em; color:var(--text-muted); font-weight:700;">SÉLECTION DU MATÉRIEL :</label>
+    <div class="picker-box" id="pickerMateriel">Chargement du matériel disponible...</div>
+
+    <button type="button" class="btn-submit" id="btnResa" onclick="soumettreReservation()">Valider la Réservation</button>
+  </div>
+
+  <div class="card">
+    <h3>Mes Réservations en cours</h3>
+    <div id="loadingPerso" style="font-size:0.85em; color:var(--text-muted);">Chargement de vos réservations...</div>
+    <div id="listeResasPerso"></div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/VOTRE_ID_DEPLOIEMENT/exec";
+
+    const user = localStorage.getItem("regie_user") || "Inconnu";
+    const role = localStorage.getItem("regie_role") || "etudiant";
+
+    document.getElementById("userName").innerText = user;
+    document.getElementById("userRoleTxt").innerText = (role === "admin") ? "Administrateur" : "Étudiant";
+    if (role === "admin") document.getElementById("adminMenuOptions").style.display = "block";
+
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      const menu = document.getElementById("userMenu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
+    function fermerMenuSiClicExterieur(e) {
+      const menu = document.getElementById("userMenu");
+      if (menu && menu.style.display === "block" && !menu.contains(e.target)) menu.style.display = "none";
+    }
+    function deconnexion() {
+      if (!confirm("Voulez-vous vraiment vous déconnecter ?")) return;
+      localStorage.removeItem("regie_user");
+      localStorage.removeItem("regie_role");
+      location.href = "index.html";
+    }
+
+    fetch(`${SCRIPT_URL}?action=getAll`)
+      .then(r => r.json())
+      .then(res => {
+        const picker = document.getElementById("pickerMateriel");
+        picker.innerHTML = "";
+        if (res.success && res.items) {
+          res.items.forEach(item => {
+            const label = document.createElement("label");
+            label.className = "picker-item";
+            label.innerHTML = `
+              <input type="checkbox" value="${item.id}" style="margin:0;">
+              <span class="code-tag">${item.id}</span>
+              <span style="color:#fff;">${item.nom}</span>
+            `;
+            picker.appendChild(label);
+          });
+        }
+      });
+
+    chargerMesReservations();
+
+    function chargerMesReservations() {
+      fetch(`${SCRIPT_URL}?action=getUserResas&demandeur=${encodeURIComponent(user)}`)
+        .then(r => r.json())
+        .then(res => {
+          document.getElementById("loadingPerso").style.display = "none";
+          const conteneur = document.getElementById("listeResasPerso");
+          conteneur.innerHTML = "";
+
+          if (res.success && res.reservations && res.reservations.length > 0) {
+            res.reservations.forEach(r => {
+              const div = document.createElement("div");
+              div.className = "resa-row";
+              div.innerHTML = `
+                <div>
+                  <div style="font-weight:700; color:#fff; font-size:0.9em;">${r.nom} <span class="code-tag">${r.id}</span></div>
+                  <div style="font-size:0.75em; color:var(--text-muted); margin-top:2px;">Projet : <strong style="color:#cbd5e1;">${r.projet}</strong> &bull; Du ${r.debut} au ${r.fin}</div>
+                </div>
+                <button type="button" class="btn-del" onclick="annulerReservation(${r.row})">Annuler</button>
+              `;
+              conteneur.appendChild(div);
+            });
+          } else {
+            conteneur.innerHTML = '<div style="font-size:0.85em; color:var(--text-muted);">Aucune réservation active à votre nom.</div>';
+          }
+        });
+    }
+
+    function soumettreReservation() {
+      const projet = document.getElementById("inputProjet").value.trim();
+      const dDebut = document.getElementById("inputDateDebut").value;
+      const dFin = document.getElementById("inputDateFin").value;
+      const coches = Array.from(document.querySelectorAll('#pickerMateriel input[type="checkbox"]:checked')).map(c => c.value);
+
+      if (!projet || !dDebut || !dFin || coches.length === 0) {
+        alert("Veuillez renseigner le nom du projet, les dates et cocher au moins un équipement.");
+        return;
+      }
+
+      const btn = document.getElementById("btnResa");
+      btn.disabled = true;
+      btn.innerText = "Validation...";
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          actionType: "RESERVATION",
+          demandeur: user,
+          projet: projet,
+          dateDebut: dDebut,
+          dateFin: dFin,
+          ids: coches
+        })
+      })
+      .then(() => {
+        alert("Réservation enregistrée avec succès !");
+        location.reload();
+      })
+      .catch(err => {
+        alert("Erreur réseau : " + err);
+        btn.disabled = false;
+        btn.innerText = "Valider la Réservation";
+      });
+    }
+
+    function annulerReservation(row) {
+      if (!confirm("Voulez-vous vraiment annuler cette réservation ?")) return;
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          actionType: "DELETE_RESA",
+          row: row
+        })
+      })
+      .then(() => {
+        alert("Réservation supprimée !");
+        location.reload();
+      })
+      .catch(err => alert("Erreur réseau : " + err));
+    }
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Régie - Planning & Réservations</title>
   <style>
     * { box-sizing: border-box; }
     body {

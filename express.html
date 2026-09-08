@@ -3,79 +3,110 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Régie - Retour Express Supervisé</title>
+  <title>Régie - Déchargement Rapide</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
+    :root {
+      --bg-body: #0d0f12;
+      --bg-surface: #171a21;
+      --bg-surface-elevated: #20242e;
+      --border: #292e3b;
+      --text-main: #f1f3f7;
+      --text-muted: #8b949e;
+      --status-dispo: #10b981;
+      --status-amber: #f59e0b;
+    }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 14px; margin: 0 auto; max-width: 500px; background: #121212; color: #f8f9fa;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      margin: 0 auto; max-width: 520px; background-color: var(--bg-body);
+      color: var(--text-main); padding: 14px; -webkit-font-smoothing: antialiased;
     }
-    h2 { margin: 0 0 4px 0; color: #fff; }
-    .badge-mode {
-      display: inline-block; background: #ffc107; color: #000; font-size: 0.75em;
-      font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 12px;
+    .app-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
     }
+    .brand-group { display: flex; align-items: center; gap: 10px; }
+    .brand-logo { height: 36px; max-width: 70px; object-fit: contain; }
+    .brand-fallback {
+      background: #fff; color: #000; font-weight: 900; font-size: 0.65em;
+      line-height: 1; padding: 5px 6px; border-radius: 4px;
+    }
+    .brand-text h1 { margin: 0; font-size: 0.95em; font-weight: 800; color: #fff; }
+    .brand-text span { display: block; font-size: 0.72em; font-weight: 600; color: var(--status-amber); text-transform: uppercase; }
     .card {
-      background: #1e1e1e; border-radius: 10px; padding: 14px; margin-bottom: 12px;
-      border: 1px solid #333;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; margin-bottom: 12px;
     }
     #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
     input[type="text"], input[type="password"] {
-      width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444;
-      background: #2a2a2a; color: #fff; font-size: 15px;
+      width: 100%; padding: 11px 12px; border-radius: 8px; border: 1px solid var(--border);
+      background: #090a0d; color: #fff; font-size: 14px; font-family: inherit;
+    }
+    .btn-action {
+      padding: 0 16px; background: var(--status-amber); color: #000; border: none;
+      border-radius: 8px; font-weight: 800; cursor: pointer;
     }
     .scanned-list {
-      max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;
+      max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-top: 10px;
     }
     .scanned-item {
-      background: #28a745; color: #fff; padding: 10px 12px; border-radius: 6px;
-      display: flex; justify-content: space-between; align-items: center; font-size: 0.88em;
-      animation: flash 0.3s ease;
+      background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25);
+      color: #fff; padding: 10px 12px; border-radius: 8px; display: flex;
+      justify-content: space-between; align-items: center; font-size: 0.86em;
+      animation: flash 0.25s ease;
     }
     @keyframes flash {
-      from { transform: scale(1.03); background: #34ce57; }
-      to { transform: scale(1); background: #28a745; }
+      from { transform: scale(1.02); background: rgba(16,185,129,0.3); }
+      to { transform: scale(1); background: rgba(16,185,129,0.12); }
     }
-    .nav-link { color: #007bff; text-decoration: none; font-size: 0.85em; display: block; margin-top: 10px; text-align: center; }
+    .code-tag {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82em; font-weight: 700;
+      color: #38bdf8; background: #000; padding: 1px 5px; border-radius: 3px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Overlay Code Prof -->
-  <div id="pinOverlay" style="position:fixed; top:0; left:0; right:0; bottom:0; background:#121212; z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px;">
-    <div class="card" style="width:100%; max-width:340px; text-align:center;">
+  <!-- MODAL CODE ENSEIGNANT -->
+  <div id="pinOverlay" style="position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg-body); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px;">
+    <div class="card" style="width:100%; max-width:340px; text-align:center; background:var(--bg-surface-elevated);">
       <div style="font-size:2.5em; margin-bottom:6px;">⚡</div>
-      <h3 style="margin-top:0;">Déchargement express</h3>
-      <p style="font-size:0.85em; color:#aaa;">Saisie du code enseignant régie :</p>
+      <h3 style="margin-top:0; color:#fff;">Déchargement Rapide</h3>
+      <p style="font-size:0.84em; color:var(--text-muted); margin-bottom:14px;">Accès supervision enseignant / régisseur :</p>
       <input type="password" id="codeProfInput" maxlength="6" placeholder="••••" style="text-align:center; font-size:1.4em; letter-spacing:4px; margin-bottom:12px;">
-      <button type="button" onclick="activerModeExpress()" style="width:100%; padding:12px; background:#ffc107; color:#000; border:none; border-radius:6px; font-weight:800; cursor:pointer;">Activer le scan continu</button>
-      <a href="index.html" class="nav-link">&larr; Retourner à l'accueil</a>
+      <button type="button" onclick="activerModeRapide()" class="btn-action" style="width:100%; padding:12px;">Activer la session</button>
+      <a href="index.html" style="display:block; margin-top:12px; font-size:0.8em; color:var(--text-muted); text-decoration:none;">&larr; Quitter vers le scan</a>
     </div>
   </div>
 
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <div>
-      <h2>Retour Express</h2>
-      <span class="badge-mode">Supervisé enseignant</span>
+  <header class="app-header">
+    <div class="brand-group">
+      <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+      <div id="logoFallback" class="brand-fallback" style="display:none;">DN<br>MADE</div>
+      <div class="brand-text">
+        <h1>Déchargement Rapide</h1>
+        <span>Supervision Enseignant</span>
+      </div>
     </div>
-    <a href="index.html" style="color:#aaa; text-decoration:none; font-size:0.85em;">Quitter &rarr;</a>
-  </div>
+    <a href="index.html" style="font-size:0.8em; color:var(--text-muted); text-decoration:none; border:1px solid var(--border); padding:4px 8px; border-radius:6px;">Terminer &rarr;</a>
+  </header>
 
-  <!-- Caméra -->
   <div class="card">
     <div id="reader"></div>
     <form onsubmit="traiterSaisieManuelle(event)" style="margin-top:10px; display:flex; gap:8px;">
-      <input type="text" id="manualId" placeholder="ID manuel ou douchette...">
-      <button type="submit" style="padding:0 14px; background:#ffc107; border:none; border-radius:6px; font-weight:700; cursor:pointer;">OK</button>
+      <input type="text" id="manualId" placeholder="ID ou code barre douchette...">
+      <button type="submit" class="btn-action">OK</button>
     </form>
   </div>
 
-  <!-- Historique en direct de la session -->
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <strong style="font-size:0.9em;">Matériels traités en direct</strong>
-      <span id="compteurSession" style="font-size:0.85em; color:#ffc107; font-weight:700;">0 rentré(s)</span>
+      <strong style="font-size:0.88em;">Équipements réintégrés</strong>
+      <span id="compteurSession" style="font-size:0.82em; color:var(--status-amber); font-weight:800; font-family:'JetBrains Mono', monospace;">0 traité(s)</span>
     </div>
     <div id="listeScans" class="scanned-list"></div>
   </div>
@@ -88,7 +119,7 @@
     let dernierScanTemps = 0;
     let totalTraites = 0;
 
-    function activerModeExpress() {
+    function activerModeRapide() {
       const code = document.getElementById("codeProfInput").value.trim();
       if (!code) return;
       codeProf = code;
@@ -103,9 +134,7 @@
         { fps: 10, qrbox: { width: 220, height: 220 } },
         (decodedText) => {
           const now = Date.now();
-          // Évite le double-scan accidentel du même code en moins de 2 secondes
           if (decodedText === dernierScanId && (now - dernierScanTemps) < 2000) return;
-
           dernierScanId = decodedText;
           dernierScanTemps = now;
           envoyerRetourRapide(decodedText);
@@ -123,14 +152,14 @@
     }
 
     function envoyerRetourRapide(id) {
-      // Bip sonore court pour confirmation auditive
+      // Bip audio de confirmation
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = audioCtx.createOscillator();
       osc.type = "sine";
-      osc.frequency.setValueAtTime(880, audioCtx.currentTime); // La aigu
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime);
       osc.connect(audioCtx.destination);
       osc.start();
-      osc.stop(audioCtx.currentTime + 0.1);
+      osc.stop(audioCtx.currentTime + 0.08);
 
       fetch(SCRIPT_URL, {
         method: "POST",
@@ -145,15 +174,14 @@
       .then(res => {
         if (res.success) {
           totalTraites++;
-          document.getElementById("compteurSession").innerText = `${totalTraites} rentré(s)`;
-
+          document.getElementById("compteurSession").innerText = `${totalTraites} traité(s)`;
           const conteneur = document.getElementById("listeScans");
           const div = document.createElement("div");
           div.className = "scanned-item";
           div.innerHTML = `
             <div>
-              <strong>${res.nom}</strong> (${res.id})<br>
-              <span style="font-size:0.8em; opacity:0.9;">👉 ${res.loc}</span>
+              <strong>${res.nom}</strong> <span class="code-tag">${res.id}</span><br>
+              <span style="font-size:0.78em; color:var(--text-muted);">👉 ${res.loc}</span>
             </div>
             <span>✅</span>
           `;

@@ -524,9 +524,43 @@
       executerAction(statutFinal, lieuFinal, "-", qteChoisie);
     }
 
-    function confirmerRetourDirect() {
+   function confirmerRetourDirect() {
+      const qteTotale = parseInt(currentItem.qte, 10) || 1;
+      const statut = (currentItem.statut || "");
       const locNominale = currentItem.locNominale || "Stock Régie";
-      executerAction("Dispo", locNominale);
+
+      // Si article unitaire -> retour direct
+      if (qteTotale === 1) {
+        executerAction("Dispo", locNominale, "-", 1, "RETOUR");
+        return;
+      }
+
+      // Pour un lot : calculer combien sont dehors
+      let totalSorti = 0;
+      if (statut.toLowerCase() === "sorti") {
+        totalSorti = qteTotale;
+      } else if (statut.includes("Partiel")) {
+        const m = statut.match(/\((\d+)\//);
+        if (m) totalSorti = parseInt(m[1], 10);
+      }
+
+      if (totalSorti <= 0) {
+        alert("Cet équipement est déjà entièrement au stock !");
+        return;
+      }
+
+      // Demande combien d'unités sont rapportées
+      const reponse = prompt(`Combien d'unités retournez-vous au stock ? (${totalSorti} actuellement dehors) :`, totalSorti);
+      if (reponse === null) return;
+
+      const qteARendre = parseInt(reponse, 10);
+      if (isNaN(qteARendre) || qteARendre <= 0 || qteARendre > totalSorti) {
+        alert(`Quantité invalide. Doit être comprise entre 1 et ${totalSorti}.`);
+        return;
+      }
+
+      executerAction("Dispo", locNominale, "-", qteARendre, "RETOUR");
+    }
     }
 
     function declarerPanne() {
@@ -535,12 +569,46 @@
       executerAction("SAV", "Atelier SAV", motif);
     }
 
-    function executerAction(statut, lieu, panne = "-", qte = 1) {
+  function executerAction(statut, lieu, panne = "-", qte = 1, actionType = "") {
       const btnSortie = document.getElementById("btnConfirmerSortie");
       if (btnSortie) {
         btnSortie.disabled = true;
         btnSortie.innerText = "Enregistrement...";
       }
+
+      const payload = {
+        id: currentItem.id,
+        action: actionType ? actionType : ((statut === "Dispo") ? "RETOUR" : (statut === "SAV" ? "SAV" : "SORTIE")),
+        nouveauStatut: statut,
+        lieu: lieu,
+        user: user,
+        panne: panne,
+        qte: qte
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        if (payload.action === "RETOUR") {
+          const locCible = currentItem.locNominale || "Stock Régie";
+          afficherConfirmationRangement(locCible);
+        } else {
+          alert("Action enregistrée !");
+          location.reload();
+        }
+      })
+      .catch(err => {
+        alert("Erreur réseau : " + err);
+        if (btnSortie) {
+          btnSortie.disabled = false;
+          btnSortie.innerText = "Confirmer la sortie";
+        }
+      });
+    }
 
       const payload = {
         id: currentItem.id,

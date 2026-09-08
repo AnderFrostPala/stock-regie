@@ -3,195 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Régie - Scan Matériel</title>
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <title>Régie - Réservations</title>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 16px; margin: 0 auto; max-width: 520px; background: #f4f5f7; color: #333; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 16px; margin: 0 auto; max-width: 600px; background: #f4f5f7; color: #333; }
     h2, h3 { margin-top: 0; }
     .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
-    .btn-action-group { display: flex; gap: 8px; margin: 15px 0 10px 0; }
-    .btn-action { flex: 1; padding: 12px 6px; color: #fff; border: none; border-radius: 6px; font-weight: bold; font-size: 0.85em; cursor: pointer; }
-    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 0.85em; }
-    input, select, textarea { width: 100%; padding: 10px; margin: 6px 0 12px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-    .btn-valider { width: 100%; padding: 12px; background: #222; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    input, select { width: 100%; padding: 10px; margin: 6px 0 12px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    .item-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .item-row:last-child { border-bottom: none; }
+    .btn-submit { width: 100%; padding: 12px; background: #007bff; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .nav-link { display: inline-block; margin-bottom: 12px; color: #007bff; text-decoration: none; font-weight: 500; font-size: 0.9em; }
+    .cat-title { background: #e9ecef; padding: 6px 10px; border-radius: 4px; margin-top: 12px; font-size: 0.9em; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <a href="reservation.html" class="nav-link">Accéder au planning des réservations &rarr;</a>
-  <h2>Régie Stock & Prêt</h2>
+  <a href="index.html" class="nav-link">&larr; Retour au scanner</a>
+  <h2>Réserver du matériel</h2>
 
   <div class="card">
-    <div id="reader" style="width: 100%;"></div>
-    <div style="margin-top: 10px; display: flex; gap: 6px;">
-      <input type="text" id="manualId" placeholder="Ou taper l'ID (ex: DM7_001)" style="margin: 0;">
-      <button onclick="rechercherManuel()" style="padding: 0 12px; background: #555; color: #fff; border: none; border-radius: 4px; cursor: pointer;">OK</button>
-    </div>
-  </div>
+    <h3>Détails du projet</h3>
+    <form id="resaForm" onsubmit="validerReservation(event)">
+      <label>Demandeur :</label>
+      <select id="selectEtudiant" required></select>
 
-  <div id="ficheMateriel" class="card" style="display:none;">
-    <h3 id="itemNom" style="margin-bottom: 6px;"></h3>
-    <div style="font-size: 0.9em; line-height: 1.5;">
-      <div><strong>ID :</strong> <span id="itemId"></span></div>
-      <div><strong>Statut :</strong> <span id="itemStatutBadge" class="badge"></span></div>
-      <div><strong>Lieu actuel :</strong> <span id="itemLoc"></span></div>
-      <div><strong>Détenteur :</strong> <span id="itemEmp"></span></div>
-      <div><strong>Réservation :</strong> <span id="itemResa"></span></div>
-    </div>
+      <label>Nom du projet / Événement :</label>
+      <input type="text" id="inputProjet" placeholder="ex. Éval Spectacle, Concert..." required>
 
-    <div id="zoneTech" style="margin-top: 12px; padding: 10px; background: #eef5fc; border-left: 4px solid #007bff; border-radius: 4px; font-size: 0.85em; display: none;">
-      <div id="itemNotes" style="margin-bottom: 6px;"></div>
-      <a id="itemDocLink" href="#" target="_blank" style="color: #007bff; font-weight: bold; text-decoration: underline;">Consulter le manuel / Charte DMX</a>
-    </div>
+      <label>Dates / Période d'utilisation :</label>
+      <input type="text" id="inputDates" placeholder="ex. Du 12 au 14 Octobre" required>
 
-    <hr style="border: 0; border-top: 1px solid #eee; margin: 16px 0;">
+      <h3>Sélection du matériel disponible</h3>
+      <div id="listeMateriel">Chargement des équipements...</div>
 
-    <div class="btn-action-group">
-      <button type="button" class="btn-action" style="background: #28a745;" onclick="ouvrirAction('SORTIE')">Sortie plateau</button>
-      <button type="button" class="btn-action" style="background: #007bff;" onclick="ouvrirAction('RETOUR')">Retour stock</button>
-      <button type="button" class="btn-action" style="background: #dc3545;" onclick="ouvrirAction('SAV')">Signalement SAV</button>
-    </div>
-
-    <form id="actionForm" onsubmit="soumettreAction(event)" style="display:none; margin-top: 12px;">
-      <input type="hidden" id="formRow">
-      <input type="hidden" id="formAction">
-
-      <div id="champsSortie" style="display:none;">
-        <label>Emprunteur :</label>
-        <select id="selectEtudiant" required></select>
-        <label>Lieu de destination :</label>
-        <input type="text" id="inputDest" placeholder="ex. Plateau 1, Studio..." required>
-      </div>
-
-      <div id="champsRetour" style="display:none;">
-        <label>Emplacement de retour :</label>
-        <input type="text" id="inputRangement" value="Stock" required>
-      </div>
-
-      <div id="champsSAV" style="display:none;">
-        <label>Description du problème :</label>
-        <textarea id="inputPanne" rows="2" placeholder="Panne constatée, canal HS, cellule dévissée..." required></textarea>
-      </div>
-
-      <button type="submit" id="btnValider" class="btn-valider">Confirmer</button>
+      <button type="submit" id="btnResa" class="btn-submit" style="margin-top: 16px;">Confirmer la réservation</button>
     </form>
   </div>
 
   <script>
     // COLLE ICI TON URL WEB APP GOOGLE APPS SCRIPT
-    const SCRIPT_URL = "https://script.google.com/macros/s/VOTRE_ID_DEPLOIEMENT/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
-    const scanner = new Html5Qrcode("reader");
-    scanner.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 250 },
-      (code) => {
-        scanner.stop();
-        chargerDonnees(code);
-      },
-      () => {}
-    );
+    let parc = [];
 
-    function rechercherManuel() {
-      const id = document.getElementById("manualId").value.trim();
-      if (id) chargerDonnees(id);
-    }
+    fetch(`${SCRIPT_URL}?action=getAll`)
+      .then(r => r.json())
+      .then(res => {
+        if (!res.success) {
+          document.getElementById("listeMateriel").innerText = "Impossible de charger le stock.";
+          return;
+        }
 
-    function chargerDonnees(id) {
-      fetch(`${SCRIPT_URL}?action=getItem&id=${encodeURIComponent(id)}`)
-        .then(r => r.json())
-        .then(res => {
-          if (!res.success) {
-            alert(res.message);
-            location.reload();
-            return;
-          }
-
-          document.getElementById("ficheMateriel").style.display = "block";
-          document.getElementById("formRow").value = res.row;
-          document.getElementById("itemId").innerText = res.id;
-          document.getElementById("itemNom").innerText = res.nom;
-          document.getElementById("itemLoc").innerText = res.localisation;
-          document.getElementById("itemEmp").innerText = res.emprunteur;
-          document.getElementById("itemResa").innerText = `${res.statutResa} (${res.detailResa})`;
-
-          const badge = document.getElementById("itemStatutBadge");
-          badge.innerText = res.statut;
-          if (res.statut === "Dispo") {
-            badge.style.background = "#d4edda"; badge.style.color = "#155724";
-          } else if (res.statut === "Sorti") {
-            badge.style.background = "#fff3cd"; badge.style.color = "#856404";
-          } else {
-            badge.style.background = "#f8d7da"; badge.style.color = "#721c24";
-          }
-
-          const zoneTech = document.getElementById("zoneTech");
-          const itemNotes = document.getElementById("itemNotes");
-          const itemDoc = document.getElementById("itemDocLink");
-
-          if (res.notesTech || res.docUrl) {
-            zoneTech.style.display = "block";
-            itemNotes.innerText = res.notesTech || "Pas de spécifications particulières.";
-            if (res.docUrl) {
-              itemDoc.href = res.docUrl;
-              itemDoc.style.display = "inline";
-            } else {
-              itemDoc.style.display = "none";
-            }
-          } else {
-            zoneTech.style.display = "none";
-          }
-
-          const selectEtu = document.getElementById("selectEtudiant");
-          selectEtu.innerHTML = "<option value=''>-- Sélectionner un étudiant --</option>";
-          if (res.etudiants) {
-            res.etudiants.forEach(nom => {
-              const opt = document.createElement("option");
-              opt.value = nom;
-              opt.innerText = nom;
-              selectEtu.appendChild(opt);
-            });
-          }
+        const selectEtu = document.getElementById("selectEtudiant");
+        selectEtu.innerHTML = "<option value=''>-- Sélectionner votre nom --</option>";
+        res.etudiants.forEach(nom => {
+          const opt = document.createElement("option");
+          opt.value = nom;
+          opt.innerText = nom;
+          selectEtu.appendChild(opt);
         });
-    }
 
-    function ouvrirAction(type) {
-      document.getElementById("actionForm").style.display = "block";
-      document.getElementById("formAction").value = type;
+        parc = res.items;
+        afficherCatalogue();
+      });
 
-      document.getElementById("champsSortie").style.display = (type === "SORTIE") ? "block" : "none";
-      document.getElementById("champsRetour").style.display = (type === "RETOUR") ? "block" : "none";
-      document.getElementById("champsSAV").style.display = (type === "SAV") ? "block" : "none";
+    function afficherCatalogue() {
+      const container = document.getElementById("listeMateriel");
+      container.innerHTML = "";
 
-      const btn = document.getElementById("btnValider");
-      if (type === "SORTIE") {
-        btn.style.background = "#28a745";
-        btn.innerText = "Valider la sortie";
-      } else if (type === "RETOUR") {
-        btn.style.background = "#007bff";
-        btn.innerText = "Valider la réintégration";
-      } else if (type === "SAV") {
-        btn.style.background = "#dc3545";
-        btn.innerText = "Déclarer en SAV";
+      const categories = {};
+      parc.forEach(item => {
+        if (item.statutResa === "Réservé") return; // On masque ce qui est déjà réservé
+        if (!categories[item.categorie]) categories[item.categorie] = [];
+        categories[item.categorie].push(item);
+      });
+
+      for (const [cat, items] of Object.entries(categories)) {
+        const catHeader = document.createElement("div");
+        catHeader.className = "cat-title";
+        catHeader.innerText = cat;
+        container.appendChild(catHeader);
+
+        items.forEach(it => {
+          const row = document.createElement("div");
+          row.className = "item-row";
+          row.innerHTML = `
+            <div>
+              <strong>${it.nom}</strong>
+              <div style="font-size: 0.8em; color: #666;">${it.id} &bull; ${it.localisation}</div>
+            </div>
+            <input type="checkbox" name="matSelectionne" value="${it.id}" style="width: auto; margin: 0;">
+          `;
+          container.appendChild(row);
+        });
       }
     }
 
-    function soumettreAction(e) {
+    function validerReservation(e) {
       e.preventDefault();
-      const action = document.getElementById("formAction").value;
-      const btn = document.getElementById("btnValider");
+
+      const checkboxes = document.querySelectorAll('input[name="matSelectionne"]:checked');
+      const idsChoisis = Array.from(checkboxes).map(cb => cb.value);
+
+      if (idsChoisis.length === 0) {
+        alert("Veuillez sélectionner au moins un équipement.");
+        return;
+      }
+
+      const btn = document.getElementById("btnResa");
       btn.innerText = "Enregistrement...";
       btn.disabled = true;
 
       const payload = {
-        actionType: "STOCK_UPDATE",
-        row: document.getElementById("formRow").value,
-        action: action,
-        emprunteur: document.getElementById("selectEtudiant").value,
-        localisation: (action === "SORTIE") ? document.getElementById("inputDest").value : document.getElementById("inputRangement").value,
-        detailPanne: document.getElementById("inputPanne").value
+        actionType: "RESERVATION",
+        demandeur: document.getElementById("selectEtudiant").value,
+        projet: document.getElementById("inputProjet").value,
+        dates: document.getElementById("inputDates").value,
+        ids: idsChoisis
       };
 
       fetch(SCRIPT_URL, {
@@ -200,10 +129,10 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       }).then(() => {
-        alert("Action enregistrée avec succès !");
+        alert("Réservation enregistrée !");
         location.reload();
       }).catch(() => {
-        alert("Erreur réseau");
+        alert("Erreur lors de la réservation.");
         btn.disabled = false;
       });
     }

@@ -1,276 +1,212 @@
-<!DOCTYPE html>
+=<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Régie Stock - DNMADe</title>
+  <title>Régie - Scan Matériel</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --accent: #38bdf8;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --green: #22c55e;
-      --orange: #f97316;
-      --red: #ef4444;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 1rem; max-width: 700px; margin: 0 auto; }
-    h1 { font-size: 1.4rem; text-align: center; margin-bottom: 1rem; color: var(--accent); }
-    
-    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-    .tab-btn { flex: 1; padding: 0.75rem; border: none; border-radius: 8px; background: var(--card); color: var(--text); cursor: pointer; font-weight: bold; }
-    .tab-btn.active { background: var(--accent); color: #000; }
-    
-    .panel { display: none; background: var(--card); border-radius: 12px; padding: 1rem; }
-    .panel.active { display: block; }
-    
-    #reader { width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
-    .form-group { margin-bottom: 0.8rem; }
-    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.2rem; }
-    input, select { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 1rem; }
-    .btn-submit { width: 100%; padding: 0.9rem; border: none; border-radius: 8px; background: var(--accent); color: #000; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 0.5rem; }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem; text-align: center; }
-    .stat-box { background: #0f172a; padding: 0.7rem; border-radius: 8px; border: 1px solid #334155; }
-    .stat-number { font-size: 1.2rem; font-weight: bold; }
-    .item-card { background: #0f172a; border-radius: 8px; padding: 0.8rem; margin-bottom: 0.6rem; border-left: 5px solid var(--muted); }
-    .item-card.dispo { border-left-color: var(--green); }
-    .item-card.emprunt { border-left-color: var(--orange); }
-    .item-card.sav { border-left-color: var(--red); }
-    .item-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 0.3rem; }
-    .badge { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
-    .badge-dispo { background: #14532d; color: #4ade80; }
-    .badge-emprunt { background: #7c2d12; color: #fdba74; }
-    .badge-sav { background: #7f1d1d; color: #fca5a5; }
-    .item-details { font-size: 0.85rem; color: var(--muted); }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 16px; margin: 0 auto; max-width: 520px; background: #f4f5f7; color: #333; }
+    h2, h3 { margin-top: 0; }
+    .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+    .btn-action-group { display: flex; gap: 8px; margin: 15px 0 10px 0; }
+    .btn-action { flex: 1; padding: 12px 6px; color: #fff; border: none; border-radius: 6px; font-weight: bold; font-size: 0.85em; cursor: pointer; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 0.85em; }
+    input, select, textarea { width: 100%; padding: 10px; margin: 6px 0 12px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    .btn-valider { width: 100%; padding: 12px; background: #222; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .nav-link { display: inline-block; margin-bottom: 12px; color: #007bff; text-decoration: none; font-weight: 500; font-size: 0.9em; }
   </style>
 </head>
 <body>
-<div style="text-align: right; margin-bottom: 0.8rem;">
-  <a href="reservation.html" style="color: var(--accent); font-weight: bold; font-size: 0.9rem; text-decoration: none; border: 1px solid var(--accent); padding: 5px 10px; border-radius: 6px;">
-    📅 Planning des Réservations →
-  </a>
-</div>
-  <h1>⚡ Régie Stock</h1>
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('scan')">📷 Scanner / Sortir</button>
-    <button class="tab-btn" onclick="switchTab('dashboard')">📋 Dashboard Régie</button>
+  <a href="reservation.html" class="nav-link">Accéder au planning des réservations &rarr;</a>
+  <h2>Régie Stock & Prêt</h2>
+
+  <div class="card">
+    <div id="reader" style="width: 100%;"></div>
+    <div style="margin-top: 10px; display: flex; gap: 6px;">
+      <input type="text" id="manualId" placeholder="Ou taper l'ID (ex: DM7_001)" style="margin: 0;">
+      <button onclick="rechercherManuel()" style="padding: 0 12px; background: #555; color: #fff; border: none; border-radius: 4px; cursor: pointer;">OK</button>
+    </div>
   </div>
 
-  <!-- PANNEAU SCANNER -->
-  <div id="panel-scan" class="panel active">
-    <div id="reader"></div>
+  <div id="ficheMateriel" class="card" style="display:none;">
+    <h3 id="itemNom" style="margin-bottom: 6px;"></h3>
+    <div style="font-size: 0.9em; line-height: 1.5;">
+      <div><strong>ID :</strong> <span id="itemId"></span></div>
+      <div><strong>Statut :</strong> <span id="itemStatutBadge" class="badge"></span></div>
+      <div><strong>Lieu actuel :</strong> <span id="itemLoc"></span></div>
+      <div><strong>Détenteur :</strong> <span id="itemEmp"></span></div>
+      <div><strong>Réservation :</strong> <span id="itemResa"></span></div>
+    </div>
 
-    <form id="stock-form" onsubmit="submitForm(event)">
-      <div class="form-group">
-        <label>ID Matériel</label>
-        <input type="text" id="item-id" required placeholder="ex: WASH_150_01">
-      </div>
-      <div class="form-group">
-        <label>Action</label>
-        <select id="item-action" onchange="toggleFields()">
-          <option value="Emprunté">Sortie / Emprunt</option>
-          <option value="Dispo">Retour au Stock / Flight</option>
-          <option value="SAV">Signaler en Panne / SAV</option>
-        </select>
-      </div>
-      <div class="form-group" id="group-loc">
-        <label>Destination / Salle</label>
-        <input type="text" id="item-loc" placeholder="ex: Plateau 1, Studio Son...">
-      </div>
-      
-      <!-- CHAMP AVEC AUTOCOMPLÉTION DEPUIS LE SHEETS -->
-      <div class="form-group" id="group-user">
-        <label>Nom de l'étudiant</label>
-        <input type="text" id="item-user" list="liste-etudiants" placeholder="Commence à taper ton prénom...">
-        <datalist id="liste-etudiants"></datalist>
+    <div id="zoneTech" style="margin-top: 12px; padding: 10px; background: #eef5fc; border-left: 4px solid #007bff; border-radius: 4px; font-size: 0.85em; display: none;">
+      <div id="itemNotes" style="margin-bottom: 6px;"></div>
+      <a id="itemDocLink" href="#" target="_blank" style="color: #007bff; font-weight: bold; text-decoration: underline;">Consulter le manuel / Charte DMX</a>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 16px 0;">
+
+    <div class="btn-action-group">
+      <button type="button" class="btn-action" style="background: #28a745;" onclick="ouvrirAction('SORTIE')">Sortie plateau</button>
+      <button type="button" class="btn-action" style="background: #007bff;" onclick="ouvrirAction('RETOUR')">Retour stock</button>
+      <button type="button" class="btn-action" style="background: #dc3545;" onclick="ouvrirAction('SAV')">Signalement SAV</button>
+    </div>
+
+    <form id="actionForm" onsubmit="soumettreAction(event)" style="display:none; margin-top: 12px;">
+      <input type="hidden" id="formRow">
+      <input type="hidden" id="formAction">
+
+      <div id="champsSortie" style="display:none;">
+        <label>Emprunteur :</label>
+        <select id="selectEtudiant" required></select>
+        <label>Lieu de destination :</label>
+        <input type="text" id="inputDest" placeholder="ex. Plateau 1, Studio..." required>
       </div>
 
-      <div class="form-group" id="group-panne" style="display: none;">
-        <label>Détail de la panne</label>
-        <input type="text" id="item-panne" placeholder="ex: Lampe grillée, reset infini...">
+      <div id="champsRetour" style="display:none;">
+        <label>Emplacement de retour :</label>
+        <input type="text" id="inputRangement" value="Stock" required>
       </div>
-      <button type="submit" id="btn-submit" class="btn-submit">Enregistrer le mouvement</button>
+
+      <div id="champsSAV" style="display:none;">
+        <label>Description du problème :</label>
+        <textarea id="inputPanne" rows="2" placeholder="Panne constatée, canal HS, cellule dévissée..." required></textarea>
+      </div>
+
+      <button type="submit" id="btnValider" class="btn-valider">Confirmer</button>
     </form>
   </div>
 
-  <!-- PANNEAU DASHBOARD -->
-  <div id="panel-dashboard" class="panel">
-    <div class="summary">
-      <div class="stat-box"><div class="stat-number" style="color:var(--green);" id="count-dispo">0</div>Dispo</div>
-      <div class="stat-box"><div class="stat-number" style="color:var(--orange);" id="count-emprunt">0</div>Sortis</div>
-      <div class="stat-box"><div class="stat-number" style="color:var(--red);" id="count-sav">0</div>SAV</div>
-    </div>
-    <div id="items-list">Chargement des données...</div>
-  </div>
-
   <script>
-    // COLLE TON LIEN APPS SCRIPT CI-DESSOUS :
+    // COLLE ICI TON URL WEB APP GOOGLE APPS SCRIPT
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
-    let html5QrCode = null;
+    const scanner = new Html5Qrcode("reader");
+    scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 250 },
+      (code) => {
+        scanner.stop();
+        chargerDonnees(code);
+      },
+      () => {}
+    );
 
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      
-      if (tab === 'scan') {
-        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
-        document.getElementById('panel-scan').classList.add('active');
-        startScanner();
-      } else {
-        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
-        document.getElementById('panel-dashboard').classList.add('active');
-        stopScanner();
-        loadDashboard();
-      }
+    function rechercherManuel() {
+      const id = document.getElementById("manualId").value.trim();
+      if (id) chargerDonnees(id);
     }
 
-    function toggleFields() {
-      const action = document.getElementById('item-action').value;
-      document.getElementById('group-loc').style.display = action === 'Emprunté' ? 'block' : 'none';
-      document.getElementById('group-user').style.display = action === 'Emprunté' ? 'block' : 'none';
-      document.getElementById('group-panne').style.display = action === 'SAV' ? 'block' : 'none';
-    }
-
-    function startScanner() {
-      if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("reader");
-      }
-      html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 220, height: 220 } },
-        (decodedText) => {
-          document.getElementById('item-id').value = decodedText.trim();
-          stopScanner();
-          if (navigator.vibrate) navigator.vibrate(80);
-        },
-        (error) => {}
-      ).catch(err => console.log("Caméra en attente"));
-    }
-
-    function stopScanner() {
-      if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().catch(() => {});
-      }
-    }
-
-    // Chargement dynamique de la liste des étudiants pour l'autocomplétion
-    async function loadEtudiants() {
-      try {
-        const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
-        const datalist = document.getElementById('liste-etudiants');
-        datalist.innerHTML = "";
-        if (data.etudiants && data.etudiants.length > 0) {
-          data.etudiants.forEach(nom => {
-            const opt = document.createElement('option');
-            opt.value = nom;
-            datalist.appendChild(opt);
-          });
-        }
-      } catch (e) {
-        console.warn("Impossible de charger les étudiants", e);
-      }
-    }
-
-    async function submitForm(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btn-submit');
-      btn.disabled = true;
-      btn.innerText = "Enregistrement en cours...";
-
-      const payload = {
-        id: document.getElementById('item-id').value,
-        statut: document.getElementById('item-action').value,
-        localisation: document.getElementById('item-loc').value,
-        emprunteur: document.getElementById('item-user').value,
-        panne: document.getElementById('item-panne').value
-      };
-
-      try {
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        alert("✅ Mouvement enregistré dans l'historique !");
-        document.getElementById('stock-form').reset();
-        toggleFields();
-        startScanner();
-      } catch (err) {
-        alert("Erreur lors de l'enregistrement : " + err);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Enregistrer le mouvement";
-      }
-    }
-
-    async function loadDashboard() {
-      const container = document.getElementById('items-list');
-      container.innerHTML = "Actualisation...";
-      
-      try {
-        const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
-        const items = data.items || [];
-        
-        let cDispo = 0, cEmprunt = 0, cSav = 0;
-        container.innerHTML = "";
-
-        items.forEach(item => {
-          let cardClass = "dispo";
-          let badgeClass = "badge-dispo";
-          
-          if (item.statut === "Emprunté") {
-            cardClass = "emprunt";
-            badgeClass = "badge-emprunt";
-            cEmprunt++;
-          } else if (item.statut === "SAV") {
-            cardClass = "sav";
-            badgeClass = "badge-sav";
-            cSav++;
-          } else {
-            cDispo++;
+    function chargerDonnees(id) {
+      fetch(`${SCRIPT_URL}?action=getItem&id=${encodeURIComponent(id)}`)
+        .then(r => r.json())
+        .then(res => {
+          if (!res.success) {
+            alert(res.message);
+            location.reload();
+            return;
           }
 
-          container.innerHTML += `
-            <div class="item-card ${cardClass}">
-              <div class="item-header">
-                <span>${item.nom} <small style="color:var(--muted)">(${item.id})</small></span>
-                <span class="badge ${badgeClass}">${item.statut}</span>
-              </div>
-              <div class="item-details">
-                ${item.statut === 'Emprunté' ? `📍 <b>${item.localisation}</b> par <b>${item.emprunteur}</b>` : ''}
-                ${item.statut === 'Dispo' ? `Au stock / flight` : ''}
-                ${item.statut === 'SAV' ? `⚠️ <b>Panne :</b> ${item.panne}` : ''}
-                <div style="font-size:0.75rem; margin-top:4px;">Dernière maj : ${item.dateMaj}</div>
-              </div>
-            </div>
-          `;
+          document.getElementById("ficheMateriel").style.display = "block";
+          document.getElementById("formRow").value = res.row;
+          document.getElementById("itemId").innerText = res.id;
+          document.getElementById("itemNom").innerText = res.nom;
+          document.getElementById("itemLoc").innerText = res.localisation;
+          document.getElementById("itemEmp").innerText = res.emprunteur;
+          document.getElementById("itemResa").innerText = `${res.statutResa} (${res.detailResa})`;
+
+          const badge = document.getElementById("itemStatutBadge");
+          badge.innerText = res.statut;
+          if (res.statut === "Dispo") {
+            badge.style.background = "#d4edda"; badge.style.color = "#155724";
+          } else if (res.statut === "Sorti") {
+            badge.style.background = "#fff3cd"; badge.style.color = "#856404";
+          } else {
+            badge.style.background = "#f8d7da"; badge.style.color = "#721c24";
+          }
+
+          const zoneTech = document.getElementById("zoneTech");
+          const itemNotes = document.getElementById("itemNotes");
+          const itemDoc = document.getElementById("itemDocLink");
+
+          if (res.notesTech || res.docUrl) {
+            zoneTech.style.display = "block";
+            itemNotes.innerText = res.notesTech || "Pas de spécifications particulières.";
+            if (res.docUrl) {
+              itemDoc.href = res.docUrl;
+              itemDoc.style.display = "inline";
+            } else {
+              itemDoc.style.display = "none";
+            }
+          } else {
+            zoneTech.style.display = "none";
+          }
+
+          const selectEtu = document.getElementById("selectEtudiant");
+          selectEtu.innerHTML = "<option value=''>-- Sélectionner un étudiant --</option>";
+          if (res.etudiants) {
+            res.etudiants.forEach(nom => {
+              const opt = document.createElement("option");
+              opt.value = nom;
+              opt.innerText = nom;
+              selectEtu.appendChild(opt);
+            });
+          }
         });
+    }
 
-        document.getElementById('count-dispo').innerText = cDispo;
-        document.getElementById('count-emprunt').innerText = cEmprunt;
-        document.getElementById('count-sav').innerText = cSav;
+    function ouvrirAction(type) {
+      document.getElementById("actionForm").style.display = "block";
+      document.getElementById("formAction").value = type;
 
-      } catch (err) {
-        container.innerHTML = "Erreur lors du chargement des données.";
+      document.getElementById("champsSortie").style.display = (type === "SORTIE") ? "block" : "none";
+      document.getElementById("champsRetour").style.display = (type === "RETOUR") ? "block" : "none";
+      document.getElementById("champsSAV").style.display = (type === "SAV") ? "block" : "none";
+
+      const btn = document.getElementById("btnValider");
+      if (type === "SORTIE") {
+        btn.style.background = "#28a745";
+        btn.innerText = "Valider la sortie";
+      } else if (type === "RETOUR") {
+        btn.style.background = "#007bff";
+        btn.innerText = "Valider la réintégration";
+      } else if (type === "SAV") {
+        btn.style.background = "#dc3545";
+        btn.innerText = "Déclarer en SAV";
       }
     }
 
-    // Démarrage
-    window.addEventListener('DOMContentLoaded', () => {
-      startScanner();
-      loadEtudiants();
-    });
+    function soumettreAction(e) {
+      e.preventDefault();
+      const action = document.getElementById("formAction").value;
+      const btn = document.getElementById("btnValider");
+      btn.innerText = "Enregistrement...";
+      btn.disabled = true;
+
+      const payload = {
+        actionType: "STOCK_UPDATE",
+        row: document.getElementById("formRow").value,
+        action: action,
+        emprunteur: document.getElementById("selectEtudiant").value,
+        localisation: (action === "SORTIE") ? document.getElementById("inputDest").value : document.getElementById("inputRangement").value,
+        detailPanne: document.getElementById("inputPanne").value
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(() => {
+        alert("Action enregistrée avec succès !");
+        location.reload();
+      }).catch(() => {
+        alert("Erreur réseau");
+        btn.disabled = false;
+      });
+    }
   </script>
 </body>
 </html>

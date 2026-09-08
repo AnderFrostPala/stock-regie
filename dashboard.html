@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
+    
     :root {
       --bg-body: #0d0f12;
       --bg-surface: #171a21;
@@ -16,16 +17,20 @@
       --border: #292e3b;
       --text-main: #f1f3f7;
       --text-muted: #8b949e;
+      
       --status-dispo: #10b981;
       --status-sorti: #ef4444;
       --status-sav: #f59e0b;
       --status-blue: #3b82f6;
     }
+
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
       margin: 0 auto; max-width: 640px; background-color: var(--bg-body);
       color: var(--text-main); padding: 14px; -webkit-font-smoothing: antialiased;
     }
+
+    /* HEADER */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
@@ -38,11 +43,16 @@
     }
     .brand-text h1 { margin: 0; font-size: 0.95em; font-weight: 800; color: #fff; }
     .brand-text span { display: block; font-size: 0.72em; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    
     .user-pill-btn {
       display: flex; align-items: center; gap: 7px; background: var(--bg-surface);
       border: 1px solid var(--border); padding: 6px 10px; border-radius: 20px;
       color: var(--text-main); cursor: pointer; font-size: 0.82em; font-weight: 600; font-family: inherit;
+      transition: all 0.15s ease;
     }
+    .user-pill-btn:hover { background: var(--bg-surface-elevated); }
+
+    /* MENU UTILISATEUR */
     #userMenu {
       position: absolute; right: 14px; top: 62px; width: 220px;
       background: var(--bg-surface-elevated); border: 1px solid var(--border);
@@ -56,6 +66,8 @@
     }
     .menu-item:hover { background: rgba(255,255,255,0.06); }
     .menu-item.danger { color: var(--status-sorti); }
+
+    /* NAVIGATION */
     .quick-nav { display: flex; gap: 6px; margin-bottom: 14px; }
     .quick-nav a {
       flex: 1; text-align: center; padding: 7px 4px; border-radius: 6px;
@@ -63,27 +75,37 @@
       color: var(--text-muted); text-decoration: none; font-size: 0.78em; font-weight: 700;
     }
     .quick-nav a.active { color: #fff; border-color: #4b5563; background: var(--bg-surface-elevated); }
+
+    /* TUILES KPI CLIQUABLES */
     .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
     .kpi-card {
       background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;
-      padding: 10px 6px; text-align: center;
+      padding: 10px 4px; text-align: center; cursor: pointer; user-select: none;
+      transition: all 0.15s ease;
     }
-    .kpi-num { font-size: 1.3em; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
-    .kpi-lbl { font-size: 0.68em; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
+    .kpi-card:hover { background: var(--bg-surface-elevated); border-color: #3b4252; }
+    .kpi-card.active { border-color: #fff; background: #1c202a; transform: translateY(-1px); }
+    .kpi-num { font-size: 1.25em; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+    .kpi-lbl { font-size: 0.68em; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; font-weight: 700; }
+
+    /* RECHERCHE & FILTRES */
     .filter-card {
       background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px;
       padding: 12px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px;
     }
-    input[type="text"], select {
-      width: 100%; padding: 9px 12px; border-radius: 6px; border: 1px solid var(--border);
+    input[type="text"] {
+      width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border);
       background: #0d0f12; color: #fff; font-size: 14px; font-family: inherit;
     }
+    input[type="text"]:focus { outline: none; border-color: var(--status-blue); }
     .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
     .chip {
       background: #1f232c; border: 1px solid var(--border); color: var(--text-muted);
       padding: 5px 10px; border-radius: 20px; font-size: 0.76em; font-weight: 700; cursor: pointer;
     }
     .chip.active { background: #fff; color: #000; border-color: #fff; }
+
+    /* CARTES LISTE */
     .item-card {
       background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px;
       padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px;
@@ -91,6 +113,7 @@
     .item-card.is-dispo { border-left: 5px solid var(--status-dispo); }
     .item-card.is-sorti { border-left: 5px solid var(--status-sorti); }
     .item-card.is-sav   { border-left: 5px solid var(--status-sav); }
+
     .item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .item-name { font-weight: 700; font-size: 0.95em; color: #fff; }
     .code-tag {
@@ -105,11 +128,13 @@
     .badge-sorti { background: rgba(239,68,68,0.15); color: #f87171; }
     .badge-sav   { background: rgba(245,158,11,0.15); color: #fbbf24; }
     .badge-resa  { background: rgba(59,130,246,0.2); color: #60a5fa; margin-left: 4px; }
+    
     .meta-line { font-size: 0.8em; color: var(--text-muted); display: flex; justify-content: space-between; }
     .btn-manual {
       color: #94a3b8; text-decoration: none; font-size: 0.75em; font-weight: 700;
       border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px;
     }
+    .btn-manual:hover { background: rgba(255,255,255,0.06); color: #fff; }
   </style>
 </head>
 <body onclick="fermerMenuSiClicExterieur(event)">
@@ -148,21 +173,35 @@
     <a href="dashboard.html" class="active">Vue Parc</a>
   </nav>
 
+  <!-- TUILES KPI (RÉSERVÉS / AU STOCK / SORTIS / SAV) -->
   <div class="kpi-row">
-    <div class="kpi-card"><div class="kpi-num" id="kpiTotal">-</div><div class="kpi-lbl">Total</div></div>
-    <div class="kpi-card"><div class="kpi-num" style="color:var(--status-dispo);" id="kpiDispo">-</div><div class="kpi-lbl">En Stock</div></div>
-    <div class="kpi-card"><div class="kpi-num" style="color:var(--status-sorti);" id="kpiSorti">-</div><div class="kpi-lbl">Sortis</div></div>
-    <div class="kpi-card"><div class="kpi-num" style="color:var(--status-sav);" id="kpiSav">-</div><div class="kpi-lbl">SAV</div></div>
+    <div class="kpi-card" id="kpiCardResa" onclick="clicKpi('RESA')">
+      <div class="kpi-num" style="color: var(--status-blue);" id="kpiResa">-</div>
+      <div class="kpi-lbl">Réservés</div>
+    </div>
+    <div class="kpi-card" id="kpiCardDispo" onclick="clicKpi('STOCK')">
+      <div class="kpi-num" style="color: var(--status-dispo);" id="kpiDispo">-</div>
+      <div class="kpi-lbl">Au Stock</div>
+    </div>
+    <div class="kpi-card" id="kpiCardSorti" onclick="clicKpi('SORTIS')">
+      <div class="kpi-num" style="color: var(--status-sorti);" id="kpiSorti">-</div>
+      <div class="kpi-lbl">Sortis</div>
+    </div>
+    <div class="kpi-card" id="kpiCardSav" onclick="clicKpi('SAV')">
+      <div class="kpi-num" style="color: var(--status-sav);" id="kpiSav">-</div>
+      <div class="kpi-lbl">SAV</div>
+    </div>
   </div>
 
+  <!-- BARRE DE RECHERCHE & CHIPS -->
   <div class="filter-card">
     <input type="text" id="searchInput" oninput="filtrerInventaire()" placeholder="Rechercher par nom, ID, référence...">
     <div class="filter-chips">
-      <div class="chip active" onclick="setFiltreStatut('TOUS', this)">Tous</div>
-      <div class="chip" onclick="setFiltreStatut('SORTIS', this)">Sortis uniquement</div>
-      <div class="chip" onclick="setFiltreStatut('STOCK', this)">En stock</div>
-      <div class="chip" onclick="setFiltreStatut('SAV', this)">En panne</div>
-      <div class="chip" onclick="setFiltreStatut('RESA', this)">Réservés</div>
+      <div class="chip active" id="chip-TOUS" onclick="setFiltreStatut('TOUS', this)">Tous</div>
+      <div class="chip" id="chip-RESA" onclick="setFiltreStatut('RESA', this)">Réservés</div>
+      <div class="chip" id="chip-STOCK" onclick="setFiltreStatut('STOCK', this)">Au stock</div>
+      <div class="chip" id="chip-SORTIS" onclick="setFiltreStatut('SORTIS', this)">Sortis</div>
+      <div class="chip" id="chip-SAV" onclick="setFiltreStatut('SAV', this)">En panne</div>
     </div>
   </div>
 
@@ -170,6 +209,7 @@
   <div id="listeMateriel"></div>
 
   <script>
+    // COLLE TON URL APPS SCRIPT ICI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let rawItems = [];
@@ -186,10 +226,12 @@
       const menu = document.getElementById("userMenu");
       menu.style.display = (menu.style.display === "block") ? "none" : "block";
     }
+
     function fermerMenuSiClicExterieur(e) {
       const menu = document.getElementById("userMenu");
       if (menu && menu.style.display === "block" && !menu.contains(e.target)) menu.style.display = "none";
     }
+
     function deconnexion() {
       if (!confirm("Voulez-vous vraiment vous déconnecter ?")) return;
       localStorage.removeItem("regie_user");
@@ -197,6 +239,7 @@
       location.href = "index.html";
     }
 
+    // RÉCUPÉRATION DU PARC COMPLET
     fetch(`${SCRIPT_URL}?action=getAll`)
       .then(r => r.json())
       .then(res => {
@@ -205,23 +248,51 @@
           rawItems = res.items || [];
           calculerKpis(rawItems);
           filtrerInventaire();
+        } else {
+          document.getElementById("loading").innerText = res.message || "Erreur de chargement.";
+          document.getElementById("loading").style.display = "block";
         }
       })
       .catch(err => {
-        document.getElementById("loading").innerText = "Erreur de chargement du parc.";
+        document.getElementById("loading").innerText = "Erreur de connexion au serveur.";
       });
 
     function calculerKpis(items) {
-      document.getElementById("kpiTotal").innerText = items.length;
-      document.getElementById("kpiDispo").innerText = items.filter(i => (i.statut || "").toLowerCase().includes("dispo")).length;
-      document.getElementById("kpiSorti").innerText = items.filter(i => (i.statut || "").toLowerCase().includes("sorti")).length;
-      document.getElementById("kpiSav").innerText   = items.filter(i => (i.statut || "").toLowerCase().includes("sav")).length;
+      const nbResa = items.filter(i => {
+        const r = (i.statutResa || "").toLowerCase();
+        return (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
+      }).length;
+
+      const nbDispo = items.filter(i => (i.statut || "").toLowerCase().includes("dispo")).length;
+      const nbSorti = items.filter(i => (i.statut || "").toLowerCase().includes("sorti")).length;
+      const nbSav   = items.filter(i => (i.statut || "").toLowerCase().includes("sav")).length;
+
+      document.getElementById("kpiResa").innerText = nbResa;
+      document.getElementById("kpiDispo").innerText = nbDispo;
+      document.getElementById("kpiSorti").innerText = nbSorti;
+      document.getElementById("kpiSav").innerText   = nbSav;
+    }
+
+    function clicKpi(filtre) {
+      const cible = (filtreStatutCourant === filtre) ? "TOUS" : filtre;
+      const chipEl = document.getElementById("chip-" + cible);
+      setFiltreStatut(cible, chipEl);
     }
 
     function setFiltreStatut(filtre, el) {
       filtreStatutCourant = filtre;
+
+      // État visuel des chips
       document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-      el.classList.add("active");
+      if (el) el.classList.add("active");
+
+      // État visuel des tuiles KPI
+      document.querySelectorAll(".kpi-card").forEach(k => k.classList.remove("active"));
+      if (filtre === "RESA")   document.getElementById("kpiCardResa").classList.add("active");
+      if (filtre === "STOCK")  document.getElementById("kpiCardDispo").classList.add("active");
+      if (filtre === "SORTIS") document.getElementById("kpiCardSorti").classList.add("active");
+      if (filtre === "SAV")    document.getElementById("kpiCardSav").classList.add("active");
+
       filtrerInventaire();
     }
 
@@ -237,7 +308,8 @@
         if (!matchTexte) return false;
 
         const st = (item.statut || "").toLowerCase();
-        const estResa = (item.statutResa || "").toLowerCase().includes("réservé");
+        const r = (item.statutResa || "").toLowerCase();
+        const estResa = (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
 
         if (filtreStatutCourant === "SORTIS") return st.includes("sorti");
         if (filtreStatutCourant === "STOCK")  return st.includes("dispo");
@@ -254,7 +326,7 @@
       itemsFiltres.forEach(item => {
         const st = (item.statut || "").toLowerCase();
         let carteClass = "is-dispo";
-        let badgeHtml = '<span class="badge badge-dispo">En stock</span>';
+        let badgeHtml = '<span class="badge badge-dispo">Au stock</span>';
 
         if (st.includes("sorti")) {
           carteClass = "is-sorti";
@@ -264,7 +336,8 @@
           badgeHtml = '<span class="badge badge-sav">SAV</span>';
         }
 
-        const estResa = (item.statutResa || "").toLowerCase().includes("réservé");
+        const r = (item.statutResa || "").toLowerCase();
+        const estResa = (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
         const resaBadge = estResa ? '<span class="badge badge-resa">📅 Réservé</span>' : '';
         const manuelLink = (item.docUrl && item.docUrl.startsWith("http")) 
           ? `<a href="${item.docUrl}" target="_blank" class="btn-manual">📄 Manuel</a>` : '';

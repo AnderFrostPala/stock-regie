@@ -9,7 +9,7 @@
     * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 16px; margin: 0 auto; max-width: 520px; background: #f4f5f7; color: #212529;
+      padding: 16px; margin: 0 auto; max-width: 520px; background: #f0f2f5; color: #212529;
     }
     h2, h3 { margin-top: 0; }
     
@@ -22,8 +22,19 @@
     .nav-links a { color: #007bff; text-decoration: none; font-weight: 600; }
 
     .card {
-      background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 14px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 14px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    /* COHÉRENCE DASHBOARD : CARTES AVEC FOND PLEIN ET BORD GAUCHE */
+    .card-dispo {
+      background: #e8f5e9 !important; border-left: 6px solid #28a745 !important;
+    }
+    .card-sorti {
+      background: #ffebee !important; border-left: 6px solid #dc3545 !important;
+    }
+    .card-sav {
+      background: #fff3e0 !important; border-left: 6px solid #fd7e14 !important;
     }
 
     /* Scanner & Saisie */
@@ -37,14 +48,11 @@
       border-radius: 6px; font-weight: 700; cursor: pointer;
     }
 
-    /* Badges Statut */
-    .status-badge {
-      display: inline-block; padding: 4px 10px; border-radius: 6px;
-      font-weight: 700; font-size: 0.82em; text-transform: uppercase; letter-spacing: 0.5px;
+    /* BADGE RÉSERVÉ (FIXE, NON CLIQUABLE) */
+    .badge-resa-static {
+      background: #007bff; color: #fff; padding: 5px 10px; border-radius: 6px;
+      font-size: 0.8em; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;
     }
-    .badge-dispo { background: #28a745; color: #fff; }
-    .badge-sorti { background: #dc3545; color: #fff; }
-    .badge-sav   { background: #fd7e14; color: #fff; }
 
     /* Bouton Manuel */
     .btn-manuel {
@@ -54,7 +62,7 @@
     }
     .btn-manuel:hover { background: #343a40; }
 
-    /* Boutons de commande */
+    /* Boutons d'action */
     .actions-grid { display: flex; gap: 8px; margin-top: 14px; }
     .btn-cmd {
       flex: 1; padding: 12px 6px; border: none; border-radius: 6px; font-weight: 700;
@@ -62,7 +70,7 @@
     }
     .btn-sortie { background: #28a745; }
     .btn-retour { background: #007bff; }
-    .btn-sav    { background: #dc3545; }
+    .btn-sav    { background: #fd7e14; } /* SAV passe en orange Dashboard */
 
     .btn-submit-action {
       width: 100%; padding: 12px; background: #28a745; color: #fff;
@@ -76,11 +84,11 @@
   <div id="modalRangement" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.75); z-index:3000; align-items:center; justify-content:center; padding:16px;">
     <div style="background:#fff; border-radius:12px; padding:24px; max-width:400px; width:100%; text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.25);">
       <div style="font-size:3em; margin-bottom:8px;">📦</div>
-      <h3 style="margin:0 0 6px 0;">Rangement Matériel</h3>
+      <h3 style="margin:0 0 6px 0;">Rangement matériel</h3>
       <p style="font-size:0.88em; color:#666; margin:0 0 16px 0;">Merci de replacer l'équipement à son emplacement attitré :</p>
       
       <div style="background:#e8f5e9; border:2px dashed #28a745; border-radius:8px; padding:14px; margin-bottom:18px;">
-        <div style="font-size:0.75em; text-transform:uppercase; color:#2e7d32; font-weight:700;">Emplacement Nominal</div>
+        <div style="font-size:0.75em; text-transform:uppercase; color:#2e7d32; font-weight:700;">Emplacement nominal</div>
         <div id="locNominaleTxt" style="font-size:1.3em; font-weight:800; color:#1b5e20; margin-top:4px;">Stock Régie</div>
       </div>
 
@@ -90,7 +98,7 @@
     </div>
   </div>
 
-  <!-- Modal Authentification Étudiant / Régisseur -->
+  <!-- Modal Connexion -->
   <div id="authModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:#f4f5f7; z-index:2000; align-items:center; justify-content:center; padding:16px;">
     <div class="card" style="max-width:380px; width:100%; text-align:center;">
       <h3 style="margin-top:0;">Connexion Régie</h3>
@@ -119,7 +127,7 @@
     </div>
   </div>
 
-  <!-- Zone Scanner Caméra & Saisie Manuel -->
+  <!-- Scanner Caméra & Saisie -->
   <div class="card">
     <div id="reader"></div>
     <div class="search-row">
@@ -128,41 +136,42 @@
     </div>
   </div>
 
-  <!-- Fiche Détails Matériel scanné -->
+  <!-- Fiche Matériel (Colorée entièrement selon statut) -->
   <div id="cardDetails" class="card" style="display:none;">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:8px;">
       <div>
         <h3 id="itemNom" style="margin:0; font-size:1.15em;">-</h3>
-        <div style="font-size:0.82em; color:#666; margin-top:2px;">
-          ID : <code id="itemId" style="font-weight:700;">-</code> &bull; <span id="itemCat">-</span>
+        <div style="font-size:0.82em; color:#444; margin-top:2px;">
+          ID : <code id="itemId" style="font-weight:700; background:#fff; padding:1px 5px; border-radius:4px;">-</code> &bull; <span id="itemCat">-</span>
         </div>
       </div>
-      <a id="btnDoc" href="#" target="_blank" class="btn-manuel" style="display:none;">
-        📄 Manuel
-      </a>
+      
+      <div style="display:flex; gap:6px; align-items:center;">
+        <!-- Badge Réservé non-cliquable -->
+        <span id="badgeResaStatic" class="badge-resa-static" style="display:none;">📅 Réservé</span>
+        <!-- Bouton Manuel -->
+        <a id="btnDoc" href="#" target="_blank" class="btn-manuel" style="display:none;">📄 Manuel</a>
+      </div>
     </div>
 
-    <div style="background:#f8f9fa; padding:10px 12px; border-radius:6px; font-size:0.88em; margin-bottom:12px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-        <span>État actuel :</span>
-        <span id="itemStatutBadge" class="status-badge">-</span>
-      </div>
+    <div style="background:rgba(255,255,255,0.7); padding:10px 12px; border-radius:8px; font-size:0.88em; margin-bottom:12px; border:1px solid rgba(0,0,0,0.05);">
+      <div style="margin-bottom:4px;">État : <strong id="itemStatutTxt">-</strong></div>
       <div style="margin-bottom:4px;">Lieu actuel : <strong id="itemLieu">-</strong></div>
       <div style="margin-bottom:4px;">Détenteur : <strong id="itemUser">-</strong></div>
-      <div id="lignePanne" style="display:none; color:#dc3545; font-weight:600; margin-top:4px;">
+      <div id="lignePanne" style="display:none; color:#dc3545; font-weight:700; margin-top:4px;">
         ⚠️ Panne : <span id="itemPanne">-</span>
       </div>
     </div>
 
-    <!-- 3 Boutons d'action rapides -->
+    <!-- 3 Boutons d'action -->
     <div class="actions-grid">
       <button type="button" class="btn-cmd btn-sortie" onclick="ouvrirZoneSortie()">Sortie</button>
       <button type="button" class="btn-cmd btn-retour" onclick="confirmerRetourDirect()">Retour stock</button>
       <button type="button" class="btn-cmd btn-sav" onclick="declarerPanne()">Panne SAV</button>
     </div>
 
-    <!-- Zone contextuelle : Destination lors d'une sortie -->
-    <div id="zoneLieuSortie" style="display:none; margin-top:14px; border-top:1px solid #eee; padding-top:12px;">
+    <!-- Formulaire Destination Sortie -->
+    <div id="zoneLieuSortie" style="display:none; margin-top:14px; border-top:1px solid rgba(0,0,0,0.1); padding-top:12px;">
       <label style="font-weight:700; font-size:0.88em;">Destination / Lieu :</label>
       <select id="selectLieu" onchange="gererChangementLieu(this.value)" style="margin-top:6px; margin-bottom:8px;">
         <option value="Atelier A">Atelier A</option>
@@ -185,13 +194,12 @@
   </div>
 
   <script>
-    // COLLE ICI TON URL APPS SCRIPT
+    // COLLE TON URL APPS SCRIPT ICI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let currentItem = null;
     let html5QrCode = null;
 
-    // 1. GESTION DE SESSION & IDENTITÉ
     let user = localStorage.getItem("regie_user");
     let role = localStorage.getItem("regie_role") || "etudiant";
 
@@ -229,7 +237,6 @@
     function initialiserInterface() {
       document.getElementById("userName").innerText = user;
 
-      // Affichage des liens admin / express selon les droits
       if (role === "admin") {
         document.getElementById("lienAdminNav").style.display = "inline";
         document.getElementById("lienExpressNav").style.display = "inline";
@@ -238,7 +245,6 @@
       demarrerCamera();
     }
 
-    // 2. SCANNER QR CODE
     function demarrerCamera() {
       html5QrCode = new Html5Qrcode("reader");
       html5QrCode.start(
@@ -247,12 +253,9 @@
         (decodedText) => {
           chercherMateriel(decodedText);
         }
-      ).catch(() => {
-        // En cas de caméra non autorisée ou sur ordinateur
-      });
+      ).catch(() => {});
     }
 
-    // 3. RECHERCHE DU MATÉRIEL
     function chercherMateriel(id) {
       const cleanId = (id || "").trim();
       if (!cleanId) return;
@@ -273,14 +276,16 @@
 
     function afficherFicheMateriel(item) {
       currentItem = item;
-      document.getElementById("cardDetails").style.display = "block";
+      const card = document.getElementById("cardDetails");
+      card.style.display = "block";
+
       document.getElementById("itemNom").innerText = item.nom;
       document.getElementById("itemId").innerText = item.id;
       document.getElementById("itemCat").innerText = `${item.categorie || ""} (${item.sousCategorie || ""})`;
       document.getElementById("itemLieu").innerText = item.localisation || "Stock";
       document.getElementById("itemUser").innerText = (item.emprunteur && item.emprunteur !== "-") ? item.emprunteur : "-";
 
-      // 1. Bouton "Manuel" (uniquement si docUrl existe)
+      // 1. Bouton "Manuel" (si lien en colonne N)
       const btnDoc = document.getElementById("btnDoc");
       if (item.docUrl && item.docUrl.startsWith("http")) {
         btnDoc.href = item.docUrl;
@@ -289,22 +294,32 @@
         btnDoc.style.display = "none";
       }
 
-      // 2. Badge de statut (Rouge = Sorti, Vert = En stock, Orange = SAV)
-      const badge = document.getElementById("itemStatutBadge");
+      // 2. Badge Réservé statique
+      const badgeResa = document.getElementById("badgeResaStatic");
+      const r = (item.statutResa || "").toLowerCase();
+      const estReserve = (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
+      badgeResa.style.display = estReserve ? "inline-flex" : "none";
+
+      // 3. Coloration complète de la carte selon le statut
+      card.classList.remove("card-dispo", "card-sorti", "card-sav");
       const st = (item.statut || "").toLowerCase();
+      const txtStatut = document.getElementById("itemStatutTxt");
 
       if (st.includes("sorti")) {
-        badge.className = "status-badge badge-sorti";
-        badge.innerText = "Sorti";
+        card.classList.add("card-sorti");
+        txtStatut.innerText = "Sorti";
+        txtStatut.style.color = "#dc3545";
       } else if (st.includes("sav")) {
-        badge.className = "status-badge badge-sav";
-        badge.innerText = "SAV";
+        card.classList.add("card-sav");
+        txtStatut.innerText = "En SAV / Panne";
+        txtStatut.style.color = "#fd7e14";
       } else {
-        badge.className = "status-badge badge-dispo";
-        badge.innerText = "En stock";
+        card.classList.add("card-dispo");
+        txtStatut.innerText = "En stock";
+        txtStatut.style.color = "#28a745";
       }
 
-      // Affichage panne
+      // Panne
       const lignePanne = document.getElementById("lignePanne");
       if (item.panne && item.panne !== "-") {
         document.getElementById("itemPanne").innerText = item.panne;
@@ -313,11 +328,9 @@
         lignePanne.style.display = "none";
       }
 
-      // Replie la zone de sortie par défaut
       document.getElementById("zoneLieuSortie").style.display = "none";
     }
 
-    // 4. LOGIQUE DES ACTIONS
     function ouvrirZoneSortie() {
       document.getElementById("zoneLieuSortie").style.display = "block";
       document.getElementById("selectLieu").focus();
@@ -349,7 +362,6 @@
     }
 
     function confirmerRetourDirect() {
-      // Pour le retour, le lieu redevient l'emplacement nominal ou Stock
       const locNominale = currentItem.locNominale || "Stock Régie";
       executerAction("Dispo", locNominale);
     }
@@ -384,7 +396,6 @@
       })
       .then(() => {
         if (statut === "Dispo") {
-          // Affiche le rappel de rangement sans recharger tout de suite
           const locCible = currentItem.locNominale || "Stock Régie";
           afficherConfirmationRangement(locCible);
         } else {
@@ -401,7 +412,6 @@
       });
     }
 
-    // 5. GESTION DU RAPPEL DE RANGEMENT
     function afficherConfirmationRangement(locCible) {
       document.getElementById("locNominaleTxt").innerText = locCible;
       document.getElementById("modalRangement").style.display = "flex";

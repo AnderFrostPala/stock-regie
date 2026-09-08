@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Réservations - Régie Matériel</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --orange: #f97316;
+      --red: #ef4444;
+      --blue: #3b82f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 1rem; max-width: 750px; margin: 0 auto; }
+    
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+    h1 { font-size: 1.3rem; color: var(--accent); }
+    a.btn-nav { color: var(--accent); text-decoration: none; font-weight: bold; font-size: 0.9rem; border: 1px solid var(--accent); padding: 6px 12px; border-radius: 6px; }
+
+    /* Dossiers dépliables */
+    details.cat-box { background: var(--card); border-radius: 10px; margin-bottom: 0.8rem; overflow: hidden; border: 1px solid #334155; }
+    summary.cat-title { padding: 0.9rem 1rem; font-weight: bold; font-size: 1.05rem; cursor: pointer; background: #243248; user-select: none; }
+    
+    details.subcat-box { margin: 0.6rem 0.8rem; border-left: 3px solid var(--accent); background: #131d2e; border-radius: 6px; }
+    summary.subcat-title { padding: 0.6rem 0.8rem; font-weight: 600; font-size: 0.95rem; cursor: pointer; color: var(--accent); }
+
+    /* Ligne équipement */
+    .item-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 0.75rem 0.8rem; border-top: 1px solid #1e293b; gap: 0.5rem; }
+    .item-info strong { display: block; font-size: 0.95rem; }
+    .item-info small { color: var(--muted); font-size: 0.8rem; }
+
+    /* Badges & Actions */
+    .status-group { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+    .badge { font-size: 0.7rem; padding: 3px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+    .badge-dispo { background: #14532d; color: #4ade80; }
+    .badge-emprunt { background: #7c2d12; color: #fdba74; }
+    .badge-sav { background: #7f1d1d; color: #fca5a5; }
+    
+    .badge-reserve { background: #1e3a8a; color: #93c5fd; cursor: pointer; text-decoration: underline; }
+    .badge-nonreserve { background: #334155; color: #94a3b8; }
+
+    button.btn-action { background: var(--accent); color: #000; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+
+    /* Modale / Pop-up de réservation */
+    #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; padding: 1rem; z-index: 100; }
+    .modal-card { background: var(--card); border-radius: 12px; padding: 1.2rem; width: 100%; max-width: 420px; border: 1px solid #334155; }
+    .modal-card h3 { margin-bottom: 0.8rem; font-size: 1.1rem; color: var(--accent); }
+    .form-group { margin-bottom: 0.8rem; }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.2rem; }
+    input { width: 100%; padding: 0.65rem; border-radius: 6px; background: #0f172a; color: #fff; border: 1px solid #334155; font-size: 0.95rem; }
+    .modal-btns { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📅 Réservations</h1>
+    <a href="index.html" class="btn-nav">📷 Retour Scan</a>
+  </header>
+
+  <div id="tree-container">Chargement de l'inventaire...</div>
+
+  <!-- MODALE DE RÉSERVATION -->
+  <div id="modal">
+    <div class="modal-card">
+      <h3 id="modal-title">Réserver une machine</h3>
+      
+      <div class="form-group">
+        <label>Date de l'emprunt prévu</label>
+        <input type="date" id="res-date">
+      </div>
+
+      <div class="form-group">
+        <label>Nom de l'étudiant</label>
+        <input type="text" id="res-user" list="liste-etudiants" placeholder="Tape ton prénom...">
+        <datalist id="liste-etudiants"></datalist>
+      </div>
+
+      <div class="modal-btns">
+        <button class="btn-action" style="flex:1; padding:0.8rem;" id="btn-save" onclick="validerReservation()">Confirmer</button>
+        <button style="flex:1; background:transparent; border:1px solid #475569; color:var(--text); border-radius:6px; cursor:pointer;" onclick="fermerModal()">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // COLLE TON URL APPS SCRIPT CI-DESSOUS :
+    const SCRIPT_URL = "VOTRE_URL_GOOGLE_APPS_SCRIPT_ICI";
+
+    let activeItemId = null;
+    let cacheItems = [];
+
+    async function init() {
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        cacheItems = data.items || [];
+
+        // Remplir la datalist des étudiants
+        const dl = document.getElementById('liste-etudiants');
+        dl.innerHTML = "";
+        (data.etudiants || []).forEach(e => {
+          dl.innerHTML += `<option value="${e}">`;
+        });
+
+        afficherArbre(cacheItems);
+      } catch (e) {
+        document.getElementById('tree-container').innerText = "Erreur de chargement des réservations.";
+      }
+    }
+
+    function afficherArbre(items) {
+      const container = document.getElementById('tree-container');
+      container.innerHTML = "";
+
+      // Grouper par Catégorie -> Sous-Catégorie
+      const group = {};
+      items.forEach(item => {
+        const cat = item.categorie || "Autres";
+        const sub = item.sousCategorie || "Général";
+        if (!group[cat]) group[cat] = {};
+        if (!group[cat][sub]) group[cat][sub] = [];
+        group[cat][sub].push(item);
+      });
+
+      for (const [catName, subCats] of Object.entries(group)) {
+        let catHtml = `
+          <details class="cat-box" open>
+            <summary class="cat-title">📁 ${catName}</summary>
+        `;
+
+        for (const [subName, subItems] of Object.entries(subCats)) {
+          catHtml += `
+            <details class="subcat-box" open>
+              <summary class="subcat-title">📂 ${subName} (${subItems.length})</summary>
+          `;
+
+          subItems.forEach(i => {
+            const isReserved = i.statutResa === "Réservé";
+            const badgePhysique = i.statut === "Emprunté" ? "badge-emprunt" : i.statut === "SAV" ? "badge-sav" : "badge-dispo";
+
+            catHtml += `
+              <div class="item-row">
+                <div class="item-info">
+                  <strong>${i.nom}</strong>
+                  <small>${i.id} • Lieu actuel : ${i.localisation}</small>
+                </div>
+                <div class="status-group">
+                  <span class="badge ${badgePhysique}">${i.statut}</span>
+                  ${isReserved 
+                    ? `<span class="badge badge-reserve" onclick="afficherDetailResa('${i.id}')">📅 Réservé</span>
+                       <button class="btn-action" style="background:#475569; color:#fff;" onclick="annulerResa('${i.id}')">Libérer</button>`
+                    : `<span class="badge badge-nonreserve">Libre</span>
+                       <button class="btn-action" onclick="ouvrirModal('${i.id}', '${i.nom}')">Réserver</button>`
+                  }
+                </div>
+              </div>
+            `;
+          });
+
+          catHtml += `</details>`;
+        }
+
+        catHtml += `</details>`;
+        container.innerHTML += catHtml;
+      }
+    }
+
+    function ouvrirModal(id, nom) {
+      activeItemId = id;
+      document.getElementById('modal-title').innerText = `Réserver : ${nom}`;
+      document.getElementById('res-date').value = "";
+      document.getElementById('res-user').value = "";
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function fermerModal() {
+      document.getElementById('modal').style.display = 'none';
+      activeItemId = null;
+    }
+
+    function afficherDetailResa(id) {
+      const item = cacheItems.find(x => x.id === id);
+      if (item) {
+        alert(`📌 Réservation pour ${item.nom} :\n${item.detailResa}`);
+      }
+    }
+
+    async function validerReservation() {
+      const date = document.getElementById('res-date').value;
+      const user = document.getElementById('res-user').value.trim();
+      const btn = document.getElementById('btn-save');
+
+      if (!date || !user) {
+        return alert("Merci de préciser une date et le nom de l'étudiant.");
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Validation...";
+
+      const payload = {
+        type: "reservation",
+        id: activeItemId,
+        statutResa: "Réservé",
+        detailResa: `Réservé pour le ${date} par ${user}`,
+        emprunteur: user
+      };
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        alert("✅ Réservation enregistrée !");
+        fermerModal();
+        init(); // Recharge la vue
+      } catch (err) {
+        alert("Erreur : " + err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Confirmer";
+      }
+    }
+
+    async function annulerResa(id) {
+      if (!confirm("Voulez-vous libérer cette réservation ?")) return;
+
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "reservation",
+          id: id,
+          statutResa: "Non réservé",
+          detailResa: "-",
+          emprunteur: "-"
+        })
+      });
+
+      alert("Réservation libérée !");
+      init();
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

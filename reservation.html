@@ -30,7 +30,7 @@
       padding: 14px; -webkit-font-smoothing: antialiased;
     }
 
-    /* HEADER OFFICIEL */
+    /* HEADER */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
@@ -99,36 +99,65 @@
     input:focus { outline: none; border-color: var(--status-blue-light); }
     .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
 
-    /* LISTE MATÉRIEL AVEC RECHERCHE */
+    /* RECHERCHE ET SÉLECTION */
     .search-box {
       width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border);
-      background: #090a0d; color: #fff; font-size: 13px; font-family: inherit; margin-bottom: 8px;
+      background: #090a0d; color: #fff; font-size: 13px; font-family: inherit; margin-bottom: 10px;
     }
     .selection-counter {
       font-size: 0.8em; font-weight: 700; color: var(--status-blue-light); text-align: right; margin-bottom: 6px;
     }
+
+    /* ARBORESCENCE DÉPLIABLE (CATÉGORIES & SOUS-CATÉGORIES) */
     .picker-box {
-      max-height: 220px; overflow-y: auto; background: #090a0d; border: 1px solid var(--border);
-      border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 4px;
+      max-height: 380px; overflow-y: auto; background: #090a0d; border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 6px;
     }
+
+    details.cat-group {
+      background: #12151c; border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+    }
+    details.cat-group summary {
+      padding: 9px 12px; font-size: 0.86em; font-weight: 800; color: #fff;
+      cursor: pointer; user-select: none; background: #161922; display: flex;
+      justify-content: space-between; align-items: center; list-style: none;
+    }
+    details.cat-group summary::-webkit-details-marker { display: none; }
+    details.cat-group summary::after { content: "▼"; font-size: 0.75em; color: var(--text-muted); transition: transform 0.2s; }
+    details.cat-group[open] summary::after { transform: rotate(180deg); }
+
+    details.subcat-group {
+      margin: 6px 8px 6px 14px; border-left: 2px solid #2d3342; padding-left: 8px;
+    }
+    details.subcat-group summary {
+      padding: 4px 6px; font-size: 0.8em; font-weight: 700; color: #94a3b8;
+      cursor: pointer; user-select: none; background: none; display: flex;
+      justify-content: space-between; align-items: center; list-style: none;
+    }
+    details.subcat-group summary::-webkit-details-marker { display: none; }
+    details.subcat-group summary::after { content: "▸"; font-size: 0.8em; color: var(--text-muted); transition: transform 0.2s; }
+    details.subcat-group[open] summary::after { transform: rotate(90deg); }
+
     .picker-item {
-      display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 6px;
-      font-size: 0.86em; cursor: pointer; user-select: none;
+      display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 5px;
+      font-size: 0.82em; cursor: pointer; user-select: none; margin-left: 4px;
     }
-    .picker-item:hover { background: #161a22; }
+    .picker-item:hover { background: #1a1e27; }
+    .picker-item input[type="checkbox"] { margin: 0; cursor: pointer; }
+
     .code-tag {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.82em; font-weight: 700;
-      color: #38bdf8; background: #000; padding: 2px 6px; border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.8em; font-weight: 700;
+      color: #38bdf8; background: #000; padding: 1px 5px; border-radius: 3px;
     }
 
     .btn-submit {
       width: 100%; padding: 13px; background: var(--status-blue); color: #fff;
       border: none; border-radius: 8px; font-weight: 800; font-size: 0.95em; cursor: pointer;
-      font-family: inherit; margin-top: 12px; transition: background 0.15s ease;
+      font-family: inherit; margin-top: 14px; transition: background 0.15s ease;
     }
     .btn-submit:hover { background: #1d4ed8; }
 
-    /* LIGNES RÉSERVATIONS EXISTANTES */
+    /* RÉSERVATIONS EN COURS */
     .resa-row {
       background: #0d0f12; border: 1px solid var(--border); border-radius: 8px;
       padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
@@ -179,7 +208,7 @@
     <a href="dashboard.html">Vue Parc</a>
   </nav>
 
-  <!-- BLOC 1 : ACCORDÉON MES RÉSERVATIONS EN COURS -->
+  <!-- BLOC 1 : MES RÉSERVATIONS EN COURS -->
   <div class="card">
     <button type="button" class="accordion-toggle" onclick="toggleAccordeon()">
       <span>📋 Mes réservations en cours (<span id="nbResasPerso">0</span>)</span>
@@ -191,7 +220,7 @@
     </div>
   </div>
 
-  <!-- BLOC 2 : NOUVELLE DEMANDE DE RÉSERVATION -->
+  <!-- BLOC 2 : NOUVELLE RÉSERVATION AVEC CATÉGORIES DÉPLIABLES -->
   <div class="card">
     <h3>Nouvelle Demande de Réservation</h3>
     
@@ -209,14 +238,15 @@
       </div>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-      <label style="margin:0;">Sélection du matériel :</label>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+      <label style="margin:0;">Catalogue matériel :</label>
       <div id="compteurSelection" class="selection-counter">0 sélectionné(s)</div>
     </div>
 
-    <input type="text" id="searchMaterielInput" class="search-box" placeholder="🔍 Filtrer le matériel (ex: DM7, SM58, Découpe...)" oninput="filtrerListePicker()">
+    <input type="text" id="searchMaterielInput" class="search-box" placeholder="🔍 Rechercher (nom, ID, micro, dmx...)" oninput="filtrerParcArborescent()">
 
-    <div class="picker-box" id="pickerMateriel">Chargement du parc disponible...</div>
+    <!-- ARBORESCENCE DÉPLIABLE -->
+    <div class="picker-box" id="pickerMateriel">Chargement du parc matériel...</div>
 
     <button type="button" class="btn-submit" id="btnResa" onclick="soumettreReservation()">Valider la Réservation</button>
   </div>
@@ -226,6 +256,7 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let rawMateriel = [];
+    const selectionIds = new Set(); // Maintient les ID cochés
     const user = localStorage.getItem("regie_user") || "Inconnu";
     const role = localStorage.getItem("regie_role") || "etudiant";
 
@@ -263,52 +294,112 @@
       }
     }
 
-    // 1. CHARGEMENT DU MATÉRIEL POUR LA SÉLECTION
+    // 1. CHARGEMENT DU PARC
     fetch(`${SCRIPT_URL}?action=getAll`)
       .then(r => r.json())
       .then(res => {
         if (res.success && res.items) {
           rawMateriel = res.items;
-          rendrePicker(rawMateriel);
+          rendreArborescence(rawMateriel, false);
         }
       });
 
-    function rendrePicker(items) {
-      const picker = document.getElementById("pickerMateriel");
-      picker.innerHTML = "";
+    // 2. CONVERSION ET RENDU EN ACCORDÉONS HIÉRARCHIQUES
+    function rendreArborescence(items, openAll = false) {
+      const conteneur = document.getElementById("pickerMateriel");
+      conteneur.innerHTML = "";
 
-      if (items.length === 0) {
-        picker.innerHTML = '<div style="font-size:0.8em; color:var(--text-muted); padding:8px;">Aucun matériel correspondant.</div>';
+      if (!items || items.length === 0) {
+        conteneur.innerHTML = '<div style="font-size:0.8em; color:var(--text-muted); padding:10px; text-align:center;">Aucun équipement trouvé.</div>';
         return;
       }
 
+      // Structure : { [cat]: { [subCat]: [items] } }
+      const tree = {};
       items.forEach(item => {
-        const label = document.createElement("label");
-        label.className = "picker-item";
-        label.innerHTML = `
-          <input type="checkbox" value="${item.id}" onchange="majCompteurSelection()" style="margin:0;">
-          <span class="code-tag">${item.id}</span>
-          <span style="color:#fff;">${item.nom}</span>
-        `;
-        picker.appendChild(label);
+        const cat = item.categorie || "Autre";
+        const sub = item.sousCategorie || "Général";
+        if (!tree[cat]) tree[cat] = {};
+        if (!tree[cat][sub]) tree[cat][sub] = [];
+        tree[cat][sub].push(item);
+      });
+
+      // Tri alphabétique des catégories
+      const sortedCats = Object.keys(tree).sort();
+
+      sortedCats.forEach(cat => {
+        const catDetails = document.createElement("details");
+        catDetails.className = "cat-group";
+        if (openAll) catDetails.open = true;
+
+        let totalCatItems = 0;
+        Object.values(tree[cat]).forEach(arr => totalCatItems += arr.length);
+
+        const catSummary = document.createElement("summary");
+        catSummary.innerHTML = `<span>📁 ${cat}</span> <span style="font-size:0.75em; color:var(--text-muted); font-family:'JetBrains Mono';">${totalCatItems}</span>`;
+        catDetails.appendChild(catSummary);
+
+        const sortedSubs = Object.keys(tree[cat]).sort();
+        sortedSubs.forEach(sub => {
+          const subDetails = document.createElement("details");
+          subDetails.className = "subcat-group";
+          if (openAll) subDetails.open = true;
+
+          const subItems = tree[cat][sub];
+          const subSummary = document.createElement("summary");
+          subSummary.innerHTML = `<span>📂 ${sub}</span> <span style="font-size:0.75em; color:var(--text-muted); font-family:'JetBrains Mono';">${subItems.length}</span>`;
+          subDetails.appendChild(subSummary);
+
+          subItems.forEach(item => {
+            const label = document.createElement("label");
+            label.className = "picker-item";
+            const isChecked = selectionIds.has(item.id);
+
+            label.innerHTML = `
+              <input type="checkbox" value="${item.id}" ${isChecked ? 'checked' : ''} onchange="toggleSelection(this)">
+              <span class="code-tag">${item.id}</span>
+              <span style="color:#fff;">${item.nom}</span>
+            `;
+            subDetails.appendChild(label);
+          });
+
+          catDetails.appendChild(subDetails);
+        });
+
+        conteneur.appendChild(catDetails);
       });
     }
 
-    function filtrerListePicker() {
+    function toggleSelection(checkbox) {
+      if (checkbox.checked) {
+        selectionIds.add(checkbox.value);
+      } else {
+        selectionIds.delete(checkbox.value);
+      }
+      document.getElementById("compteurSelection").innerText = `${selectionIds.size} sélectionné(s)`;
+    }
+
+    function filtrerParcArborescent() {
       const q = document.getElementById("searchMaterielInput").value.trim().toLowerCase();
+
+      if (!q) {
+        rendreArborescence(rawMateriel, false);
+        return;
+      }
+
+      // Filtre les items qui correspondent à la recherche
       const filtres = rawMateriel.filter(item => 
         (item.nom || "").toLowerCase().includes(q) ||
-        (item.id || "").toLowerCase().includes(q)
+        (item.id || "").toLowerCase().includes(q) ||
+        (item.categorie || "").toLowerCase().includes(q) ||
+        (item.sousCategorie || "").toLowerCase().includes(q)
       );
-      rendrePicker(filtres);
+
+      // Déplie automatiquement les accordéons quand on effectue une recherche
+      rendreArborescence(filtres, true);
     }
 
-    function majCompteurSelection() {
-      const nb = document.querySelectorAll('#pickerMateriel input[type="checkbox"]:checked').length;
-      document.getElementById("compteurSelection").innerText = `${nb} sélectionné(s)`;
-    }
-
-    // 2. RÉSERVATIONS PERSONNELLES
+    // 3. CHARGEMENT RÉSERVATIONS PERSONNELLES
     chargerMesReservations();
 
     function chargerMesReservations() {
@@ -348,10 +439,10 @@
       const projet = document.getElementById("inputProjet").value.trim();
       const dDebut = document.getElementById("inputDateDebut").value;
       const dFin = document.getElementById("inputDateFin").value;
-      const coches = Array.from(document.querySelectorAll('#pickerMateriel input[type="checkbox"]:checked')).map(c => c.value);
+      const coches = Array.from(selectionIds);
 
       if (!projet || !dDebut || !dFin || coches.length === 0) {
-        alert("Veuillez renseigner le nom du projet, les dates et cocher au moins un équipement.");
+        alert("Veuillez renseigner le nom du projet, les dates et sélectionner au moins un équipement.");
         return;
       }
 

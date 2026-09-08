@@ -378,13 +378,12 @@
         btnSortie.disabled = true;
         btnSortie.innerText = "Enregistrement...";
       }
-
 const payload = {
         id: currentItem.id,
-        action: (statut === "Dispo") ? "RETOUR" : "SORTIE",
+        action: (statut === "Dispo") ? "RETOUR" : (statut === "SAV" ? "SAV" : "SORTIE"),
         nouveauStatut: statut,
         lieu: lieu,
-        user: (statut === "Dispo") ? "-" : user,
+        user: user, // <-- C'est l'étudiant connecté qui réalise l'action !
         panne: panne
       };
 

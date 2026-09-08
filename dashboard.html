@@ -304,13 +304,23 @@
         const emprunteur = (it.emprunteur && it.emprunteur !== "-") ? it.emprunteur : "-";
         const localisation = it.localisation || "Stock";
 
-        // Bouton Réservation
+// Bouton Réservation
         let boutonResaHtml = '';
         if (estEnReservation(it)) {
           boutonResaHtml = `
             <button type="button" class="btn-resa-tag" onclick="ouvrirCalendrier('${it.id}', '${it.nom.replace(/'/g, "\\'")}')">
               📅 RÉSERVÉ
             </button>
+          `;
+        }
+
+        // Bouton Notice PDF (si présent en colonne N)
+        let boutonDocHtml = '';
+        if (it.docUrl && it.docUrl.startsWith("http")) {
+          boutonDocHtml = `
+            <a href="${it.docUrl}" target="_blank" style="text-decoration:none; background:#495057; color:#fff; padding:8px 12px; border-radius:8px; font-size:0.82em; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+              📄 Notice
+            </a>
           `;
         }
 
@@ -333,6 +343,7 @@
             </div>
 
             <div class="item-actions">
+              ${boutonDocHtml}
               ${boutonResaHtml}
             </div>
           </div>

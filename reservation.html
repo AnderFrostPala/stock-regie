@@ -8,7 +8,7 @@
     * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 16px; margin: 0 auto; max-width: 650px; background: #f4f5f7; color: #333;
+      padding: 16px; margin: 0 auto; max-width: 680px; background: #f4f5f7; color: #333;
     }
     h2, h3, h4 { margin-top: 0; }
     .card {
@@ -20,7 +20,7 @@
       background: #e9ecef; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 0.85em;
     }
     .nav-link { display: inline-block; margin-bottom: 12px; color: #007bff; text-decoration: none; font-weight: 500; font-size: 0.9em; }
-    input[type="text"], input[type="date"] {
+    input[type="text"], input[type="date"], input[type="search"] {
       width: 100%; padding: 10px; margin: 6px 0 12px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
     }
     .grid-dates { display: flex; gap: 10px; }
@@ -29,23 +29,60 @@
       width: 100%; padding: 14px; background: #007bff; color: #fff; border: none;
       border-radius: 6px; font-weight: bold; font-size: 1em; cursor: pointer;
     }
-    .cat-header {
-      background: #212529; color: #fff; padding: 8px 12px; border-radius: 4px;
-      margin-top: 16px; font-weight: bold; font-size: 0.95em;
+    .btn-submit:disabled { background: #6c757d; cursor: not-allowed; }
+
+    /* Accordéons Catégories & Sous-Catégories */
+    details.cat-group {
+      margin-top: 10px; border: 1px solid #dee2e6; border-radius: 6px; overflow: hidden; background: #fff;
     }
-    .subcat-header {
-      background: #e2e6ea; color: #495057; padding: 4px 10px; margin: 8px 0 4px 0;
-      font-size: 0.85em; font-weight: 600; border-left: 3px solid #007bff;
+    summary.cat-summary {
+      background: #212529; color: #fff; padding: 10px 14px; font-weight: bold; font-size: 0.95em;
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none;
     }
+    summary.cat-summary::-webkit-details-marker { display: none; }
+    summary.cat-summary::after {
+      content: "▾"; font-size: 1.1em; transition: transform 0.2s;
+    }
+    details.cat-group[open] > summary.cat-summary::after {
+      transform: rotate(180deg);
+    }
+
+    details.subcat-group {
+      margin: 8px 10px; border-left: 3px solid #007bff; background: #fafbfc; border-radius: 4px;
+    }
+    summary.subcat-summary {
+      padding: 8px 10px; font-weight: 600; font-size: 0.88em; color: #495057;
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none;
+    }
+    summary.subcat-summary::-webkit-details-marker { display: none; }
+    summary.subcat-summary::after {
+      content: "▾"; font-size: 1em; transition: transform 0.2s;
+    }
+    details.subcat-group[open] > summary.subcat-summary::after {
+      transform: rotate(180deg);
+    }
+
+    .subcat-content { padding: 4px 10px 8px 10px; }
+
+    /* Rangée Matériel */
     .item-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 4px; border-bottom: 1px solid #eee;
+      padding: 8px 0; border-bottom: 1px solid #eee;
     }
+    .item-row:last-child { border-bottom: none; }
+    .item-info strong { display: block; font-size: 0.9em; }
+    .item-meta { font-size: 0.78em; color: #6c757d; }
+    .item-actions { display: flex; align-items: center; gap: 10px; }
+
     .btn-cal {
       background: #f8f9fa; border: 1px solid #ced4da; border-radius: 4px;
-      padding: 4px 8px; font-size: 0.8em; cursor: pointer; margin-right: 8px;
+      padding: 4px 8px; font-size: 0.8em; cursor: pointer;
     }
     .btn-cal:hover { background: #e9ecef; }
+
+    /* Barre de recherche */
+    .search-box-wrapper { position: relative; }
+    .search-hint { font-size: 0.8em; color: #6c757d; margin-top: -6px; margin-bottom: 10px; }
 
     /* Modal Calendrier */
     #calModal {
@@ -121,13 +158,18 @@
         <h3>Matériel à réserver</h3>
         <span id="compteurChoix" style="font-size: 0.85em; color: #007bff; font-weight: bold;">0 sélectionné</span>
       </div>
-      <p style="font-size: 0.85em; color: #666; margin-top: -6px;">
-        Clique sur 📅 pour voir les jours déjà pris pour un appareil.
-      </p>
 
+      <!-- Barre de recherche & Autocomplétion -->
+      <div class="search-box-wrapper">
+        <input type="search" id="rechercheRapide" list="suggestionsMat" placeholder="🔍 Rechercher un matériel (ex: SM58, DM7, Découpe, DMX...)" oninput="filtrerCatalogue()">
+        <datalist id="suggestionsMat"></datalist>
+      </div>
+      <div class="search-hint">Astuce : les catégories s'ouvrent automatiquement lors de la frappe.</div>
+
+      <!-- Conteneur d'accordéons -->
       <div id="listeCatalogue">Chargement des équipements...</div>
 
-      <button type="submit" id="btnSubmit" class="btn-submit" style="margin-top: 16px;">
+      <button type="submit" id="btnSubmit" class="btn-submit" style="margin-top: 18px;">
         Enregistrer la réservation
       </button>
     </div>
@@ -151,8 +193,9 @@
     document.getElementById("inputDebut").value = today;
     document.getElementById("inputFin").value = today;
 
-    // 2. CHARGEMENT DU CATALOGUE
+    // 2. ÉTAT GLOBAL
     let parc = [];
+    const elementsSelectionnes = new Set(); // Mémorise les IDs cochés même lors des recherches
 
     fetch(`${SCRIPT_URL}?action=getAll`)
       .then(r => r.json())
@@ -162,63 +205,130 @@
           return;
         }
         parc = res.items || [];
+        alimenterAutocompletion();
         afficherCatalogue();
       })
       .catch(() => {
         document.getElementById("listeCatalogue").innerText = "Impossible de joindre le serveur.";
       });
 
-    function afficherCatalogue() {
+    // 3. AUTOCOMPLÉTION (DATALIST)
+    function alimenterAutocompletion() {
+      const datalist = document.getElementById("suggestionsMat");
+      datalist.innerHTML = "";
+      // Unicité des noms pour ne pas doubler les modèles démultipliés
+      const nomsUniques = Array.from(new Set(parc.map(item => item.nom)));
+      nomsUniques.forEach(nom => {
+        const opt = document.createElement("option");
+        opt.value = nom;
+        datalist.appendChild(opt);
+      });
+    }
+
+    // 4. RENDU DE L'ACCORDÉON
+    function afficherCatalogue(terme = "") {
       const container = document.getElementById("listeCatalogue");
       container.innerHTML = "";
+      const motCle = terme.trim().toLowerCase();
 
-      // Regroupement par Catégorie > Sous-Catégorie
+      // Regroupement hiérarchique : Catégorie -> Sous-Catégorie -> Items
       const arbre = {};
+      let totalTrouves = 0;
+
       parc.forEach(item => {
+        const nom = (item.nom || "").toLowerCase();
+        const id = (item.id || "").toLowerCase();
+        const ref = (item.ref || "").toLowerCase();
         const cat = item.categorie || "Général";
-        const sub = item.sousCategorie || "Divers";
-        if (!arbre[cat]) arbre[cat] = {};
-        if (!arbre[cat][sub]) arbre[cat][sub] = [];
-        arbre[cat][sub].push(item);
+        const sub = item.sousCategorie || "Non classé";
+
+        // Filtre de recherche
+        const correspond = !motCle || nom.includes(motCle) || id.includes(motCle) || ref.includes(motCle) || cat.toLowerCase().includes(motCle) || sub.toLowerCase().includes(motCle);
+
+        if (correspond) {
+          totalTrouves++;
+          if (!arbre[cat]) arbre[cat] = {};
+          if (!arbre[cat][sub]) arbre[cat][sub] = [];
+          arbre[cat][sub].push(item);
+        }
       });
 
+      if (totalTrouves === 0) {
+        container.innerHTML = `<div style="padding: 14px; text-align: center; color: #888;">Aucun équipement ne correspond à "<strong>${terme}</strong>".</div>`;
+        return;
+      }
+
       for (const [cat, subcats] of Object.entries(arbre)) {
-        const catDiv = document.createElement("div");
-        catDiv.className = "cat-header";
-        catDiv.innerText = cat;
-        container.appendChild(catDiv);
+        const catDetails = document.createElement("details");
+        catDetails.className = "cat-group";
+        // Si une recherche est en cours, on déplie automatiquement
+        if (motCle) catDetails.open = true;
+
+        const nbTotalCat = Object.values(subcats).reduce((acc, arr) => acc + arr.length, 0);
+
+        const catSummary = document.createElement("summary");
+        catSummary.className = "cat-summary";
+        catSummary.innerHTML = `<span>${cat}</span> <span style="font-size:0.8em; opacity:0.85;">${nbTotalCat} machine(s)</span>`;
+        catDetails.appendChild(catSummary);
 
         for (const [sub, items] of Object.entries(subcats)) {
-          const subDiv = document.createElement("div");
-          subDiv.className = "subcat-header";
-          subDiv.innerText = sub;
-          container.appendChild(subDiv);
+          const subDetails = document.createElement("details");
+          subDetails.className = "subcat-group";
+          if (motCle) subDetails.open = true;
+
+          const subSummary = document.createElement("summary");
+          subSummary.className = "subcat-summary";
+          subSummary.innerHTML = `<span>${sub}</span> <span style="font-size:0.8em; color:#888;">(${items.length})</span>`;
+          subDetails.appendChild(subSummary);
+
+          const subContent = document.createElement("div");
+          subContent.className = "subcat-content";
 
           items.forEach(it => {
+            const isChecked = elementsSelectionnes.has(it.id);
             const row = document.createElement("div");
             row.className = "item-row";
             row.innerHTML = `
-              <div>
+              <div class="item-info">
                 <strong>${it.nom}</strong>
-                <div style="font-size: 0.8em; color: #666;">ID : ${it.id} &bull; ${it.localisation}</div>
+                <div class="item-meta">ID : ${it.id} &bull; ${it.localisation}</div>
               </div>
-              <div style="display:flex; align-items:center;">
+              <div class="item-actions">
                 <button type="button" class="btn-cal" onclick="ouvrirCalendrier('${it.id}', '${it.nom.replace(/'/g, "\\'")}')">📅 Planning</button>
-                <input type="checkbox" name="choixMat" value="${it.id}" onchange="majCompteur()" style="width:18px; height:18px; cursor:pointer;">
+                <input type="checkbox" value="${it.id}" ${isChecked ? "checked" : ""} onchange="basculerChoix(this)" style="width:18px; height:18px; cursor:pointer;">
               </div>
             `;
-            container.appendChild(row);
+            subContent.appendChild(row);
           });
+
+          subDetails.appendChild(subContent);
+          catDetails.appendChild(subDetails);
         }
+
+        container.appendChild(catDetails);
       }
     }
 
-    function majCompteur() {
-      const total = document.querySelectorAll('input[name="choixMat"]:checked').length;
-      document.getElementById("compteurChoix").innerText = `${total} sélectionné(s)`;
+    // 5. GESTION DES RECHERCHES ET COCHES
+    function filtrerCatalogue() {
+      const q = document.getElementById("rechercheRapide").value;
+      afficherCatalogue(q);
     }
 
-    // 3. LOGIQUE DU CALENDRIER MODAL
+    function basculerChoix(cb) {
+      if (cb.checked) {
+        elementsSelectionnes.add(cb.value);
+      } else {
+        elementsSelectionnes.delete(cb.value);
+      }
+      majCompteur();
+    }
+
+    function majCompteur() {
+      document.getElementById("compteurChoix").innerText = `${elementsSelectionnes.size} sélectionné(s)`;
+    }
+
+    // 6. MODAL CALENDRIER MENSUEL
     let calDateCourante = new Date();
     let calItemIdEnCours = null;
     let calResasEnCours = [];
@@ -265,7 +375,6 @@
       });
 
       const premierJourMois = new Date(annee, mois, 1).getDay();
-      // Ajustement lundi = 0
       const offset = (premierJourMois === 0 ? 6 : premierJourMois - 1);
       const nbJoursMois = new Date(annee, mois + 1, 0).getDate();
 
@@ -280,22 +389,19 @@
         cell.className = "cal-cell";
         cell.innerText = d;
 
-        // Date du jour format YYYY-MM-DD
         const dateStr = `${annee}-${String(mois + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const matchResa = calResasEnCours.find(r => dateStr >= r.debut && dateStr <= r.fin);
 
-        // Vérifie si le jour est réservé
-        const estReserve = calResasEnCours.some(r => dateStr >= r.debut && dateStr <= r.fin);
-
-        if (estReserve) {
+        if (matchResa) {
           cell.className += " cal-reserved";
-          cell.title = "Réservé";
+          cell.title = `Réservé pour : ${matchResa.projet} (${matchResa.demandeur})`;
         }
 
         grid.appendChild(cell);
       }
     }
 
-    // 4. VALIDATION DE LA RÉSERVATION
+    // 7. ENVOI DE LA DEMANDE
     function validerReservation(e) {
       e.preventDefault();
 
@@ -303,13 +409,11 @@
       const dFin = document.getElementById("inputFin").value;
 
       if (dFin < dDebut) {
-        alert("La date de fin ne peut pas être antérieure à la date de début.");
+        alert("La date de retour ne peut pas être antérieure à la date de départ.");
         return;
       }
 
-      const coches = document.querySelectorAll('input[name="choixMat"]:checked');
-      const ids = Array.from(coches).map(c => c.value);
-
+      const ids = Array.from(elementsSelectionnes);
       if (ids.length === 0) {
         alert("Veuillez cocher au moins un équipement à réserver.");
         return;
@@ -335,7 +439,7 @@
         body: JSON.stringify(payload)
       })
       .then(() => {
-        alert("Réservation enregistrée avec succès !");
+        alert("Réservation confirmée avec succès !");
         window.location.href = "index.html";
       })
       .catch(err => {

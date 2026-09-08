@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Régie - Administration Parc & Comptes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    
+    :root {
+      --bg-body: #0d0f12;
+      --bg-surface: #171a21;
+      --bg-surface-elevated: #20242e;
+      --border: #292e3b;
+      --text-main: #f1f3f7;
+      --text-muted: #8b949e;
+      
+      --status-dispo: #10b981;
+      --status-sorti: #ef4444;
+      --status-sav: #f59e0b;
+      --status-blue: #3b82f6;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      margin: 0 auto; max-width: 680px;
+      background-color: var(--bg-body); color: var(--text-main);
+      padding: 14px; -webkit-font-smoothing: antialiased;
+    }
+
+    /* HEADER */
+    .app-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
+    }
+    .brand-group { display: flex; align-items: center; gap: 10px; }
+    .brand-logo { height: 36px; max-width: 70px; object-fit: contain; }
+    .brand-fallback {
+      background: #fff; color: #000; font-weight: 900; font-size: 0.65em;
+      line-height: 1; padding: 5px 6px; border-radius: 4px;
+    }
+    .brand-text h1 { margin: 0; font-size: 0.95em; font-weight: 800; color: #fff; }
+    .brand-text span { display: block; font-size: 0.72em; font-weight: 600; color: #f87171; text-transform: uppercase; }
+
+    .quick-nav { display: flex; gap: 6px; margin-bottom: 14px; }
+    .quick-nav a {
+      flex: 1; text-align: center; padding: 7px 4px; border-radius: 6px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      color: var(--text-muted); text-decoration: none; font-size: 0.78em; font-weight: 700;
+    }
+    .quick-nav a:hover { color: #fff; border-color: #4b5563; }
+
+    .card {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-bottom: 14px;
+    }
+    h3 { margin-top: 0; margin-bottom: 12px; font-size: 1em; color: #fff; font-weight: 800; }
+
+    /* FORMULAIRES & INPUTS */
+    label { font-size: 0.76em; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    input[type="text"], input[type="password"], select {
+      width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+      background: #0d0f12; color: #fff; font-size: 14px; font-family: inherit; margin-bottom: 10px;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--status-blue); }
+
+    .btn-submit {
+      width: 100%; padding: 12px; background: var(--status-blue); color: #fff;
+      border: none; border-radius: 8px; font-weight: 800; font-size: 0.92em; cursor: pointer;
+      font-family: inherit; transition: background 0.15s ease;
+    }
+    .btn-submit:hover { background: #2563eb; }
+
+    /* TABLEAU DES ÉTUDIANTS */
+    .user-stat-row {
+      background: #0d0f12; border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px; margin-bottom: 8px;
+    }
+    .user-stat-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+    }
+    .badge-role {
+      font-size: 0.72em; padding: 2px 7px; border-radius: 4px; font-weight: 800; text-transform: uppercase;
+    }
+    .role-admin { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+    .role-etu   { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+
+    .metrics-bar {
+      display: flex; gap: 14px; font-size: 0.8em; color: var(--text-muted); margin-bottom: 6px;
+    }
+    .metrics-bar strong { color: #fff; font-family: 'JetBrains Mono', monospace; }
+
+    .items-held-box {
+      background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 6px; padding: 8px 10px; margin-top: 6px; font-size: 0.82em;
+    }
+    .code-tag {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82em; font-weight: 700;
+      color: #38bdf8; background: #000; padding: 1px 5px; border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MODAL VÉRIFICATION DU MOT DE PASSE MAÎTRE ADMIN -->
+  <div id="adminPassModal" style="position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg-body); z-index:3000; display:flex; align-items:center; justify-content:center; padding:16px;">
+    <div class="card" style="max-width:360px; width:100%; text-align:center; background:var(--bg-surface-elevated);">
+      <div style="font-size:2.4em; margin-bottom:6px;">🔒</div>
+      <h3 style="margin-top:0;">Espace Administrateur</h3>
+      <p style="font-size:0.85em; color:var(--text-muted);">Saisissez le mot de passe maître de la régie :</p>
+      <input type="password" id="adminPassInput" placeholder="Mot de passe maître..." style="text-align:center; margin-bottom:12px;">
+      <button type="button" onclick="validerMotDePasseMaster()" class="btn-submit" style="background:#dc2626;">Déverrouiller l'accès</button>
+      <a href="index.html" style="display:block; margin-top:12px; font-size:0.8em; color:var(--text-muted); text-decoration:none;">&larr; Retour au scan</a>
+    </div>
+  </div>
+
+  <!-- CONTENU PRINCIPAL DE L'ADMIN -->
+  <header class="app-header">
+    <div class="brand-group">
+      <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+      <div id="logoFallback" class="brand-fallback" style="display:none;">DN<br>MADE</div>
+      <div class="brand-text">
+        <h1>Panneau Admin</h1>
+        <span>DNMADe Marseille &bull; Supervision</span>
+      </div>
+    </div>
+    <a href="index.html" style="font-size:0.8em; color:var(--text-muted); text-decoration:none; border:1px solid var(--border); padding:5px 10px; border-radius:6px;">Quitter &rarr;</a>
+  </header>
+
+  <nav class="quick-nav">
+    <a href="index.html">Scan & Fiche</a>
+    <a href="dashboard.html">Vue Parc</a>
+    <a href="reservation.html">Planning Résas</a>
+    <a href="express.html" style="color:#fbbf24;">⚡ Mode Camion</a>
+  </nav>
+
+  <!-- BLOC 1 : CRÉATION D'UN COMPTE ÉTUDIANT OU ADMIN -->
+  <div class="card">
+    <h3>Ajouter un Utilisateur</h3>
+    <form onsubmit="creerUtilisateur(event)">
+      <label>Nom et Prénom :</label>
+      <input type="text" id="newNom" placeholder="ex: Julien Delmas" required>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+        <div>
+          <label>Code PIN (4 chiffres) :</label>
+          <input type="password" id="newPin" maxlength="4" placeholder="••••" required style="text-align:center; letter-spacing:3px;">
+        </div>
+        <div>
+          <label>Rôle :</label>
+          <select id="newRole">
+            <option value="etudiant">Étudiant</option>
+            <option value="admin">Administrateur</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" id="btnAjoutUser" class="btn-submit">Enregistrer l'utilisateur</button>
+    </form>
+  </div>
+
+  <!-- BLOC 2 : TABLEAU D'ACTIVITÉ DES ÉTUDIANTS -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0;">Activité des Comptes & Encours</h3>
+      <button type="button" onclick="chargerStats()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:4px 8px; border-radius:4px; font-size:0.75em; cursor:pointer;">Rafraîchir ↻</button>
+    </div>
+
+    <input type="text" id="filterUsersInput" placeholder="Filtrer par nom..." oninput="filtrerUtilisateurs()" style="margin-bottom:12px;">
+
+    <div id="loadingStats" style="text-align:center; padding:16px; font-size:0.85em; color:var(--text-muted);">Récupération des statistiques régie...</div>
+    <div id="listeComptes"></div>
+  </div>
+
+  <script>
+    // COLLE TON URL APPS SCRIPT ICI
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+
+    let rawStats = [];
+    const localRole = localStorage.getItem("regie_role") || "etudiant";
+
+    // 1. VÉRIFICATION DU RÔLE LOCAL
+    if (localRole !== "admin") {
+      alert("Accès réservé aux administrateurs de la régie.");
+      window.location.href = "index.html";
+    }
+
+    // 2. CONTRÔLE DU MOT DE PASSE MAÎTRE
+    function validerMotDePasseMaster() {
+      const pass = document.getElementById("adminPassInput").value.trim();
+      if (!pass) return;
+
+      fetch(`${SCRIPT_URL}?action=checkAdminPass&pass=${encodeURIComponent(pass)}`)
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) {
+            document.getElementById("adminPassModal").style.display = "none";
+            chargerStats();
+          } else {
+            alert(res.message || "Mot de passe incorrect.");
+          }
+        })
+        .catch(err => alert("Erreur de connexion : " + err));
+    }
+
+    // 3. CHARGEMENT DES STATS ET ENCOURS
+    function chargerStats() {
+      document.getElementById("loadingStats").style.display = "block";
+      document.getElementById("listeComptes").innerHTML = "";
+
+      fetch(`${SCRIPT_URL}?action=getAdminStats`)
+        .then(r => r.json())
+        .then(res => {
+          document.getElementById("loadingStats").style.display = "none";
+          if (res.success && res.stats) {
+            rawStats = res.stats;
+            afficherListeComptes(rawStats);
+          }
+        })
+        .catch(() => {
+          document.getElementById("loadingStats").innerText = "Erreur lors de la récupération des données.";
+        });
+    }
+
+    function afficherListeComptes(liste) {
+      const conteneur = document.getElementById("listeComptes");
+      conteneur.innerHTML = "";
+
+      if (liste.length === 0) {
+        conteneur.innerHTML = '<div style="font-size:0.85em; color:var(--text-muted); text-align:center;">Aucun profil trouvé.</div>';
+        return;
+      }
+
+      liste.forEach(u => {
+        const div = document.createElement("div");
+        div.className = "user-stat-row";
+
+        const badgeClass = (u.role === "admin") ? "badge-role role-admin" : "badge-role role-etu";
+        const hasHeldItems = u.materielEnMain && u.materielEnMain.length > 0;
+
+        div.innerHTML = `
+          <div class="user-stat-header">
+            <strong style="color:#fff; font-size:0.95em;">${u.nom}</strong>
+            <span class="${badgeClass}">${u.role}</span>
+          </div>
+
+          <div class="metrics-bar">
+            <span>Sorties : <strong>${u.totalSorties}</strong></span>
+            <span>Retours : <strong>${u.totalRetours}</strong></span>
+            <span>Résas : <strong>${u.totalResas}</strong></span>
+          </div>
+
+          ${hasHeldItems ? `
+            <div class="items-held-box">
+              <strong style="color:var(--status-sorti);">⚠️ Matériel actuellement en prêt (${u.materielEnMain.length}) :</strong>
+              <div style="margin-top:4px; line-height:1.4;">${u.materielEnMain.map(m => `<span class="code-tag" style="margin-right:4px;">${m}</span>`).join(" ")}</div>
+            </div>
+          ` : `
+            <div style="font-size:0.78em; color:var(--status-dispo);">✅ Tout le matériel emprunté a été rendu.</div>
+          `}
+        `;
+        conteneur.appendChild(div);
+      });
+    }
+
+    function filtrerUtilisateurs() {
+      const q = document.getElementById("filterUsersInput").value.trim().toLowerCase();
+      const filtres = rawStats.filter(u => (u.nom || "").toLowerCase().includes(q));
+      afficherListeComptes(filtres);
+    }
+
+    // 4. CRÉATION D'UN UTILISATEUR
+    function creerUtilisateur(e) {
+      e.preventDefault();
+      const nom = document.getElementById("newNom").value.trim();
+      const pin = document.getElementById("newPin").value.trim();
+      const role = document.getElementById("newRole").value;
+
+      if (!nom || pin.length !== 4 || isNaN(pin)) {
+        alert("Nom obligatoire et PIN composé de 4 chiffres.");
+        return;
+      }
+
+      const btn = document.getElementById("btnAjoutUser");
+      btn.disabled = true;
+      btn.innerText = "Création...";
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          actionType: "REGISTER",
+          nom: nom,
+          pin: pin,
+          role: role
+        })
+      })
+      .then(() => {
+        alert(`L'utilisateur ${nom} a été créé avec succès !`);
+        document.getElementById("newNom").value = "";
+        document.getElementById("newPin").value = "";
+        btn.disabled = false;
+        btn.innerText = "Enregistrer l'utilisateur";
+        chargerStats();
+      })
+      .catch(err => {
+        alert("Erreur réseau : " + err);
+        btn.disabled = false;
+        btn.innerText = "Enregistrer l'utilisateur";
+      });
+    }
+  </script>
+</body>
+</html>

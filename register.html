@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Régie - Inscription</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 16px; margin: 0 auto; max-width: 420px; background: #f4f5f7; color: #333;
+    }
+    .card {
+      background: #fff; border-radius: 8px; padding: 20px; margin-top: 30px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+    h2 { margin-top: 0; margin-bottom: 6px; }
+    p.subtitle { font-size: 0.85em; color: #666; margin-top: 0; margin-bottom: 20px; }
+    label { font-size: 0.9em; font-weight: 600; display: block; margin-top: 10px; }
+    input {
+      width: 100%; padding: 12px; margin: 6px 0 12px 0; border: 1px solid #ccc;
+      border-radius: 4px; font-size: 15px;
+    }
+    .btn-submit {
+      width: 100%; padding: 14px; background: #28a745; color: #fff; border: none;
+      border-radius: 6px; font-weight: bold; font-size: 1em; cursor: pointer; margin-top: 10px;
+    }
+    .btn-submit:disabled { background: #6c757d; cursor: not-allowed; }
+    .nav-link { display: inline-block; margin-top: 16px; color: #007bff; text-decoration: none; font-size: 0.9em; text-align: center; width: 100%; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Créer un compte</h2>
+    <p class="subtitle">Enregistre ton nom pour signer tes emprunts et réservations régie.</p>
+
+    <form id="formRegister" onsubmit="creerCompte(event)">
+      <label>Nom & Prénom :</label>
+      <input type="text" id="regNom" placeholder="ex. Thomas Morel" required>
+
+      <label>Code PIN (4 chiffres) :</label>
+      <input type="password" id="regPin" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required style="letter-spacing: 6px; font-size: 1.3em; text-align: center;">
+
+      <label>Confirmer le code PIN :</label>
+      <input type="password" id="regPinConf" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required style="letter-spacing: 6px; font-size: 1.3em; text-align: center;">
+
+      <button type="submit" id="btnSubmit" class="btn-submit">Valider l'inscription</button>
+    </form>
+
+    <a href="index.html" class="nav-link">&larr; Déjà un compte ? Se connecter</a>
+  </div>
+
+  <script>
+    // COLLE ICI TON URL DE DÉPLOIEMENT APPS SCRIPT
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+
+    function creerCompte(e) {
+      e.preventDefault();
+
+      const nom = document.getElementById("regNom").value.trim();
+      const pin = document.getElementById("regPin").value.trim();
+      const pinConf = document.getElementById("regPinConf").value.trim();
+
+      if (pin.length !== 4 || isNaN(pin)) {
+        alert("Le code PIN doit comporter exactement 4 chiffres.");
+        return;
+      }
+
+      if (pin !== pinConf) {
+        alert("Les deux codes PIN ne correspondent pas.");
+        return;
+      }
+
+      const btn = document.getElementById("btnSubmit");
+      btn.innerText = "Création en cours...";
+      btn.disabled = true;
+
+      const payload = {
+        actionType: "REGISTER",
+        nom: nom,
+        pin: pin
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          // Connexion automatique dans le navigateur
+          localStorage.setItem("regie_user", res.nomOfficiel);
+          alert(`Bienvenue ${res.nomOfficiel} ! Ton compte a été créé.`);
+          window.location.href = "index.html";
+        } else {
+          alert("Erreur : " + res.message);
+          btn.disabled = false;
+          btn.innerText = "Valider l'inscription";
+        }
+      })
+      .catch(err => {
+        alert("Erreur de connexion au serveur : " + err);
+        btn.disabled = false;
+        btn.innerText = "Valider l'inscription";
+      });
+    }
+  </script>
+</body>
+</html>

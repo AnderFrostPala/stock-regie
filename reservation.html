@@ -6,7 +6,7 @@
   <title>Régie - Planning & Réservations</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     
@@ -14,164 +14,170 @@
       --bg-body: #0d0f12;
       --bg-surface: #171a21;
       --bg-surface-elevated: #20242e;
-      --border: #292e3b;
-      --text-main: #f1f3f7;
-      --text-muted: #8b949e;
+      --border: #2e3442;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
       --status-dispo: #10b981;
       --status-sorti: #ef4444;
       --status-blue: #2563eb;
-      --status-blue-light: #3b82f6;
+      --status-blue-light: #38bdf8;
     }
 
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      margin: 0 auto; max-width: 600px;
+      margin: 0 auto; max-width: 620px;
       background-color: var(--bg-body); color: var(--text-main);
-      padding: 14px; -webkit-font-smoothing: antialiased;
+      padding: 16px; -webkit-font-smoothing: antialiased;
+      font-size: 16px;
     }
 
     /* HEADER */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
-      padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
+      padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--border);
     }
-    .brand-group { display: flex; align-items: center; gap: 10px; }
-    .brand-logo { height: 36px; max-width: 70px; object-fit: contain; }
+    .brand-group { display: flex; align-items: center; gap: 12px; }
+    .brand-logo { height: 42px; max-width: 80px; object-fit: contain; }
     .brand-fallback {
-      background: #fff; color: #000; font-weight: 900; font-size: 0.65em;
-      line-height: 1; padding: 5px 6px; border-radius: 4px;
+      background: #fff; color: #000; font-weight: 900; font-size: 0.75em;
+      line-height: 1; padding: 6px 8px; border-radius: 4px;
     }
-    .brand-text h1 { margin: 0; font-size: 0.95em; font-weight: 800; color: #fff; }
-    .brand-text span { display: block; font-size: 0.72em; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    .brand-text h1 { margin: 0; font-size: 1.15em; font-weight: 800; color: #fff; }
+    .brand-text span { display: block; font-size: 0.8em; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
     
     .user-pill-btn {
-      display: flex; align-items: center; gap: 7px; background: var(--bg-surface);
-      border: 1px solid var(--border); padding: 6px 10px; border-radius: 20px;
-      color: var(--text-main); cursor: pointer; font-size: 0.82em; font-weight: 600; font-family: inherit;
+      display: flex; align-items: center; gap: 8px; background: var(--bg-surface);
+      border: 1px solid var(--border); padding: 8px 14px; border-radius: 20px;
+      color: var(--text-main); cursor: pointer; font-size: 0.9em; font-weight: 700; font-family: inherit;
     }
 
     /* MENU UTILISATEUR */
     #userMenu {
-      position: absolute; right: 14px; top: 62px; width: 220px;
+      position: absolute; right: 16px; top: 70px; width: 240px;
       background: var(--bg-surface-elevated); border: 1px solid var(--border);
-      border-radius: 10px; padding: 8px 0; z-index: 1000; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      border-radius: 12px; padding: 8px 0; z-index: 1000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     }
-    .menu-header { padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 0.8em; color: var(--text-muted); }
+    .menu-header { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 0.88em; color: var(--text-muted); }
     .menu-item {
-      display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px;
+      display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px;
       background: none; border: none; color: var(--text-main); text-align: left;
-      font-size: 0.86em; cursor: pointer; text-decoration: none; font-family: inherit;
+      font-size: 0.95em; cursor: pointer; text-decoration: none; font-family: inherit; font-weight: 600;
     }
     .menu-item:hover { background: rgba(255,255,255,0.06); }
     .menu-item.danger { color: var(--status-sorti); }
 
-    /* NAVIGATION */
-    .quick-nav { display: flex; gap: 6px; margin-bottom: 14px; }
+    /* ONGLETS */
+    .quick-nav { display: flex; gap: 8px; margin-bottom: 16px; }
     .quick-nav a {
-      flex: 1; text-align: center; padding: 7px 4px; border-radius: 6px;
+      flex: 1; text-align: center; padding: 10px 6px; border-radius: 8px;
       background: var(--bg-surface); border: 1px solid var(--border);
-      color: var(--text-muted); text-decoration: none; font-size: 0.78em; font-weight: 700;
+      color: var(--text-muted); text-decoration: none; font-size: 0.88em; font-weight: 700;
     }
-    .quick-nav a.active { color: #fff; border-color: #4b5563; background: var(--bg-surface-elevated); }
+    .quick-nav a.active { color: #fff; border-color: #64748b; background: var(--bg-surface-elevated); }
 
     .card {
       background: var(--bg-surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 16px; margin-bottom: 14px;
+      border-radius: 14px; padding: 18px; margin-bottom: 16px;
     }
-    h3 { margin-top: 0; margin-bottom: 12px; font-size: 0.98em; color: #fff; font-weight: 800; }
+    h3 { margin-top: 0; margin-bottom: 14px; font-size: 1.15em; color: #fff; font-weight: 800; }
 
-    /* ACCORDÉON MES RÉSERVATIONS */
+    /* ACCORDÉON RÉSERVATIONS EN COURS */
     .accordion-toggle {
       width: 100%; display: flex; justify-content: space-between; align-items: center;
-      background: none; border: none; color: #60a5fa; font-size: 0.92em; font-weight: 700;
+      background: none; border: none; color: #60a5fa; font-size: 1.05em; font-weight: 800;
       cursor: pointer; padding: 0; text-align: left; font-family: inherit;
     }
     .accordion-content {
-      margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); display: block;
+      margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: block;
     }
 
-    /* FORMULAIRE & DATE */
-    label { font-size: 0.76em; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    /* FORMULAIRE & SÉLECTIONS */
+    label { font-size: 0.85em; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 6px; }
     input[type="text"], input[type="date"] {
-      width: 100%; padding: 11px 12px; border-radius: 8px; border: 1px solid var(--border);
-      background: #0d0f12; color: #fff; font-size: 14px; font-family: inherit; margin-bottom: 10px;
+      width: 100%; padding: 13px 14px; border-radius: 8px; border: 1px solid var(--border);
+      background: #090a0d; color: #fff; font-size: 15px; font-family: inherit; margin-bottom: 12px;
     }
     input:focus { outline: none; border-color: var(--status-blue-light); }
-    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
 
-    /* RECHERCHE ET SÉLECTION */
     .search-box {
-      width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border);
-      background: #090a0d; color: #fff; font-size: 13px; font-family: inherit; margin-bottom: 10px;
+      width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border);
+      background: #090a0d; color: #fff; font-size: 15px; font-family: inherit; margin-bottom: 12px;
     }
     .selection-counter {
-      font-size: 0.8em; font-weight: 700; color: var(--status-blue-light); text-align: right; margin-bottom: 6px;
+      font-size: 0.9em; font-weight: 800; color: var(--status-blue-light); text-align: right; margin-bottom: 8px;
     }
 
-    /* ARBORESCENCE DÉPLIABLE (CATÉGORIES & SOUS-CATÉGORIES) */
+    /* ARBORESCENCE GRANDE TAILLE (CATÉGORIES & SOUS-CATÉGORIES) */
     .picker-box {
-      max-height: 380px; overflow-y: auto; background: #090a0d; border: 1px solid var(--border);
-      border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 6px;
+      max-height: 480px; overflow-y: auto; background: #090a0d; border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 10px;
     }
 
+    /* GROS BLOC CATÉGORIE */
     details.cat-group {
-      background: #12151c; border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+      background: #141720; border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
     }
     details.cat-group summary {
-      padding: 9px 12px; font-size: 0.86em; font-weight: 800; color: #fff;
-      cursor: pointer; user-select: none; background: #161922; display: flex;
+      padding: 14px 16px; font-size: 1.05em; font-weight: 800; color: #fff;
+      cursor: pointer; user-select: none; background: #1c202a; display: flex;
       justify-content: space-between; align-items: center; list-style: none;
     }
     details.cat-group summary::-webkit-details-marker { display: none; }
-    details.cat-group summary::after { content: "▼"; font-size: 0.75em; color: var(--text-muted); transition: transform 0.2s; }
+    details.cat-group summary::after { content: "▼"; font-size: 0.85em; color: var(--text-muted); transition: transform 0.2s; }
     details.cat-group[open] summary::after { transform: rotate(180deg); }
 
+    /* GROS BLOC SOUS-CATÉGORIE */
     details.subcat-group {
-      margin: 6px 8px 6px 14px; border-left: 2px solid #2d3342; padding-left: 8px;
+      margin: 10px 12px 12px 16px; border-left: 3px solid #334155; padding-left: 12px;
     }
     details.subcat-group summary {
-      padding: 4px 6px; font-size: 0.8em; font-weight: 700; color: #94a3b8;
-      cursor: pointer; user-select: none; background: none; display: flex;
-      justify-content: space-between; align-items: center; list-style: none;
+      padding: 8px 10px; font-size: 0.95em; font-weight: 800; color: #cbd5e1;
+      cursor: pointer; user-select: none; background: rgba(255,255,255,0.03); border-radius: 6px;
+      display: flex; justify-content: space-between; align-items: center; list-style: none;
+      margin-bottom: 6px;
     }
     details.subcat-group summary::-webkit-details-marker { display: none; }
-    details.subcat-group summary::after { content: "▸"; font-size: 0.8em; color: var(--text-muted); transition: transform 0.2s; }
+    details.subcat-group summary::after { content: "▸"; font-size: 0.9em; color: var(--text-muted); transition: transform 0.2s; }
     details.subcat-group[open] summary::after { transform: rotate(90deg); }
 
+    /* LIGNES D'ÉQUIPEMENT LARGES & FACILES À CLIQUER */
     .picker-item {
-      display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 5px;
-      font-size: 0.82em; cursor: pointer; user-select: none; margin-left: 4px;
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px;
+      font-size: 0.95em; cursor: pointer; user-select: none; margin-bottom: 4px;
+      background: #0f1218; border: 1px solid rgba(255,255,255,0.04);
     }
-    .picker-item:hover { background: #1a1e27; }
-    .picker-item input[type="checkbox"] { margin: 0; cursor: pointer; }
+    .picker-item:hover { background: #1a202c; border-color: #334155; }
+    .picker-item input[type="checkbox"] {
+      width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: var(--status-blue);
+    }
 
     .code-tag {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.8em; font-weight: 700;
-      color: #38bdf8; background: #000; padding: 1px 5px; border-radius: 3px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.88em; font-weight: 800;
+      color: #38bdf8; background: #000; padding: 3px 7px; border-radius: 4px; border: 1px solid #1e293b;
     }
 
     .btn-submit {
-      width: 100%; padding: 13px; background: var(--status-blue); color: #fff;
-      border: none; border-radius: 8px; font-weight: 800; font-size: 0.95em; cursor: pointer;
-      font-family: inherit; margin-top: 14px; transition: background 0.15s ease;
+      width: 100%; padding: 15px; background: var(--status-blue); color: #fff;
+      border: none; border-radius: 10px; font-weight: 800; font-size: 1.05em; cursor: pointer;
+      font-family: inherit; margin-top: 16px; transition: background 0.15s ease;
     }
     .btn-submit:hover { background: #1d4ed8; }
 
     /* RÉSERVATIONS EN COURS */
     .resa-row {
-      background: #0d0f12; border: 1px solid var(--border); border-radius: 8px;
-      padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      background: #090a0d; border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px;
     }
     .btn-del {
       background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);
-      padding: 6px 10px; border-radius: 6px; font-size: 0.78em; font-weight: 700; cursor: pointer;
+      padding: 8px 12px; border-radius: 6px; font-size: 0.85em; font-weight: 800; cursor: pointer;
     }
     .btn-del:hover { background: rgba(239,68,68,0.25); }
   </style>
 </head>
 <body onclick="fermerMenuSiClicExterieur(event)">
 
-  <!-- HEADER -->
   <header class="app-header">
     <div class="brand-group">
       <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
@@ -182,26 +188,24 @@
       </div>
     </div>
     <button type="button" class="user-pill-btn" onclick="toggleUserMenu(event)">
-      <span style="width:7px; height:7px; border-radius:50%; background:var(--status-dispo);"></span>
+      <span style="width:8px; height:8px; border-radius:50%; background:var(--status-dispo);"></span>
       <span id="userName">...</span>
-      <span style="font-size:0.7em; color:var(--text-muted);">▼</span>
+      <span style="font-size:0.75em; color:var(--text-muted);">▼</span>
     </button>
   </header>
 
-  <!-- MENU DÉROULANT UTILISATEUR -->
   <div id="userMenu">
     <div class="menu-header">Profil : <strong id="userRoleTxt">Étudiant</strong></div>
     <a href="reservation.html" class="menu-item"><span>📅</span> Mes réservations</a>
     <div id="adminMenuOptions" style="display:none;">
       <a href="admin.html" class="menu-item" style="color:#f87171;"><span>⚙️</span> Panneau Admin</a>
-      <a href="express.html" class="menu-item" style="color:#fbbf24;"><span>⚡</span> Mode Camion Express</a>
+      <a href="express.html" class="menu-item" style="color:#fbbf24;"><span>⚡</span> Déchargement Rapide</a>
     </div>
     <button type="button" class="menu-item danger" onclick="deconnexion()" style="border-top:1px solid var(--border); margin-top:4px;">
       <span>🚪</span> Se déconnecter
     </button>
   </div>
 
-  <!-- ONGLETS NAVIGATION -->
   <nav class="quick-nav">
     <a href="index.html">Scan & Fiche</a>
     <a href="reservation.html" class="active">Planning Résas</a>
@@ -215,12 +219,12 @@
       <span id="flecheAccordeon">▼</span>
     </button>
     <div class="accordion-content" id="contenuAccordeon">
-      <div id="loadingPerso" style="font-size:0.85em; color:var(--text-muted);">Chargement de vos réservations...</div>
+      <div id="loadingPerso" style="font-size:0.9em; color:var(--text-muted);">Chargement de vos réservations...</div>
       <div id="listeResasPerso"></div>
     </div>
   </div>
 
-  <!-- BLOC 2 : NOUVELLE RÉSERVATION AVEC CATÉGORIES DÉPLIABLES -->
+  <!-- BLOC 2 : NOUVELLE RÉSERVATION -->
   <div class="card">
     <h3>Nouvelle Demande de Réservation</h3>
     
@@ -238,15 +242,15 @@
       </div>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
       <label style="margin:0;">Catalogue matériel :</label>
       <div id="compteurSelection" class="selection-counter">0 sélectionné(s)</div>
     </div>
 
     <input type="text" id="searchMaterielInput" class="search-box" placeholder="🔍 Rechercher (nom, ID, micro, dmx...)" oninput="filtrerParcArborescent()">
 
-    <!-- ARBORESCENCE DÉPLIABLE -->
-    <div class="picker-box" id="pickerMateriel">Chargement du parc matériel...</div>
+    <!-- ARBORESCENCE LARGE -->
+    <div class="picker-box" id="pickerMateriel">Chargement du catalogue matériel...</div>
 
     <button type="button" class="btn-submit" id="btnResa" onclick="soumettreReservation()">Valider la Réservation</button>
   </div>
@@ -256,7 +260,7 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let rawMateriel = [];
-    const selectionIds = new Set(); // Maintient les ID cochés
+    const selectionIds = new Set();
     const user = localStorage.getItem("regie_user") || "Inconnu";
     const role = localStorage.getItem("regie_role") || "etudiant";
 
@@ -304,17 +308,16 @@
         }
       });
 
-    // 2. CONVERSION ET RENDU EN ACCORDÉONS HIÉRARCHIQUES
+    // 2. ARBORESCENCE GROS FORMAT
     function rendreArborescence(items, openAll = false) {
       const conteneur = document.getElementById("pickerMateriel");
       conteneur.innerHTML = "";
 
       if (!items || items.length === 0) {
-        conteneur.innerHTML = '<div style="font-size:0.8em; color:var(--text-muted); padding:10px; text-align:center;">Aucun équipement trouvé.</div>';
+        conteneur.innerHTML = '<div style="font-size:0.9em; color:var(--text-muted); padding:14px; text-align:center;">Aucun équipement trouvé.</div>';
         return;
       }
 
-      // Structure : { [cat]: { [subCat]: [items] } }
       const tree = {};
       items.forEach(item => {
         const cat = item.categorie || "Autre";
@@ -324,7 +327,6 @@
         tree[cat][sub].push(item);
       });
 
-      // Tri alphabétique des catégories
       const sortedCats = Object.keys(tree).sort();
 
       sortedCats.forEach(cat => {
@@ -336,7 +338,7 @@
         Object.values(tree[cat]).forEach(arr => totalCatItems += arr.length);
 
         const catSummary = document.createElement("summary");
-        catSummary.innerHTML = `<span>📁 ${cat}</span> <span style="font-size:0.75em; color:var(--text-muted); font-family:'JetBrains Mono';">${totalCatItems}</span>`;
+        catSummary.innerHTML = `<span>📁 ${cat}</span> <span style="font-size:0.85em; color:var(--text-muted); font-family:'JetBrains Mono';">${totalCatItems}</span>`;
         catDetails.appendChild(catSummary);
 
         const sortedSubs = Object.keys(tree[cat]).sort();
@@ -347,7 +349,7 @@
 
           const subItems = tree[cat][sub];
           const subSummary = document.createElement("summary");
-          subSummary.innerHTML = `<span>📂 ${sub}</span> <span style="font-size:0.75em; color:var(--text-muted); font-family:'JetBrains Mono';">${subItems.length}</span>`;
+          subSummary.innerHTML = `<span>📂 ${sub}</span> <span style="font-size:0.82em; color:var(--text-muted); font-family:'JetBrains Mono';">${subItems.length}</span>`;
           subDetails.appendChild(subSummary);
 
           subItems.forEach(item => {
@@ -358,7 +360,7 @@
             label.innerHTML = `
               <input type="checkbox" value="${item.id}" ${isChecked ? 'checked' : ''} onchange="toggleSelection(this)">
               <span class="code-tag">${item.id}</span>
-              <span style="color:#fff;">${item.nom}</span>
+              <strong style="color:#fff; font-size:1em;">${item.nom}</strong>
             `;
             subDetails.appendChild(label);
           });
@@ -387,7 +389,6 @@
         return;
       }
 
-      // Filtre les items qui correspondent à la recherche
       const filtres = rawMateriel.filter(item => 
         (item.nom || "").toLowerCase().includes(q) ||
         (item.id || "").toLowerCase().includes(q) ||
@@ -395,11 +396,10 @@
         (item.sousCategorie || "").toLowerCase().includes(q)
       );
 
-      // Déplie automatiquement les accordéons quand on effectue une recherche
       rendreArborescence(filtres, true);
     }
 
-    // 3. CHARGEMENT RÉSERVATIONS PERSONNELLES
+    // 3. RÉSERVATIONS PERSONNELLES
     chargerMesReservations();
 
     function chargerMesReservations() {
@@ -417,10 +417,10 @@
               div.className = "resa-row";
               div.innerHTML = `
                 <div>
-                  <div style="font-weight:700; color:#fff; font-size:0.9em;">
+                  <div style="font-weight:800; color:#fff; font-size:1em;">
                     ${r.nom} <span class="code-tag">${r.id}</span>
                   </div>
-                  <div style="font-size:0.75em; color:var(--text-muted); margin-top:2px;">
+                  <div style="font-size:0.82em; color:var(--text-muted); margin-top:4px;">
                     Projet : <strong style="color:#cbd5e1;">${r.projet}</strong> &bull; Du ${r.debut} au ${r.fin}
                   </div>
                 </div>
@@ -430,7 +430,7 @@
             });
           } else {
             document.getElementById("nbResasPerso").innerText = "0";
-            conteneur.innerHTML = '<div style="font-size:0.85em; color:var(--text-muted);">Aucune réservation active à votre nom.</div>';
+            conteneur.innerHTML = '<div style="font-size:0.9em; color:var(--text-muted); padding:4px 0;">Aucune réservation active à votre nom.</div>';
           }
         });
     }

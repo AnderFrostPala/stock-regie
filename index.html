@@ -1,21 +1,78 @@
-=<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Régie - Scan Matériel</title>
+  <!-- Librairie du lecteur QR code -->
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 16px; margin: 0 auto; max-width: 520px; background: #f4f5f7; color: #333; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      padding: 16px; 
+      margin: 0 auto; 
+      max-width: 520px; 
+      background: #f4f5f7; 
+      color: #333; 
+    }
     h2, h3 { margin-top: 0; }
-    .card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
-    .btn-action-group { display: flex; gap: 8px; margin: 15px 0 10px 0; }
-    .btn-action { flex: 1; padding: 12px 6px; color: #fff; border: none; border-radius: 6px; font-weight: bold; font-size: 0.85em; cursor: pointer; }
-    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 0.85em; }
-    input, select, textarea { width: 100%; padding: 10px; margin: 6px 0 12px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-    .btn-valider { width: 100%; padding: 12px; background: #222; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-    .nav-link { display: inline-block; margin-bottom: 12px; color: #007bff; text-decoration: none; font-weight: 500; font-size: 0.9em; }
+    .card { 
+      background: #fff; 
+      border-radius: 8px; 
+      padding: 16px; 
+      margin-bottom: 16px; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06); 
+    }
+    .btn-action-group { 
+      display: flex; 
+      gap: 8px; 
+      margin: 15px 0 10px 0; 
+    }
+    .btn-action { 
+      flex: 1; 
+      padding: 12px 6px; 
+      color: #fff; 
+      border: none; 
+      border-radius: 6px; 
+      font-weight: bold; 
+      font-size: 0.85em; 
+      cursor: pointer; 
+    }
+    .badge { 
+      display: inline-block; 
+      padding: 3px 8px; 
+      border-radius: 4px; 
+      font-weight: bold; 
+      font-size: 0.85em; 
+    }
+    input, select, textarea { 
+      width: 100%; 
+      padding: 10px; 
+      margin: 6px 0 12px 0; 
+      border: 1px solid #ccc; 
+      border-radius: 4px; 
+      font-size: 14px; 
+    }
+    .btn-valider { 
+      width: 100%; 
+      padding: 12px; 
+      background: #222; 
+      color: #fff; 
+      border: none; 
+      border-radius: 6px; 
+      font-weight: bold; 
+      cursor: pointer; 
+      font-size: 1em;
+    }
+    .nav-link { 
+      display: inline-block; 
+      margin-bottom: 12px; 
+      color: #007bff; 
+      text-decoration: none; 
+      font-weight: 500; 
+      font-size: 0.9em; 
+    }
   </style>
 </head>
 <body>
@@ -23,14 +80,16 @@
   <a href="reservation.html" class="nav-link">Accéder au planning des réservations &rarr;</a>
   <h2>Régie Stock & Prêt</h2>
 
+  <!-- Zone de scan et saisie manuelle -->
   <div class="card">
     <div id="reader" style="width: 100%;"></div>
     <div style="margin-top: 10px; display: flex; gap: 6px;">
       <input type="text" id="manualId" placeholder="Ou taper l'ID (ex: DM7_001)" style="margin: 0;">
-      <button onclick="rechercherManuel()" style="padding: 0 12px; background: #555; color: #fff; border: none; border-radius: 4px; cursor: pointer;">OK</button>
+      <button onclick="rechercherManuel()" style="padding: 0 14px; background: #555; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">OK</button>
     </div>
   </div>
 
+  <!-- Fiche du matériel après scan -->
   <div id="ficheMateriel" class="card" style="display:none;">
     <h3 id="itemNom" style="margin-bottom: 6px;"></h3>
     <div style="font-size: 0.9em; line-height: 1.5;">
@@ -41,6 +100,7 @@
       <div><strong>Réservation :</strong> <span id="itemResa"></span></div>
     </div>
 
+    <!-- Zone notice / DMX -->
     <div id="zoneTech" style="margin-top: 12px; padding: 10px; background: #eef5fc; border-left: 4px solid #007bff; border-radius: 4px; font-size: 0.85em; display: none;">
       <div id="itemNotes" style="margin-bottom: 6px;"></div>
       <a id="itemDocLink" href="#" target="_blank" style="color: #007bff; font-weight: bold; text-decoration: underline;">Consulter le manuel / Charte DMX</a>
@@ -48,31 +108,36 @@
 
     <hr style="border: 0; border-top: 1px solid #eee; margin: 16px 0;">
 
+    <!-- 3 Boutons d'action -->
     <div class="btn-action-group">
       <button type="button" class="btn-action" style="background: #28a745;" onclick="ouvrirAction('SORTIE')">Sortie plateau</button>
       <button type="button" class="btn-action" style="background: #007bff;" onclick="ouvrirAction('RETOUR')">Retour stock</button>
       <button type="button" class="btn-action" style="background: #dc3545;" onclick="ouvrirAction('SAV')">Signalement SAV</button>
     </div>
 
+    <!-- Formulaire d'action -->
     <form id="actionForm" onsubmit="soumettreAction(event)" style="display:none; margin-top: 12px;">
       <input type="hidden" id="formRow">
       <input type="hidden" id="formAction">
 
+      <!-- Champs spécifiques Sortie -->
       <div id="champsSortie" style="display:none;">
         <label>Emprunteur :</label>
-        <select id="selectEtudiant" required></select>
+        <select id="selectEtudiant"></select>
         <label>Lieu de destination :</label>
-        <input type="text" id="inputDest" placeholder="ex. Plateau 1, Studio..." required>
+        <input type="text" id="inputDest" placeholder="ex. Plateau 1, Studio, Régie...">
       </div>
 
+      <!-- Champs spécifiques Retour -->
       <div id="champsRetour" style="display:none;">
-        <label>Emplacement de retour :</label>
-        <input type="text" id="inputRangement" value="Stock" required>
+        <label>Emplacement de rangement :</label>
+        <input type="text" id="inputRangement" value="Stock">
       </div>
 
+      <!-- Champs spécifiques SAV -->
       <div id="champsSAV" style="display:none;">
         <label>Description du problème :</label>
-        <textarea id="inputPanne" rows="2" placeholder="Panne constatée, canal HS, cellule dévissée..." required></textarea>
+        <textarea id="inputPanne" rows="2" placeholder="Panne constatée, canal défectueux, cellule dévissée..."></textarea>
       </div>
 
       <button type="submit" id="btnValider" class="btn-valider">Confirmer</button>
@@ -80,9 +145,12 @@
   </div>
 
   <script>
-    // COLLE ICI TON URL WEB APP GOOGLE APPS SCRIPT
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+    // =========================================================================
+    // REMPLACE CETTE URL PAR TON URL DE DÉPLOIEMENT WEB APP GOOGLE APPS SCRIPT
+    // =========================================================================
+    const SCRIPT_URL = "https://script.google.com/macros/s/VOTRE_ID_DEPLOIEMENT/exec";
 
+    // Initialisation du scanner caméra
     const scanner = new Html5Qrcode("reader");
     scanner.start(
       { facingMode: "environment" },
@@ -117,16 +185,21 @@
           document.getElementById("itemEmp").innerText = res.emprunteur;
           document.getElementById("itemResa").innerText = `${res.statutResa} (${res.detailResa})`;
 
+          // Gestion du badge statut
           const badge = document.getElementById("itemStatutBadge");
           badge.innerText = res.statut;
           if (res.statut === "Dispo") {
-            badge.style.background = "#d4edda"; badge.style.color = "#155724";
+            badge.style.background = "#d4edda"; 
+            badge.style.color = "#155724";
           } else if (res.statut === "Sorti") {
-            badge.style.background = "#fff3cd"; badge.style.color = "#856404";
+            badge.style.background = "#fff3cd"; 
+            badge.style.color = "#856404";
           } else {
-            badge.style.background = "#f8d7da"; badge.style.color = "#721c24";
+            badge.style.background = "#f8d7da"; 
+            badge.style.color = "#721c24";
           }
 
+          // Section documentation / DMX
           const zoneTech = document.getElementById("zoneTech");
           const itemNotes = document.getElementById("itemNotes");
           const itemDoc = document.getElementById("itemDocLink");
@@ -144,9 +217,10 @@
             zoneTech.style.display = "none";
           }
 
+          // Remplissage de la liste des étudiants
           const selectEtu = document.getElementById("selectEtudiant");
           selectEtu.innerHTML = "<option value=''>-- Sélectionner un étudiant --</option>";
-          if (res.etudiants) {
+          if (res.etudiants && res.etudiants.length > 0) {
             res.etudiants.forEach(nom => {
               const opt = document.createElement("option");
               opt.value = nom;
@@ -154,6 +228,9 @@
               selectEtu.appendChild(opt);
             });
           }
+        })
+        .catch(err => {
+          alert("Erreur lors de la récupération des informations : " + err);
         });
     }
 
@@ -168,13 +245,13 @@
       const btn = document.getElementById("btnValider");
       if (type === "SORTIE") {
         btn.style.background = "#28a745";
-        btn.innerText = "Valider la sortie";
+        btn.innerText = "Valider la sortie plateau";
       } else if (type === "RETOUR") {
         btn.style.background = "#007bff";
-        btn.innerText = "Valider la réintégration";
+        btn.innerText = "Valider le retour au stock";
       } else if (type === "SAV") {
         btn.style.background = "#dc3545";
-        btn.innerText = "Déclarer en SAV";
+        btn.innerText = "Valider le signalement SAV";
       }
     }
 
@@ -182,7 +259,28 @@
       e.preventDefault();
       const action = document.getElementById("formAction").value;
       const btn = document.getElementById("btnValider");
-      btn.innerText = "Enregistrement...";
+
+      // Contrôles de saisie personnalisés
+      if (action === "SORTIE") {
+        const etu = document.getElementById("selectEtudiant").value;
+        const dest = document.getElementById("inputDest").value.trim();
+        if (!etu) {
+          alert("Veuillez sélectionner un emprunteur.");
+          return;
+        }
+        if (!dest) {
+          alert("Veuillez indiquer le lieu de destination.");
+          return;
+        }
+      } else if (action === "SAV") {
+        const panne = document.getElementById("inputPanne").value.trim();
+        if (!panne) {
+          alert("Veuillez décrire le problème constaté.");
+          return;
+        }
+      }
+
+      btn.innerText = "Enregistrement en cours...";
       btn.disabled = true;
 
       const payload = {
@@ -194,17 +292,21 @@
         detailPanne: document.getElementById("inputPanne").value
       };
 
+      // Envoi à Apps Script sans déclencher de blocage CORS
       fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
-      }).then(() => {
-        alert("Action enregistrée avec succès !");
+      })
+      .then(() => {
+        alert("Opération enregistrée avec succès !");
         location.reload();
-      }).catch(() => {
-        alert("Erreur réseau");
+      })
+      .catch(err => {
+        alert("Erreur lors de l'envoi : " + err);
         btn.disabled = false;
+        btn.innerText = "Confirmer";
       });
     }
   </script>

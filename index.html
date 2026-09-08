@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Régie Stock - DNMADe</title>
-  <!-- Scanner QR Code JS -->
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     :root {
@@ -28,7 +27,6 @@
     .panel { display: none; background: var(--card); border-radius: 12px; padding: 1rem; }
     .panel.active { display: block; }
     
-    /* Scanner & Form */
     #reader { width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
     .form-group { margin-bottom: 0.8rem; }
     label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.2rem; }
@@ -36,7 +34,6 @@
     .btn-submit { width: 100%; padding: 0.9rem; border: none; border-radius: 8px; background: var(--accent); color: #000; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 0.5rem; }
     .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
     
-    /* Dashboard */
     .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem; text-align: center; }
     .stat-box { background: #0f172a; padding: 0.7rem; border-radius: 8px; border: 1px solid #334155; }
     .stat-number { font-size: 1.2rem; font-weight: bold; }
@@ -67,7 +64,7 @@
 
     <form id="stock-form" onsubmit="submitForm(event)">
       <div class="form-group">
-        <label>ID Matériel (scanné ou manuel)</label>
+        <label>ID Matériel</label>
         <input type="text" id="item-id" required placeholder="ex: WASH_150_01">
       </div>
       <div class="form-group">
@@ -82,10 +79,14 @@
         <label>Destination / Salle</label>
         <input type="text" id="item-loc" placeholder="ex: Plateau 1, Studio Son...">
       </div>
+      
+      <!-- CHAMP AVEC AUTOCOMPLÉTION DEPUIS LE SHEETS -->
       <div class="form-group" id="group-user">
         <label>Nom de l'étudiant</label>
-        <input type="text" id="item-user" placeholder="ex: Thomas, Alex...">
+        <input type="text" id="item-user" list="liste-etudiants" placeholder="Commence à taper ton prénom...">
+        <datalist id="liste-etudiants"></datalist>
       </div>
+
       <div class="form-group" id="group-panne" style="display: none;">
         <label>Détail de la panne</label>
         <input type="text" id="item-panne" placeholder="ex: Lampe grillée, reset infini...">
@@ -105,8 +106,8 @@
   </div>
 
   <script>
-    // COLLE TON LIEN GOOGLE APPS SCRIPT CI-DESSOUS :
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+    // COLLE TON LIEN APPS SCRIPT CI-DESSOUS :
+    const SCRIPT_URL = "VOTRE_URL_GOOGLE_APPS_SCRIPT_ICI";
 
     let html5QrCode = null;
 
@@ -143,16 +144,34 @@
         (decodedText) => {
           document.getElementById('item-id').value = decodedText.trim();
           stopScanner();
-          // Bip / vibration de retour haptique
           if (navigator.vibrate) navigator.vibrate(80);
         },
         (error) => {}
-      ).catch(err => console.log("Caméra non démarrée"));
+      ).catch(err => console.log("Caméra en attente"));
     }
 
     function stopScanner() {
       if (html5QrCode && html5QrCode.isScanning) {
         html5QrCode.stop().catch(() => {});
+      }
+    }
+
+    // Chargement dynamique de la liste des étudiants pour l'autocomplétion
+    async function loadEtudiants() {
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        const datalist = document.getElementById('liste-etudiants');
+        datalist.innerHTML = "";
+        if (data.etudiants && data.etudiants.length > 0) {
+          data.etudiants.forEach(nom => {
+            const opt = document.createElement('option');
+            opt.value = nom;
+            datalist.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        console.warn("Impossible de charger les étudiants", e);
       }
     }
 
@@ -173,12 +192,12 @@
       try {
         await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors", // Requis pour Google Apps Script
+          mode: "no-cors",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
-        alert("✅ Mis à jour avec succès !");
+        alert("✅ Mouvement enregistré dans l'historique !");
         document.getElementById('stock-form').reset();
         toggleFields();
         startScanner();
@@ -196,7 +215,8 @@
       
       try {
         const res = await fetch(SCRIPT_URL);
-        const items = await res.json();
+        const data = await res.json();
+        const items = data.items || [];
         
         let cDispo = 0, cEmprunt = 0, cSav = 0;
         container.innerHTML = "";
@@ -242,9 +262,10 @@
       }
     }
 
-    // Démarrage initial
+    // Démarrage
     window.addEventListener('DOMContentLoaded', () => {
       startScanner();
+      loadEtudiants();
     });
   </script>
 </body>

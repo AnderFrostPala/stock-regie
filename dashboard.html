@@ -30,7 +30,6 @@
       color: var(--text-main); padding: 14px; -webkit-font-smoothing: antialiased;
     }
 
-    /* HEADER */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
@@ -52,7 +51,6 @@
     }
     .user-pill-btn:hover { background: var(--bg-surface-elevated); }
 
-    /* MENU UTILISATEUR */
     #userMenu {
       position: absolute; right: 14px; top: 62px; width: 220px;
       background: var(--bg-surface-elevated); border: 1px solid var(--border);
@@ -67,7 +65,6 @@
     .menu-item:hover { background: rgba(255,255,255,0.06); }
     .menu-item.danger { color: var(--status-sorti); }
 
-    /* NAVIGATION */
     .quick-nav { display: flex; gap: 6px; margin-bottom: 14px; }
     .quick-nav a {
       flex: 1; text-align: center; padding: 7px 4px; border-radius: 6px;
@@ -76,7 +73,6 @@
     }
     .quick-nav a.active { color: #fff; border-color: #4b5563; background: var(--bg-surface-elevated); }
 
-    /* TUILES KPI */
     .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
     .kpi-card {
       background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;
@@ -88,7 +84,6 @@
     .kpi-num { font-size: 1.25em; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
     .kpi-lbl { font-size: 0.68em; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; font-weight: 700; }
 
-    /* RECHERCHE & FILTRES */
     .filter-card {
       background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px;
       padding: 12px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px;
@@ -105,7 +100,6 @@
     }
     .chip.active { background: #fff; color: #000; border-color: #fff; }
 
-    /* CARTES DU PARC */
     .item-card {
       background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px;
       padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px;
@@ -132,13 +126,29 @@
     .badge-resa { background: rgba(59,130,246,0.2); color: #60a5fa; margin-left: 4px; }
     
     .meta-line { font-size: 0.8em; color: var(--text-muted); display: flex; justify-content: space-between; }
+    
+    /* DÉTAIL PAR EMPRUNTEUR (POUR LES LOTS) */
+    .emprunts-detail-box {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px;
+      padding: 8px 10px; margin-top: 4px; display: flex; flex-direction: column; gap: 5px; font-size: 0.8em;
+    }
+    .emprunt-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 6px;
+    }
+    .badge-qte-chip {
+      background: rgba(245,158,11,0.15); color: #fbbf24; font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(245,158,11,0.25);
+    }
+    .emprunt-loc {
+      color: #94a3b8; font-size: 0.9em;
+    }
+
     .btn-manual {
       color: #94a3b8; text-decoration: none; font-size: 0.75em; font-weight: 700;
       border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px;
     }
     .btn-manual:hover { background: rgba(255,255,255,0.06); color: #fff; }
 
-    /* SEGMENTS DE QUANTITÉ VISUELS */
     .qte-bar {
       display: inline-flex; gap: 3px; align-items: center; vertical-align: middle; margin-left: 6px;
     }
@@ -227,7 +237,7 @@
 
   <script>
     // COLLE TON URL APPS SCRIPT ICI
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+    const SCRIPT_URL = "hhttps://script.google.com/macros/s/AKfycbx05GhAv_qU32TZ-rTBw_DBPD6nKFDyypXXPMoCKDOV1nD9AXO_eFDWF-_Nx99bSHUS/exec";
 
     let rawItems = [];
     let filtreStatutCourant = "TOUS";
@@ -279,13 +289,11 @@
         return (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
       }).length;
 
-      // Au stock : les 100% dispo ET les partiels (puisqu'il en reste au stock)
       const nbDispo = items.filter(i => {
         const s = (i.statut || "");
         return s.toLowerCase().includes("dispo") || s.includes("Partiel");
       }).length;
 
-      // Sortis : les 100% sortis ET les partiels (puisqu'il y a du matériel dehors)
       const nbSorti = items.filter(i => {
         const s = (i.statut || "");
         return s.toLowerCase().includes("sorti") || s.includes("Partiel");
@@ -401,6 +409,34 @@
           `;
         }
 
+        // GESTION DÉTAILLÉE : QUI, COMBIEN, OÙ
+        const emprunteurStr = item.emprunteur || "-";
+        let detailEmpruntsHtml = "";
+
+        // Si lot partagé avec délimiteur "|" ou notation "(x..."
+        if (emprunteurStr !== "-" && (emprunteurStr.includes("|") || emprunteurStr.includes("(x"))) {
+          const parts = emprunteurStr.split("|").map(s => s.trim());
+          const rowsHtml = parts.map(p => {
+            // p ressemble à : "Léo Debelle-Membel (x3) @ Atelier A"
+            const match = p.match(/^(.*?)\s*\(x(\d+)\)\s*@\s*(.*)$/);
+            if (match) {
+              const nomP = match[1];
+              const qteP = match[2];
+              const lieuP = match[3];
+              return `
+                <div class="emprunt-row">
+                  <div>👤 <strong style="color:#fff;">${nomP}</strong> <span class="badge-qte-chip">${qteP} ex.</span></div>
+                  <div class="emprunt-loc">📍 ${lieuP}</div>
+                </div>
+              `;
+            } else {
+              return `<div class="emprunt-row"><span>👤 ${p}</span></div>`;
+            }
+          }).join("");
+
+          detailEmpruntsHtml = `<div class="emprunts-detail-box">${rowsHtml}</div>`;
+        }
+
         const div = document.createElement("div");
         div.className = `item-card ${carteClass}`;
         div.innerHTML = `
@@ -411,11 +447,15 @@
             </div>
             <div>${badgeHtml}${resaBadge}</div>
           </div>
-          <div class="meta-line">
-            <span>Lieu : <strong style="color:#fff;">${item.localisation || "Stock"}</strong></span>
-            <span>${item.emprunteur && item.emprunteur !== '-' ? 'Par : <strong style="color:#fff;">' + item.emprunteur + '</strong>' : ''}</span>
-          </div>
-          ${manuelLink ? `<div style="display:flex; justify-content:flex-end;">${manuelLink}</div>` : ''}
+
+          ${detailEmpruntsHtml ? detailEmpruntsHtml : `
+            <div class="meta-line">
+              <span>Lieu : <strong style="color:#fff;">${item.localisation || "Stock"}</strong></span>
+              <span>${emprunteurStr !== '-' ? 'Par : <strong style="color:#fff;">' + emprunteurStr + '</strong>' : ''}</span>
+            </div>
+          `}
+
+          ${manuelLink ? `<div style="display:flex; justify-content:flex-end; margin-top:2px;">${manuelLink}</div>` : ''}
         `;
         conteneur.appendChild(div);
       });

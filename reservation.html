@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
+    
     :root {
       --bg-body: #0d0f12;
       --bg-surface: #171a21;
@@ -18,13 +19,18 @@
       --text-muted: #8b949e;
       --status-dispo: #10b981;
       --status-sorti: #ef4444;
-      --status-blue: #3b82f6;
+      --status-blue: #2563eb;
+      --status-blue-light: #3b82f6;
     }
+
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      margin: 0 auto; max-width: 580px; background-color: var(--bg-body);
-      color: var(--text-main); padding: 14px; -webkit-font-smoothing: antialiased;
+      margin: 0 auto; max-width: 600px;
+      background-color: var(--bg-body); color: var(--text-main);
+      padding: 14px; -webkit-font-smoothing: antialiased;
     }
+
+    /* HEADER OFFICIEL */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
@@ -37,11 +43,14 @@
     }
     .brand-text h1 { margin: 0; font-size: 0.95em; font-weight: 800; color: #fff; }
     .brand-text span { display: block; font-size: 0.72em; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    
     .user-pill-btn {
       display: flex; align-items: center; gap: 7px; background: var(--bg-surface);
       border: 1px solid var(--border); padding: 6px 10px; border-radius: 20px;
       color: var(--text-main); cursor: pointer; font-size: 0.82em; font-weight: 600; font-family: inherit;
     }
+
+    /* MENU UTILISATEUR */
     #userMenu {
       position: absolute; right: 14px; top: 62px; width: 220px;
       background: var(--bg-surface-elevated); border: 1px solid var(--border);
@@ -55,6 +64,8 @@
     }
     .menu-item:hover { background: rgba(255,255,255,0.06); }
     .menu-item.danger { color: var(--status-sorti); }
+
+    /* NAVIGATION */
     .quick-nav { display: flex; gap: 6px; margin-bottom: 14px; }
     .quick-nav a {
       flex: 1; text-align: center; padding: 7px 4px; border-radius: 6px;
@@ -62,45 +73,76 @@
       color: var(--text-muted); text-decoration: none; font-size: 0.78em; font-weight: 700;
     }
     .quick-nav a.active { color: #fff; border-color: #4b5563; background: var(--bg-surface-elevated); }
+
     .card {
       background: var(--bg-surface); border: 1px solid var(--border);
       border-radius: 12px; padding: 16px; margin-bottom: 14px;
     }
-    h3 { margin-top: 0; margin-bottom: 12px; font-size: 1em; color: #fff; }
+    h3 { margin-top: 0; margin-bottom: 12px; font-size: 0.98em; color: #fff; font-weight: 800; }
+
+    /* ACCORDÉON MES RÉSERVATIONS */
+    .accordion-toggle {
+      width: 100%; display: flex; justify-content: space-between; align-items: center;
+      background: none; border: none; color: #60a5fa; font-size: 0.92em; font-weight: 700;
+      cursor: pointer; padding: 0; text-align: left; font-family: inherit;
+    }
+    .accordion-content {
+      margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); display: block;
+    }
+
+    /* FORMULAIRE & DATE */
+    label { font-size: 0.76em; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
     input[type="text"], input[type="date"] {
-      width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border);
+      width: 100%; padding: 11px 12px; border-radius: 8px; border: 1px solid var(--border);
       background: #0d0f12; color: #fff; font-size: 14px; font-family: inherit; margin-bottom: 10px;
     }
-    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    input:focus { outline: none; border-color: var(--status-blue-light); }
+    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+
+    /* LISTE MATÉRIEL AVEC RECHERCHE */
+    .search-box {
+      width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border);
+      background: #090a0d; color: #fff; font-size: 13px; font-family: inherit; margin-bottom: 8px;
+    }
+    .selection-counter {
+      font-size: 0.8em; font-weight: 700; color: var(--status-blue-light); text-align: right; margin-bottom: 6px;
+    }
     .picker-box {
-      max-height: 190px; overflow-y: auto; background: #0d0f12; border: 1px solid var(--border);
-      border-radius: 6px; padding: 8px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px;
+      max-height: 220px; overflow-y: auto; background: #090a0d; border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 4px;
     }
     .picker-item {
-      display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px;
-      font-size: 0.85em; cursor: pointer; user-select: none;
+      display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 6px;
+      font-size: 0.86em; cursor: pointer; user-select: none;
     }
-    .picker-item:hover { background: #1c202a; }
+    .picker-item:hover { background: #161a22; }
     .code-tag {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.8em; font-weight: 700;
-      color: #38bdf8; background: #000; padding: 1px 5px; border-radius: 3px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82em; font-weight: 700;
+      color: #38bdf8; background: #000; padding: 2px 6px; border-radius: 4px;
     }
+
     .btn-submit {
-      width: 100%; padding: 12px; background: var(--status-blue); color: #fff;
-      border: none; border-radius: 8px; font-weight: 700; font-size: 0.95em; cursor: pointer; font-family: inherit;
+      width: 100%; padding: 13px; background: var(--status-blue); color: #fff;
+      border: none; border-radius: 8px; font-weight: 800; font-size: 0.95em; cursor: pointer;
+      font-family: inherit; margin-top: 12px; transition: background 0.15s ease;
     }
+    .btn-submit:hover { background: #1d4ed8; }
+
+    /* LIGNES RÉSERVATIONS EXISTANTES */
     .resa-row {
       background: #0d0f12; border: 1px solid var(--border); border-radius: 8px;
-      padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
     .btn-del {
       background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);
-      padding: 5px 8px; border-radius: 6px; font-size: 0.78em; font-weight: 700; cursor: pointer;
+      padding: 6px 10px; border-radius: 6px; font-size: 0.78em; font-weight: 700; cursor: pointer;
     }
+    .btn-del:hover { background: rgba(239,68,68,0.25); }
   </style>
 </head>
 <body onclick="fermerMenuSiClicExterieur(event)">
 
+  <!-- HEADER -->
   <header class="app-header">
     <div class="brand-group">
       <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
@@ -117,6 +159,7 @@
     </button>
   </header>
 
+  <!-- MENU DÉROULANT UTILISATEUR -->
   <div id="userMenu">
     <div class="menu-header">Profil : <strong id="userRoleTxt">Étudiant</strong></div>
     <a href="reservation.html" class="menu-item"><span>📅</span> Mes réservations</a>
@@ -129,41 +172,60 @@
     </button>
   </div>
 
+  <!-- ONGLETS NAVIGATION -->
   <nav class="quick-nav">
     <a href="index.html">Scan & Fiche</a>
     <a href="reservation.html" class="active">Planning Résas</a>
     <a href="dashboard.html">Vue Parc</a>
   </nav>
 
+  <!-- BLOC 1 : ACCORDÉON MES RÉSERVATIONS EN COURS -->
+  <div class="card">
+    <button type="button" class="accordion-toggle" onclick="toggleAccordeon()">
+      <span>📋 Mes réservations en cours (<span id="nbResasPerso">0</span>)</span>
+      <span id="flecheAccordeon">▼</span>
+    </button>
+    <div class="accordion-content" id="contenuAccordeon">
+      <div id="loadingPerso" style="font-size:0.85em; color:var(--text-muted);">Chargement de vos réservations...</div>
+      <div id="listeResasPerso"></div>
+    </div>
+  </div>
+
+  <!-- BLOC 2 : NOUVELLE DEMANDE DE RÉSERVATION -->
   <div class="card">
     <h3>Nouvelle Demande de Réservation</h3>
-    <input type="text" id="inputProjet" placeholder="Nom du projet ou cours (ex: Captation Grand Plateau)...">
+    
+    <label>Nom du projet / Événement :</label>
+    <input type="text" id="inputProjet" placeholder="ex: Concert Marseille, Captation Grand Plateau...">
+
     <div class="date-row">
       <div>
-        <label style="font-size:0.75em; color:var(--text-muted); font-weight:700;">DU :</label>
+        <label>Date de départ :</label>
         <input type="date" id="inputDateDebut">
       </div>
       <div>
-        <label style="font-size:0.75em; color:var(--text-muted); font-weight:700;">AU :</label>
+        <label>Date de retour :</label>
         <input type="date" id="inputDateFin">
       </div>
     </div>
 
-    <label style="font-size:0.75em; color:var(--text-muted); font-weight:700;">SÉLECTION DU MATÉRIEL :</label>
-    <div class="picker-box" id="pickerMateriel">Chargement du matériel disponible...</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+      <label style="margin:0;">Sélection du matériel :</label>
+      <div id="compteurSelection" class="selection-counter">0 sélectionné(s)</div>
+    </div>
+
+    <input type="text" id="searchMaterielInput" class="search-box" placeholder="🔍 Filtrer le matériel (ex: DM7, SM58, Découpe...)" oninput="filtrerListePicker()">
+
+    <div class="picker-box" id="pickerMateriel">Chargement du parc disponible...</div>
 
     <button type="button" class="btn-submit" id="btnResa" onclick="soumettreReservation()">Valider la Réservation</button>
   </div>
 
-  <div class="card">
-    <h3>Mes Réservations en cours</h3>
-    <div id="loadingPerso" style="font-size:0.85em; color:var(--text-muted);">Chargement de vos réservations...</div>
-    <div id="listeResasPerso"></div>
-  </div>
-
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+    // COLLE TON URL APPS SCRIPT ICI
+    const SCRIPT_URL = "https://script.google.com/macros/s/VOTRE_ID_DEPLOIEMENT/exec";
 
+    let rawMateriel = [];
     const user = localStorage.getItem("regie_user") || "Inconnu";
     const role = localStorage.getItem("regie_role") || "etudiant";
 
@@ -176,10 +238,12 @@
       const menu = document.getElementById("userMenu");
       menu.style.display = (menu.style.display === "block") ? "none" : "block";
     }
+
     function fermerMenuSiClicExterieur(e) {
       const menu = document.getElementById("userMenu");
       if (menu && menu.style.display === "block" && !menu.contains(e.target)) menu.style.display = "none";
     }
+
     function deconnexion() {
       if (!confirm("Voulez-vous vraiment vous déconnecter ?")) return;
       localStorage.removeItem("regie_user");
@@ -187,25 +251,64 @@
       location.href = "index.html";
     }
 
+    function toggleAccordeon() {
+      const el = document.getElementById("contenuAccordeon");
+      const fleche = document.getElementById("flecheAccordeon");
+      if (el.style.display === "none") {
+        el.style.display = "block";
+        fleche.innerText = "▼";
+      } else {
+        el.style.display = "none";
+        fleche.innerText = "▶";
+      }
+    }
+
+    // 1. CHARGEMENT DU MATÉRIEL POUR LA SÉLECTION
     fetch(`${SCRIPT_URL}?action=getAll`)
       .then(r => r.json())
       .then(res => {
-        const picker = document.getElementById("pickerMateriel");
-        picker.innerHTML = "";
         if (res.success && res.items) {
-          res.items.forEach(item => {
-            const label = document.createElement("label");
-            label.className = "picker-item";
-            label.innerHTML = `
-              <input type="checkbox" value="${item.id}" style="margin:0;">
-              <span class="code-tag">${item.id}</span>
-              <span style="color:#fff;">${item.nom}</span>
-            `;
-            picker.appendChild(label);
-          });
+          rawMateriel = res.items;
+          rendrePicker(rawMateriel);
         }
       });
 
+    function rendrePicker(items) {
+      const picker = document.getElementById("pickerMateriel");
+      picker.innerHTML = "";
+
+      if (items.length === 0) {
+        picker.innerHTML = '<div style="font-size:0.8em; color:var(--text-muted); padding:8px;">Aucun matériel correspondant.</div>';
+        return;
+      }
+
+      items.forEach(item => {
+        const label = document.createElement("label");
+        label.className = "picker-item";
+        label.innerHTML = `
+          <input type="checkbox" value="${item.id}" onchange="majCompteurSelection()" style="margin:0;">
+          <span class="code-tag">${item.id}</span>
+          <span style="color:#fff;">${item.nom}</span>
+        `;
+        picker.appendChild(label);
+      });
+    }
+
+    function filtrerListePicker() {
+      const q = document.getElementById("searchMaterielInput").value.trim().toLowerCase();
+      const filtres = rawMateriel.filter(item => 
+        (item.nom || "").toLowerCase().includes(q) ||
+        (item.id || "").toLowerCase().includes(q)
+      );
+      rendrePicker(filtres);
+    }
+
+    function majCompteurSelection() {
+      const nb = document.querySelectorAll('#pickerMateriel input[type="checkbox"]:checked').length;
+      document.getElementById("compteurSelection").innerText = `${nb} sélectionné(s)`;
+    }
+
+    // 2. RÉSERVATIONS PERSONNELLES
     chargerMesReservations();
 
     function chargerMesReservations() {
@@ -217,19 +320,25 @@
           conteneur.innerHTML = "";
 
           if (res.success && res.reservations && res.reservations.length > 0) {
+            document.getElementById("nbResasPerso").innerText = res.reservations.length;
             res.reservations.forEach(r => {
               const div = document.createElement("div");
               div.className = "resa-row";
               div.innerHTML = `
                 <div>
-                  <div style="font-weight:700; color:#fff; font-size:0.9em;">${r.nom} <span class="code-tag">${r.id}</span></div>
-                  <div style="font-size:0.75em; color:var(--text-muted); margin-top:2px;">Projet : <strong style="color:#cbd5e1;">${r.projet}</strong> &bull; Du ${r.debut} au ${r.fin}</div>
+                  <div style="font-weight:700; color:#fff; font-size:0.9em;">
+                    ${r.nom} <span class="code-tag">${r.id}</span>
+                  </div>
+                  <div style="font-size:0.75em; color:var(--text-muted); margin-top:2px;">
+                    Projet : <strong style="color:#cbd5e1;">${r.projet}</strong> &bull; Du ${r.debut} au ${r.fin}
+                  </div>
                 </div>
                 <button type="button" class="btn-del" onclick="annulerReservation(${r.row})">Annuler</button>
               `;
               conteneur.appendChild(div);
             });
           } else {
+            document.getElementById("nbResasPerso").innerText = "0";
             conteneur.innerHTML = '<div style="font-size:0.85em; color:var(--text-muted);">Aucune réservation active à votre nom.</div>';
           }
         });
@@ -291,489 +400,6 @@
         location.reload();
       })
       .catch(err => alert("Erreur réseau : " + err));
-    }
-  </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Régie - Planning & Réservations</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 16px; margin: 0 auto; max-width: 680px; background: #f4f5f7; color: #333;
-    }
-    h2, h3, h4 { margin-top: 0; }
-    .card {
-      background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 16px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    .user-bar {
-      display: flex; justify-content: space-between; align-items: center;
-      background: #e9ecef; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 0.85em;
-    }
-    .nav-links { display: flex; gap: 10px; }
-    .nav-links a { color: #007bff; text-decoration: none; font-weight: 600; }
-    input[type="text"], input[type="date"], input[type="search"] {
-      width: 100%; padding: 10px; margin: 6px 0 12px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;
-    }
-    .grid-dates { display: flex; gap: 10px; }
-    .grid-dates > div { flex: 1; }
-    .btn-submit {
-      width: 100%; padding: 14px; background: #007bff; color: #fff; border: none;
-      border-radius: 6px; font-weight: bold; font-size: 1em; cursor: pointer;
-    }
-    .btn-submit:disabled { background: #6c757d; cursor: not-allowed; }
-
-    /* Cartes "Mes réservations" */
-    .my-resa-card {
-      background: #f8f9fa; border-left: 4px solid #007bff; border-radius: 6px;
-      padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
-    }
-    .btn-action-resa {
-      padding: 6px 10px; font-size: 0.8em; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;
-    }
-    .btn-edit { background: #ffc107; color: #212529; }
-    .btn-del { background: #dc3545; color: #fff; margin-left: 6px; }
-
-    /* Accordéons */
-    details.cat-group {
-      margin-top: 10px; border: 1px solid #dee2e6; border-radius: 6px; overflow: hidden; background: #fff;
-    }
-    summary.cat-summary {
-      background: #212529; color: #fff; padding: 10px 14px; font-weight: bold; font-size: 0.95em;
-      cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none;
-    }
-    summary.cat-summary::-webkit-details-marker { display: none; }
-    summary.cat-summary::after { content: "▾"; font-size: 1.1em; transition: transform 0.2s; }
-    details.cat-group[open] > summary.cat-summary::after { transform: rotate(180deg); }
-
-    details.subcat-group {
-      margin: 8px 10px; border-left: 3px solid #007bff; background: #fafbfc; border-radius: 4px;
-    }
-    summary.subcat-summary {
-      padding: 8px 10px; font-weight: 600; font-size: 0.88em; color: #495057;
-      cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none;
-    }
-    summary.subcat-summary::-webkit-details-marker { display: none; }
-    summary.subcat-summary::after { content: "▾"; font-size: 1em; transition: transform 0.2s; }
-    details.subcat-group[open] > summary.subcat-summary::after { transform: rotate(180deg); }
-
-    .subcat-content { padding: 4px 10px 8px 10px; }
-    .item-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 0; border-bottom: 1px solid #eee;
-    }
-    .item-row:last-child { border-bottom: none; }
-    .item-actions { display: flex; align-items: center; gap: 10px; }
-    .btn-cal {
-      background: #f8f9fa; border: 1px solid #ced4da; border-radius: 4px;
-      padding: 4px 8px; font-size: 0.8em; cursor: pointer;
-    }
-
-    /* Modal Calendrier */
-    #calModal {
-      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 14px;
-    }
-    .cal-box {
-      background: #fff; border-radius: 8px; padding: 18px; width: 100%; max-width: 400px;
-    }
-    .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: 0.85em; }
-    .cal-cell { padding: 8px 0; border-radius: 4px; background: #f8f9fa; }
-    .cal-head { font-weight: bold; background: none; color: #666; }
-    .cal-reserved { background: #dc3545 !important; color: #fff !important; font-weight: bold; }
-    .cal-empty { background: transparent; }
-  </style>
-</head>
-<body>
-
-  <!-- Modal Calendrier -->
-  <div id="calModal">
-    <div class="cal-box">
-      <div class="cal-nav">
-        <button type="button" onclick="changerMois(-1)">&larr;</button>
-        <span id="calTitre"></span>
-        <button type="button" onclick="changerMois(1)">&rarr;</button>
-      </div>
-      <h4 id="calNomItem" style="font-size: 0.9em; margin-bottom: 8px; color: #007bff; text-align: center;"></h4>
-      <div class="cal-grid" id="calGrid"></div>
-      <div style="margin-top: 14px; font-size: 0.8em; display: flex; align-items: center; gap: 8px;">
-        <span style="display:inline-block; width:12px; height:12px; background:#dc3545; border-radius:2px;"></span>
-        <span>Jours réservés</span>
-      </div>
-      <button type="button" onclick="fermerCalendrier()" style="margin-top: 14px; width:100%; padding:8px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;">Fermer</button>
-    </div>
-  </div>
-
-  <div class="user-bar">
-    <div>Demandeur : <strong id="userName">...</strong></div>
-    <div class="nav-links">
-      <a href="index.html">📷 Scan</a>
-      <span style="color:#ccc;">|</span>
-      <a href="dashboard.html">📊 Vue Parc</a>
-    </div>
-  </div>
-
-  <h2>Planning & Réservations</h2>
-
-  <!-- BLOC MES RÉSERVATIONS -->
-  <div class="card" style="border: 1px solid #cce5ff; background: #f0f7ff;">
-    <details id="detailsMesResas" open>
-      <summary style="font-weight: 700; cursor: pointer; color: #0056b3; font-size: 1.05em;">
-        📋 Mes réservations en cours (<span id="countMesResas">0</span>)
-      </summary>
-      <div id="listeMesResas" style="margin-top: 12px;">Chargement de vos réservations...</div>
-    </details>
-  </div>
-
-  <!-- NOUVELLE RÉSERVATION -->
-  <form id="formResa" onsubmit="validerReservation(event)">
-    <div class="card">
-      <h3>Nouvelle demande</h3>
-      <label>Nom du projet / Événement :</label>
-      <input type="text" id="inputProjet" placeholder="ex. Éval DNMADe, Concert Marseille, Festival..." required>
-
-      <div class="grid-dates">
-        <div>
-          <label>Date de départ :</label>
-          <input type="date" id="inputDebut" required>
-        </div>
-        <div>
-          <label>Date de retour :</label>
-          <input type="date" id="inputFin" required>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <h3>Matériel à réserver</h3>
-        <span id="compteurChoix" style="font-size: 0.85em; color: #007bff; font-weight: bold;">0 sélectionné</span>
-      </div>
-
-      <input type="search" id="rechercheRapide" list="suggestionsMat" placeholder="🔍 Rechercher un matériel (ex: SM58, DM7, Découpe, DMX...)" oninput="filtrerCatalogue()">
-      <datalist id="suggestionsMat"></datalist>
-
-      <div id="listeCatalogue">Chargement des équipements...</div>
-
-      <button type="submit" id="btnSubmit" class="btn-submit" style="margin-top: 18px;">
-        Enregistrer la réservation
-      </button>
-    </div>
-  </form>
-
-  <script>
-    // Remplace par ton URL exacte
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
-
-    const user = localStorage.getItem("regie_user");
-    if (!user) {
-      alert("Veuillez d'abord vous connecter sur la page principale.");
-      window.location.href = "index.html";
-    } else {
-      document.getElementById("userName").innerText = user;
-    }
-
-    const today = new Date().toISOString().split("T")[0];
-    document.getElementById("inputDebut").value = today;
-    document.getElementById("inputFin").value = today;
-
-    let parc = [];
-    const elementsSelectionnes = new Set();
-
-    chargerMesReservations();
-    chargerCatalogue();
-
-    function chargerMesReservations() {
-      fetch(`${SCRIPT_URL}?action=getUserResas&demandeur=${encodeURIComponent(user)}`)
-        .then(r => r.json())
-        .then(res => {
-          const container = document.getElementById("listeMesResas");
-          const liste = res.reservations || [];
-          document.getElementById("countMesResas").innerText = liste.length;
-
-          if (liste.length === 0) {
-            container.innerHTML = '<div style="color: #666; font-size: 0.88em; padding: 6px 0;">Vous n\'avez aucune réservation active enregistrée à votre nom.</div>';
-            return;
-          }
-
-          container.innerHTML = liste.map(r => `
-            <div class="my-resa-card">
-              <div>
-                <strong>${r.nom}</strong> <span style="font-size:0.8em; color:#666;">(${r.id})</span><br>
-                <span style="font-size:0.85em; color:#333;">🎭 <strong>${r.projet}</strong></span><br>
-                <span style="font-size:0.82em; color:#0056b3; font-weight:600;">📅 Du ${r.debut} au ${r.fin}</span>
-              </div>
-              <div style="white-space: nowrap;">
-                <button type="button" class="btn-action-resa btn-edit" title="Modifier les dates" onclick="modifierDates(${r.row}, '${r.debut}', '${r.fin}')">✏️ Modifier</button>
-                <button type="button" class="btn-action-resa btn-del" title="Supprimer la réservation" onclick="supprimerResa(${r.row})">🗑️ Annuler</button>
-              </div>
-            </div>
-          `).join("");
-        })
-        .catch(() => {
-          document.getElementById("listeMesResas").innerHTML = '<div style="color:red; font-size:0.85em;">Erreur lors du chargement des réservations.</div>';
-        });
-    }
-
-    function supprimerResa(row) {
-      if (!confirm("Voulez-vous vraiment annuler cette réservation ?")) return;
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ actionType: "DELETE_RESA", row: row })
-      })
-      .then(() => {
-        setTimeout(() => {
-          chargerMesReservations();
-          chargerCatalogue();
-        }, 800);
-      })
-      .catch(err => alert("Erreur réseau : " + err));
-    }
-
-    function modifierDates(row, debActuel, finActuel) {
-      const nDeb = prompt("Nouvelle date de départ (AAAA-MM-JJ) :", debActuel);
-      if (!nDeb) return;
-      const nFin = prompt("Nouvelle date de retour (AAAA-MM-JJ) :", finActuel);
-      if (!nFin) return;
-
-      if (nFin < nDeb) {
-        alert("La date de retour ne peut pas précéder la date de départ.");
-        return;
-      }
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ actionType: "UPDATE_RESA", row: row, dateDebut: nDeb, dateFin: nFin })
-      })
-      .then(() => {
-        setTimeout(() => {
-          chargerMesReservations();
-          chargerCatalogue();
-        }, 800);
-      })
-      .catch(err => alert("Erreur réseau : " + err));
-    }
-
-    function chargerCatalogue() {
-      fetch(`${SCRIPT_URL}?action=getAll`)
-        .then(r => r.json())
-        .then(res => {
-          parc = res.items || [];
-          alimenterAutocompletion();
-          afficherCatalogue();
-        });
-    }
-
-    function alimenterAutocompletion() {
-      const datalist = document.getElementById("suggestionsMat");
-      datalist.innerHTML = "";
-      const nomsUniques = Array.from(new Set(parc.map(item => item.nom)));
-      nomsUniques.forEach(nom => {
-        const opt = document.createElement("option");
-        opt.value = nom;
-        datalist.appendChild(opt);
-      });
-    }
-
-    function afficherCatalogue(terme = "") {
-      const container = document.getElementById("listeCatalogue");
-      container.innerHTML = "";
-      const motCle = terme.trim().toLowerCase();
-
-      const arbre = {};
-      let totalTrouves = 0;
-
-      parc.forEach(item => {
-        const nom = (item.nom || "").toLowerCase();
-        const id = (item.id || "").toLowerCase();
-        const cat = item.categorie || "Général";
-        const sub = item.sousCategorie || "Non classé";
-
-        const correspond = !motCle || nom.includes(motCle) || id.includes(motCle);
-
-        if (correspond) {
-          totalTrouves++;
-          if (!arbre[cat]) arbre[cat] = {};
-          if (!arbre[cat][sub]) arbre[cat][sub] = [];
-          arbre[cat][sub].push(item);
-        }
-      });
-
-      if (totalTrouves === 0) {
-        container.innerHTML = `<div style="padding:14px; text-align:center; color:#888;">Aucun résultat.</div>`;
-        return;
-      }
-
-      for (const [cat, subcats] of Object.entries(arbre)) {
-        const catDetails = document.createElement("details");
-        catDetails.className = "cat-group";
-        if (motCle) catDetails.open = true;
-
-        const catSummary = document.createElement("summary");
-        catSummary.className = "cat-summary";
-        catSummary.innerHTML = `<span>${cat}</span>`;
-        catDetails.appendChild(catSummary);
-
-        for (const [sub, items] of Object.entries(subcats)) {
-          const subDetails = document.createElement("details");
-          subDetails.className = "subcat-group";
-          if (motCle) subDetails.open = true;
-
-          const subSummary = document.createElement("summary");
-          subSummary.className = "subcat-summary";
-          subSummary.innerHTML = `<span>${sub}</span>`;
-          subDetails.appendChild(subSummary);
-
-          const subContent = document.createElement("div");
-          subContent.className = "subcat-content";
-
-          items.forEach(it => {
-            const isChecked = elementsSelectionnes.has(it.id);
-            const row = document.createElement("div");
-            row.className = "item-row";
-            row.innerHTML = `
-              <div>
-                <strong>${it.nom}</strong>
-                <div style="font-size:0.78em; color:#666;">ID : ${it.id} &bull; ${it.localisation}</div>
-              </div>
-              <div class="item-actions">
-                <button type="button" class="btn-cal" onclick="ouvrirCalendrier('${it.id}', '${it.nom.replace(/'/g, "\\'")}')">📅 Planning</button>
-                <input type="checkbox" value="${it.id}" ${isChecked ? "checked" : ""} onchange="basculerChoix(this)" style="width:18px; height:18px; cursor:pointer;">
-              </div>
-            `;
-            subContent.appendChild(row);
-          });
-
-          subDetails.appendChild(subContent);
-          catDetails.appendChild(subDetails);
-        }
-        container.appendChild(catDetails);
-      }
-    }
-
-    function filtrerCatalogue() {
-      afficherCatalogue(document.getElementById("rechercheRapide").value);
-    }
-
-    function basculerChoix(cb) {
-      if (cb.checked) elementsSelectionnes.add(cb.value);
-      else elementsSelectionnes.delete(cb.value);
-      document.getElementById("compteurChoix").innerText = `${elementsSelectionnes.size} sélectionné(s)`;
-    }
-
-    let calDateCourante = new Date();
-    let calResasEnCours = [];
-
-    function ouvrirCalendrier(id, nom) {
-      document.getElementById("calNomItem").innerText = `${nom} (${id})`;
-      document.getElementById("calModal").style.display = "flex";
-      document.getElementById("calGrid").innerHTML = "Chargement...";
-
-      fetch(`${SCRIPT_URL}?action=getDatesResa&id=${encodeURIComponent(id)}`)
-        .then(r => r.json())
-        .then(res => {
-          calResasEnCours = res.reservations || [];
-          genererGrilleCalendrier();
-        });
-    }
-
-    function fermerCalendrier() {
-      document.getElementById("calModal").style.display = "none";
-    }
-
-    function changerMois(delta) {
-      calDateCourante.setMonth(calDateCourante.getMonth() + delta);
-      genererGrilleCalendrier();
-    }
-
-    function genererGrilleCalendrier() {
-      const annee = calDateCourante.getFullYear();
-      const mois = calDateCourante.getMonth();
-      const moisNoms = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-      document.getElementById("calTitre").innerText = `${moisNoms[mois]} ${annee}`;
-
-      const grid = document.getElementById("calGrid");
-      grid.innerHTML = "";
-
-      ["L", "M", "M", "J", "V", "S", "D"].forEach(j => {
-        const h = document.createElement("div");
-        h.className = "cal-cell cal-head";
-        h.innerText = j;
-        grid.appendChild(h);
-      });
-
-      const premierJourMois = new Date(annee, mois, 1).getDay();
-      const offset = (premierJourMois === 0 ? 6 : premierJourMois - 1);
-      const nbJoursMois = new Date(annee, mois + 1, 0).getDate();
-
-      for (let i = 0; i < offset; i++) {
-        const vide = document.createElement("div");
-        vide.className = "cal-cell cal-empty";
-        grid.appendChild(vide);
-      }
-
-      for (let d = 1; d <= nbJoursMois; d++) {
-        const cell = document.createElement("div");
-        cell.className = "cal-cell";
-        cell.innerText = d;
-        const dateStr = `${annee}-${String(mois + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        if (calResasEnCours.some(r => dateStr >= r.debut && dateStr <= r.fin)) {
-          cell.className += " cal-reserved";
-        }
-        grid.appendChild(cell);
-      }
-    }
-
-    function validerReservation(e) {
-      e.preventDefault();
-      const dDebut = document.getElementById("inputDebut").value;
-      const dFin = document.getElementById("inputFin").value;
-      if (dFin < dDebut) {
-        alert("La date de retour est invalide.");
-        return;
-      }
-      const ids = Array.from(elementsSelectionnes);
-      if (ids.length === 0) {
-        alert("Sélectionnez au moins un matériel.");
-        return;
-      }
-
-      const btn = document.getElementById("btnSubmit");
-      btn.innerText = "Enregistrement...";
-      btn.disabled = true;
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          actionType: "RESERVATION",
-          demandeur: user,
-          projet: document.getElementById("inputProjet").value.trim(),
-          dateDebut: dDebut,
-          dateFin: dFin,
-          ids: ids
-        })
-      }).then(() => {
-        alert("Réservation enregistrée !");
-        elementsSelectionnes.clear();
-        document.getElementById("compteurChoix").innerText = "0 sélectionné";
-        btn.disabled = false;
-        btn.innerText = "Enregistrer la réservation";
-        chargerMesReservations();
-        chargerCatalogue();
-      });
     }
   </script>
 </body>

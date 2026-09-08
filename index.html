@@ -185,18 +185,26 @@
           document.getElementById("itemEmp").innerText = res.emprunteur;
           document.getElementById("itemResa").innerText = `${res.statutResa} (${res.detailResa})`;
 
-          // Gestion du badge statut
+// Gestion claire du badge statut
           const badge = document.getElementById("itemStatutBadge");
-          badge.innerText = res.statut;
-          if (res.statut === "Dispo") {
-            badge.style.background = "#d4edda"; 
-            badge.style.color = "#155724";
-          } else if (res.statut === "Sorti") {
-            badge.style.background = "#fff3cd"; 
-            badge.style.color = "#856404";
+          const statutActuel = (res.statut || "").trim();
+
+          if (statutActuel === "Dispo" || statutActuel === "Disponible") {
+            badge.innerText = "Disponible";
+            badge.style.background = "#d4edda"; // Vert clair
+            badge.style.color = "#155724";      // Texte vert foncé
+          } else if (statutActuel === "Sorti") {
+            badge.innerText = "Sorti (Plateau / En prêt)";
+            badge.style.background = "#fff3cd"; // Orange / Jaune clair
+            badge.style.color = "#856404";      // Texte marron/orange
+          } else if (statutActuel === "SAV") {
+            badge.innerText = "En maintenance (SAV)";
+            badge.style.background = "#f8d7da"; // Rouge clair
+            badge.style.color = "#721c24";      // Texte rouge foncé
           } else {
-            badge.style.background = "#f8d7da"; 
-            badge.style.color = "#721c24";
+            badge.innerText = statutActuel || "Indisponible";
+            badge.style.background = "#e2e3e5"; // Gris neutre
+            badge.style.color = "#383d41";
           }
 
           // Section documentation / DMX

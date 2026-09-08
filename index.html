@@ -33,7 +33,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* HEADER PRO */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
@@ -55,7 +54,6 @@
       display: block; font-size: 0.72em; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
     }
 
-    /* PASTILLE UTILISATEUR */
     .user-pill-btn {
       display: flex; align-items: center; gap: 7px;
       background: var(--bg-surface); border: 1px solid var(--border);
@@ -71,7 +69,6 @@
       background: var(--status-dispo); box-shadow: 0 0 6px var(--status-dispo);
     }
 
-    /* MENU UTILISATEUR */
     #userMenu {
       position: absolute; right: 14px; top: 62px; width: 220px;
       background: var(--bg-surface-elevated); border: 1px solid var(--border);
@@ -90,7 +87,6 @@
     .menu-item:hover { background: rgba(255,255,255,0.06); }
     .menu-item.danger { color: var(--status-sorti); }
 
-    /* NAVIGATION RAPIDE */
     .quick-nav {
       display: flex; gap: 6px; margin-bottom: 14px;
     }
@@ -102,7 +98,6 @@
     }
     .quick-nav a:hover { color: #fff; border-color: #3f4758; }
 
-    /* CARTES & MODULES */
     .card {
       background: var(--bg-surface); border: 1px solid var(--border);
       border-radius: 12px; padding: 14px; margin-bottom: 12px;
@@ -126,7 +121,6 @@
       padding: 2px 6px; border-radius: 4px; font-size: 0.85em;
     }
 
-    /* ÉTATS FICHE MATÉRIEL */
     .card-dispo {
       border-left: 5px solid var(--status-dispo) !important;
       background: linear-gradient(90deg, rgba(16,185,129,0.08) 0%, var(--bg-surface) 60%) !important;
@@ -170,7 +164,6 @@
 </head>
 <body onclick="fermerMenuSiClicExterieur(event)">
 
-  <!-- HEADER -->
   <header class="app-header">
     <div class="brand-group">
       <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
@@ -189,7 +182,6 @@
     </button>
   </header>
 
-  <!-- MENU UTILISATEUR -->
   <div id="userMenu">
     <div class="menu-header">Profil : <strong id="userRoleTxt">Étudiant</strong></div>
     <a href="reservation.html" class="menu-item"><span>📅</span> Mes réservations</a>
@@ -202,13 +194,11 @@
     </button>
   </div>
 
-  <!-- NAVIGATION RAPIDE -->
   <nav class="quick-nav">
     <a href="reservation.html">Planning Résas</a>
     <a href="dashboard.html">Vue Parc & Sorties</a>
   </nav>
 
-  <!-- SCANNER & RECHERCHE -->
   <div class="card">
     <div id="reader"></div>
     <div class="search-row">
@@ -217,7 +207,6 @@
     </div>
   </div>
 
-  <!-- FICHE MATÉRIEL -->
   <div id="cardDetails" class="card" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:8px;">
       <div>
@@ -242,16 +231,13 @@
       </div>
     </div>
 
-    <!-- 3 ACTIONS RAPIDES -->
     <div class="actions-grid">
       <button type="button" class="btn-cmd btn-sortie" onclick="ouvrirZoneSortie()">Sortie</button>
       <button type="button" class="btn-cmd btn-retour" onclick="confirmerRetourDirect()">Retour stock</button>
       <button type="button" class="btn-cmd btn-sav" onclick="declarerPanne()">Panne SAV</button>
     </div>
 
-    <!-- FORMULAIRE SORTIE (AVEC LIEU + QUANTITÉ) -->
     <div id="zoneLieuSortie" style="display:none; margin-top:14px; border-top:1px solid var(--border); padding-top:12px;">
-      <!-- Sélecteur quantité si lot > 1 -->
       <div id="zoneQuantiteSortie" style="display:none; margin-bottom:10px;">
         <label style="font-weight:700; font-size:0.82em; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px; display:block;">Quantité sortie :</label>
         <div style="display:flex; align-items:center; gap:8px;">
@@ -281,7 +267,6 @@
     </div>
   </div>
 
-  <!-- RAPPEL RANGEMENT NOMINAL (COLONNE P) -->
   <div id="modalRangement" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:3000; align-items:center; justify-content:center; padding:16px;">
     <div style="background:var(--bg-surface-elevated); border:1px solid var(--border); border-radius:14px; padding:24px; max-width:380px; width:100%; text-align:center;">
       <div style="font-size:2.8em; margin-bottom:6px;">📦</div>
@@ -299,7 +284,6 @@
     </div>
   </div>
 
-  <!-- MODAL CONNEXION -->
   <div id="authModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg-body); z-index:2000; align-items:center; justify-content:center; padding:16px;">
     <div class="card" style="max-width:360px; width:100%; text-align:center; background:var(--bg-surface-elevated);">
       <h3 style="margin-top:0; color:#fff;">Connexion Régie</h3>
@@ -311,7 +295,6 @@
   </div>
 
   <script>
-    // COLLE TON URL APPS SCRIPT ICI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let currentItem = null;
@@ -422,7 +405,6 @@
       document.getElementById("itemLieu").innerText = item.localisation || "Stock";
       document.getElementById("itemUser").innerText = (item.emprunteur && item.emprunteur !== "-") ? item.emprunteur : "-";
 
-      // Manuel
       const btnDoc = document.getElementById("btnDoc");
       if (item.docUrl && item.docUrl.startsWith("http")) {
         btnDoc.href = item.docUrl;
@@ -431,13 +413,11 @@
         btnDoc.style.display = "none";
       }
 
-      // Réservation
       const badgeResa = document.getElementById("badgeResaStatic");
       const r = (item.statutResa || "").toLowerCase();
       const estReserve = (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
       badgeResa.style.display = estReserve ? "inline-flex" : "none";
 
-      // Styles carte
       card.classList.remove("card-dispo", "card-sorti", "card-sav");
       const st = (item.statut || "").toLowerCase();
       const txtStatut = document.getElementById("itemStatutTxt");
@@ -446,6 +426,10 @@
         card.classList.add("card-sorti");
         txtStatut.innerText = "Sorti";
         txtStatut.style.color = "var(--status-sorti)";
+      } else if (st.includes("partiel")) {
+        card.classList.add("card-dispo");
+        txtStatut.innerText = item.statut;
+        txtStatut.style.color = "var(--status-sav)";
       } else if (st.includes("sav")) {
         card.classList.add("card-sav");
         txtStatut.innerText = "En SAV / Panne";
@@ -456,7 +440,6 @@
         txtStatut.style.color = "var(--status-dispo)";
       }
 
-      // Panne
       const lignePanne = document.getElementById("lignePanne");
       if (item.panne && item.panne !== "-") {
         document.getElementById("itemPanne").innerText = item.panne;
@@ -465,27 +448,29 @@
         lignePanne.style.display = "none";
       }
 
-      // Gestion dynamique quantité multiple (> 1)
-      const totalDispo = parseInt(item.qte, 10) || 1;
+      document.getElementById("zoneLieuSortie").style.display = "none";
+    }
+
+    function ouvrirZoneSortie() {
+      const zoneSortie = document.getElementById("zoneLieuSortie");
+      zoneSortie.style.display = "block";
+
+      const totalDispo = parseInt(currentItem.qte, 10) || 1;
       const zoneQte = document.getElementById("zoneQuantiteSortie");
       const inputQte = document.getElementById("inputQteSortie");
 
       if (totalDispo > 1) {
         zoneQte.style.display = "block";
         inputQte.max = totalDispo;
-        inputQte.value = totalDispo;
+        inputQte.value = 1;
         document.getElementById("txtQteMax").innerText = `/ ${totalDispo} dispo(s)`;
+        inputQte.focus();
+        inputQte.select();
       } else {
         zoneQte.style.display = "none";
         inputQte.value = 1;
+        document.getElementById("selectLieu").focus();
       }
-
-      document.getElementById("zoneLieuSortie").style.display = "none";
-    }
-
-    function ouvrirZoneSortie() {
-      document.getElementById("zoneLieuSortie").style.display = "block";
-      document.getElementById("selectLieu").focus();
     }
 
     function gererChangementLieu(val) {
@@ -510,8 +495,16 @@
         }
       }
 
+      const totalDispo = parseInt(currentItem.qte, 10) || 1;
       const qteChoisie = parseInt(document.getElementById("inputQteSortie").value, 10) || 1;
-      executerAction("Sorti", lieuFinal, "-", qteChoisie);
+
+      if (qteChoisie <= 0 || qteChoisie > totalDispo) {
+        alert(`Quantité invalide (doit être comprise entre 1 et ${totalDispo}).`);
+        return;
+      }
+
+      const statutFinal = (qteChoisie >= totalDispo) ? "Sorti" : `Partiel (${qteChoisie}/${totalDispo})`;
+      executerAction(statutFinal, lieuFinal, "-", qteChoisie);
     }
 
     function confirmerRetourDirect() {

@@ -13,40 +13,29 @@
     }
     h2, h3 { margin-top: 0; }
     
-   <!-- Barre supérieure utilisateur avec bouton Déconnexion -->
-  <div class="user-bar">
-    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-      <span>Connecté : <strong id="userName">...</strong></span>
-      <button type="button" onclick="deconnexion()" style="background: none; border: 1px solid #ced4da; border-radius: 4px; padding: 2px 7px; font-size: 0.78em; color: #6c757d; cursor: pointer; font-weight: 600;">
-        🚪 Déconnexion
-      </button>
-    </div>
+    /* Barre utilisateur & Navigation */
+    .user-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #e9ecef; padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; font-size: 0.88em; gap: 8px; flex-wrap: wrap;
+    }
+    .user-info { display: flex; align-items: center; gap: 8px; }
+    .btn-logout {
+      background: #fff; border: 1px solid #ced4da; border-radius: 4px;
+      padding: 3px 8px; font-size: 0.8em; color: #dc3545; cursor: pointer; font-weight: 700;
+    }
+    .btn-logout:hover { background: #ffebee; }
+    .nav-links { display: flex; gap: 10px; align-items: center; }
+    .nav-links a { color: #007bff; text-decoration: none; font-weight: 600; }
 
-    <div class="nav-links">
-      <a href="reservation.html">📅 Planning</a>
-      <span style="color:#bbb;">|</span>
-      <a href="dashboard.html">📊 Vue Parc</a>
-      <span id="lienAdminNav" style="display:none;">
-        <span style="color:#bbb;">|</span>
-        <a href="admin.html" style="color:#dc3545; font-weight:700;">⚙️ Admin</a>
-      </span>
-      <span id="lienExpressNav" style="display:none;">
-        <span style="color:#bbb;">|</span>
-        <a href="express.html" style="color:#ffc107; font-weight:700;">⚡ Camion</a>
-      </span>
-    </div>
-  </div>
+    .card {
+      background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 14px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.06);
+    }
 
-    /* COHÉRENCE DASHBOARD : CARTES AVEC FOND PLEIN ET BORD GAUCHE */
-    .card-dispo {
-      background: #e8f5e9 !important; border-left: 6px solid #28a745 !important;
-    }
-    .card-sorti {
-      background: #ffebee !important; border-left: 6px solid #dc3545 !important;
-    }
-    .card-sav {
-      background: #fff3e0 !important; border-left: 6px solid #fd7e14 !important;
-    }
+    /* Cartes pleines selon statut */
+    .card-dispo { background: #e8f5e9 !important; border-left: 6px solid #28a745 !important; }
+    .card-sorti { background: #ffebee !important; border-left: 6px solid #dc3545 !important; }
+    .card-sav   { background: #fff3e0 !important; border-left: 6px solid #fd7e14 !important; }
 
     /* Scanner & Saisie */
     #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
@@ -59,13 +48,11 @@
       border-radius: 6px; font-weight: 700; cursor: pointer;
     }
 
-    /* BADGE RÉSERVÉ (FIXE, NON CLIQUABLE) */
+    /* Badges */
     .badge-resa-static {
       background: #007bff; color: #fff; padding: 5px 10px; border-radius: 6px;
       font-size: 0.8em; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;
     }
-
-    /* Bouton Manuel */
     .btn-manuel {
       display: inline-flex; align-items: center; gap: 4px; background: #495057;
       color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 6px;
@@ -73,7 +60,7 @@
     }
     .btn-manuel:hover { background: #343a40; }
 
-    /* Boutons d'action */
+    /* Commandes */
     .actions-grid { display: flex; gap: 8px; margin-top: 14px; }
     .btn-cmd {
       flex: 1; padding: 12px 6px; border: none; border-radius: 6px; font-weight: 700;
@@ -81,7 +68,7 @@
     }
     .btn-sortie { background: #28a745; }
     .btn-retour { background: #007bff; }
-    .btn-sav    { background: #fd7e14; } /* SAV passe en orange Dashboard */
+    .btn-sav    { background: #fd7e14; }
 
     .btn-submit-action {
       width: 100%; padding: 12px; background: #28a745; color: #fff;
@@ -91,7 +78,7 @@
 </head>
 <body>
 
-  <!-- Modal Rappel Rangement Nominal (Colonne P) -->
+  <!-- Modal Rappel Rangement Nominal -->
   <div id="modalRangement" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.75); z-index:3000; align-items:center; justify-content:center; padding:16px;">
     <div style="background:#fff; border-radius:12px; padding:24px; max-width:400px; width:100%; text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.25);">
       <div style="font-size:3em; margin-bottom:8px;">📦</div>
@@ -120,9 +107,12 @@
     </div>
   </div>
 
-  <!-- Barre supérieure utilisateur -->
+  <!-- Barre supérieure utilisateur avec Déconnexion -->
   <div class="user-bar">
-    <div>Connecté : <strong id="userName">...</strong></div>
+    <div class="user-info">
+      <span>Connecté : <strong id="userName">...</strong></span>
+      <button type="button" class="btn-logout" onclick="deconnexion()">🚪 Déconnexion</button>
+    </div>
     <div class="nav-links">
       <a href="reservation.html">📅 Planning</a>
       <span style="color:#bbb;">|</span>
@@ -138,7 +128,7 @@
     </div>
   </div>
 
-  <!-- Scanner Caméra & Saisie -->
+  <!-- Scanner & Saisie -->
   <div class="card">
     <div id="reader"></div>
     <div class="search-row">
@@ -147,7 +137,7 @@
     </div>
   </div>
 
-  <!-- Fiche Matériel (Colorée entièrement selon statut) -->
+  <!-- Fiche Matériel -->
   <div id="cardDetails" class="card" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:8px;">
       <div>
@@ -158,9 +148,7 @@
       </div>
       
       <div style="display:flex; gap:6px; align-items:center;">
-        <!-- Badge Réservé non-cliquable -->
         <span id="badgeResaStatic" class="badge-resa-static" style="display:none;">📅 Réservé</span>
-        <!-- Bouton Manuel -->
         <a id="btnDoc" href="#" target="_blank" class="btn-manuel" style="display:none;">📄 Manuel</a>
       </div>
     </div>
@@ -174,14 +162,12 @@
       </div>
     </div>
 
-    <!-- 3 Boutons d'action -->
     <div class="actions-grid">
       <button type="button" class="btn-cmd btn-sortie" onclick="ouvrirZoneSortie()">Sortie</button>
       <button type="button" class="btn-cmd btn-retour" onclick="confirmerRetourDirect()">Retour stock</button>
       <button type="button" class="btn-cmd btn-sav" onclick="declarerPanne()">Panne SAV</button>
     </div>
 
-    <!-- Formulaire Destination Sortie -->
     <div id="zoneLieuSortie" style="display:none; margin-top:14px; border-top:1px solid rgba(0,0,0,0.1); padding-top:12px;">
       <label style="font-weight:700; font-size:0.88em;">Destination / Lieu :</label>
       <select id="selectLieu" onchange="gererChangementLieu(this.value)" style="margin-top:6px; margin-bottom:8px;">
@@ -206,7 +192,7 @@
 
   <script>
     // COLLE TON URL APPS SCRIPT ICI
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/VOTRE_ID_DEPLOIEMENT/exec";
 
     let currentItem = null;
     let html5QrCode = null;
@@ -220,6 +206,13 @@
       initialiserInterface();
     }
 
+    function deconnexion() {
+      if (!confirm("Voulez-vous vraiment vous déconnecter ?")) return;
+      localStorage.removeItem("regie_user");
+      localStorage.removeItem("regie_role");
+      location.reload();
+    }
+
     function validerConnexion() {
       const nom = document.getElementById("loginNom").value.trim();
       const pin = document.getElementById("loginPin").value.trim();
@@ -227,16 +220,6 @@
         alert("Veuillez remplir tous les champs.");
         return;
       }
-      function deconnexion() {
-      if (!confirm("Voulez-vous vraiment vous déconnecter ?")) return;
-      
-      // Nettoyage de la session locale
-      localStorage.removeItem("regie_user");
-      localStorage.removeItem("regie_role");
-
-      // Rechargement immédiat pour forcer l'affichage de la modale de connexion
-      location.reload();
-    }
 
       fetch(`${SCRIPT_URL}?action=login&nom=${encodeURIComponent(nom)}&pin=${encodeURIComponent(pin)}`)
         .then(r => r.json())
@@ -306,7 +289,6 @@
       document.getElementById("itemLieu").innerText = item.localisation || "Stock";
       document.getElementById("itemUser").innerText = (item.emprunteur && item.emprunteur !== "-") ? item.emprunteur : "-";
 
-      // 1. Bouton "Manuel" (si lien en colonne N)
       const btnDoc = document.getElementById("btnDoc");
       if (item.docUrl && item.docUrl.startsWith("http")) {
         btnDoc.href = item.docUrl;
@@ -315,13 +297,11 @@
         btnDoc.style.display = "none";
       }
 
-      // 2. Badge Réservé statique
       const badgeResa = document.getElementById("badgeResaStatic");
       const r = (item.statutResa || "").toLowerCase();
       const estReserve = (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
       badgeResa.style.display = estReserve ? "inline-flex" : "none";
 
-      // 3. Coloration complète de la carte selon le statut
       card.classList.remove("card-dispo", "card-sorti", "card-sav");
       const st = (item.statut || "").toLowerCase();
       const txtStatut = document.getElementById("itemStatutTxt");
@@ -340,7 +320,6 @@
         txtStatut.style.color = "#28a745";
       }
 
-      // Panne
       const lignePanne = document.getElementById("lignePanne");
       if (item.panne && item.panne !== "-") {
         document.getElementById("itemPanne").innerText = item.panne;

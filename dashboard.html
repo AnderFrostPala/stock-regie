@@ -30,7 +30,6 @@
       color: var(--text-main); padding: 14px; -webkit-font-smoothing: antialiased;
     }
 
-    /* HEADER */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
@@ -52,7 +51,6 @@
     }
     .user-pill-btn:hover { background: var(--bg-surface-elevated); }
 
-    /* MENU UTILISATEUR */
     #userMenu {
       position: absolute; right: 14px; top: 62px; width: 220px;
       background: var(--bg-surface-elevated); border: 1px solid var(--border);
@@ -67,7 +65,6 @@
     .menu-item:hover { background: rgba(255,255,255,0.06); }
     .menu-item.danger { color: var(--status-sorti); }
 
-    /* NAVIGATION */
     .quick-nav { display: flex; gap: 6px; margin-bottom: 14px; }
     .quick-nav a {
       flex: 1; text-align: center; padding: 7px 4px; border-radius: 6px;
@@ -76,7 +73,6 @@
     }
     .quick-nav a.active { color: #fff; border-color: #4b5563; background: var(--bg-surface-elevated); }
 
-    /* TUILES KPI */
     .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
     .kpi-card {
       background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;
@@ -88,7 +84,6 @@
     .kpi-num { font-size: 1.25em; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
     .kpi-lbl { font-size: 0.68em; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; font-weight: 700; }
 
-    /* RECHERCHE & FILTRES */
     .filter-card {
       background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px;
       padding: 12px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px;
@@ -105,7 +100,6 @@
     }
     .chip.active { background: #fff; color: #000; border-color: #fff; }
 
-    /* CARTES LISTE */
     .item-card {
       background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px;
       padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px;
@@ -136,16 +130,15 @@
     }
     .btn-manual:hover { background: rgba(255,255,255,0.06); color: #fff; }
 
-    /* SEGMENTS DE QUANTITÉ VISUELS */
     .qte-bar {
       display: inline-flex; gap: 3px; align-items: center; vertical-align: middle; margin-left: 6px;
     }
     .qte-pip {
-      width: 7px; height: 12px; border-radius: 2px;
-      background: #2a313d; display: inline-block;
+      width: 6px; height: 12px; border-radius: 2px;
+      background: #232833; display: inline-block;
     }
     .qte-pip.filled {
-      background: var(--status-dispo); box-shadow: 0 0 4px rgba(16,185,129,0.4);
+      background: var(--status-dispo); box-shadow: 0 0 4px rgba(16,185,129,0.3);
     }
     .qte-pip.out {
       background: var(--status-sorti);
@@ -188,7 +181,6 @@
     <a href="dashboard.html" class="active">Vue Parc</a>
   </nav>
 
-  <!-- TUILES KPI -->
   <div class="kpi-row">
     <div class="kpi-card" id="kpiCardResa" onclick="clicKpi('RESA')">
       <div class="kpi-num" style="color: var(--status-blue);" id="kpiResa">-</div>
@@ -208,7 +200,6 @@
     </div>
   </div>
 
-  <!-- RECHERCHE & CHIPS -->
   <div class="filter-card">
     <input type="text" id="searchInput" oninput="filtrerInventaire()" placeholder="Rechercher par nom, ID, référence...">
     <div class="filter-chips">
@@ -224,7 +215,6 @@
   <div id="listeMateriel"></div>
 
   <script>
-    // COLLE TON URL APPS SCRIPT ICI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let rawItems = [];
@@ -254,7 +244,6 @@
       location.href = "index.html";
     }
 
-    // CHARGEMENT DU PARC COMPLET
     fetch(`${SCRIPT_URL}?action=getAll`)
       .then(r => r.json())
       .then(res => {
@@ -278,7 +267,11 @@
         return (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
       }).length;
 
-      const nbDispo = items.filter(i => (i.statut || "").toLowerCase().includes("dispo")).length;
+      const nbDispo = items.filter(i => {
+        const s = (i.statut || "").toLowerCase();
+        return s.includes("dispo") || s.includes("partiel");
+      }).length;
+
       const nbSorti = items.filter(i => (i.statut || "").toLowerCase().includes("sorti")).length;
       const nbSav   = items.filter(i => (i.statut || "").toLowerCase().includes("sav")).length;
 
@@ -325,7 +318,7 @@
         const estResa = (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
 
         if (filtreStatutCourant === "SORTIS") return st.includes("sorti");
-        if (filtreStatutCourant === "STOCK")  return st.includes("dispo");
+        if (filtreStatutCourant === "STOCK")  return st.includes("dispo") || st.includes("partiel");
         if (filtreStatutCourant === "SAV")    return st.includes("sav");
         if (filtreStatutCourant === "RESA")   return estResa;
         return true;
@@ -341,9 +334,14 @@
         let carteClass = "is-dispo";
         let badgeHtml = '<span class="badge badge-dispo">Au stock</span>';
 
+        const estPartiel = st.includes("partiel");
+
         if (st.includes("sorti")) {
           carteClass = "is-sorti";
           badgeHtml = '<span class="badge badge-sorti">Sorti</span>';
+        } else if (estPartiel) {
+          carteClass = "is-dispo";
+          badgeHtml = `<span class="badge badge-sav" style="background:rgba(245,158,11,0.2); color:#fbbf24;">${item.statut}</span>`;
         } else if (st.includes("sav")) {
           carteClass = "is-sav";
           badgeHtml = '<span class="badge badge-sav">SAV</span>';
@@ -355,21 +353,31 @@
         const manuelLink = (item.docUrl && item.docUrl.startsWith("http")) 
           ? `<a href="${item.docUrl}" target="_blank" class="btn-manual">📄 Manuel</a>` : '';
 
-        // Segments visuels pour quantité multiple (> 1)
         const qteTotale = parseInt(item.qte, 10) || 1;
         let qteVisuelleHtml = "";
 
         if (qteTotale > 1) {
-          const pipClass = st.includes("sorti") ? "qte-pip out" : "qte-pip filled";
-          let pips = "";
-          const nbPips = Math.min(qteTotale, 10);
-          for (let p = 0; p < nbPips; p++) {
-            pips += `<span class="${pipClass}"></span>`;
+          let nbSortis = 0;
+          if (st.includes("sorti")) {
+            nbSortis = qteTotale;
+          } else if (estPartiel) {
+            const match = st.match(/\((\d+)\//);
+            if (match) nbSortis = parseInt(match[1], 10);
           }
+
+          const nbDispos = Math.max(0, qteTotale - nbSortis);
+          let pips = "";
+          const maxPips = Math.min(qteTotale, 10);
+          const pipsDispo = Math.round((nbDispos / qteTotale) * maxPips);
+          const pipsOut = maxPips - pipsDispo;
+
+          for (let p = 0; p < pipsDispo; p++) pips += `<span class="qte-pip filled"></span>`;
+          for (let p = 0; p < pipsOut; p++) pips += `<span class="qte-pip out"></span>`;
+
           qteVisuelleHtml = `
-            <span class="qte-bar" title="Lot de ${qteTotale} unités">
+            <span class="qte-bar" title="${nbDispos} dispo(s) sur ${qteTotale}">
               ${pips}
-              <span style="font-size:0.75em; font-family:'JetBrains Mono', monospace; margin-left:4px; color:var(--text-muted);">x${qteTotale}</span>
+              <span style="font-size:0.75em; font-family:'JetBrains Mono', monospace; margin-left:4px; color:var(--text-muted);">${nbDispos}/${qteTotale}</span>
             </span>
           `;
         }

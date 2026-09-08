@@ -130,6 +130,26 @@
   </div>
 
   <script>
+    // Vérifie si un ID est passé directement dans l'URL (ex: ?id=DM7_001)
+    function verifierParametreUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const idUrl = urlParams.get("id");
+
+      if (idUrl) {
+        // Masquer le lecteur caméra inutile dans ce cas
+        const zoneScan = document.getElementById("reader");
+        if (zoneScan) zoneScan.parentElement.style.display = "none";
+
+        // Charger directement la fiche du matériel
+        chargerDonnees(idUrl);
+      }
+    }
+
+    // Exécution automatique à l'ouverture de la page
+    window.addEventListener("DOMContentLoaded", () => {
+      verifierSession();
+      verifierParametreUrl();
+    });
     // COLLE ICI TON URL APPS SCRIPT
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 

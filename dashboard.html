@@ -8,26 +8,26 @@
     * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 16px; margin: 0 auto; max-width: 900px; background: #f4f5f7; color: #333;
+      padding: 16px; margin: 0 auto; max-width: 980px; background: #f4f5f7; color: #212529;
     }
     h2 { margin: 0 0 12px 0; }
     .nav-bar {
-      display: flex; gap: 14px; margin-bottom: 16px; font-size: 0.9em; font-weight: 500;
+      display: flex; gap: 14px; margin-bottom: 16px; font-size: 0.9em; font-weight: 600;
     }
     .nav-bar a { color: #007bff; text-decoration: none; }
-    
-    /* 4 Compteurs KPI en haut */
+
+    /* 4 Compteurs KPI */
     .kpi-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px;
     }
     .kpi-card {
-      background: #fff; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+      background: #fff; padding: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.06);
       text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
     }
     .kpi-card:hover { transform: translateY(-2px); }
     .kpi-card.active { border-color: #212529; }
-    .kpi-num { font-size: 1.8em; font-weight: bold; margin-bottom: 2px; }
-    .kpi-label { font-size: 0.8em; text-transform: uppercase; font-weight: 600; color: #666; }
+    .kpi-num { font-size: 1.9em; font-weight: 800; margin-bottom: 2px; }
+    .kpi-label { font-size: 0.8em; text-transform: uppercase; font-weight: 700; color: #6c757d; }
 
     /* Filtres et recherche */
     .controls-card {
@@ -44,37 +44,81 @@
       width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;
     }
 
-    /* Tableau du matériel */
+    /* Tableau */
     .table-container {
       background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); overflow-x: auto;
     }
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88em; }
     th { background: #f8f9fa; padding: 12px 10px; border-bottom: 2px solid #dee2e6; color: #495057; }
-    td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
-    tr:hover { background: #fdfdfe; }
+    td { padding: 12px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
+    tr:hover { background: #fbfcfd; }
 
-    /* Badges */
-    .badge {
-      display: inline-block; padding: 3px 7px; border-radius: 4px; font-weight: bold; font-size: 0.8em;
+    /* VRAIES ÉTIQUETTES PLEINES (FULL COLOR) */
+    .tag-statut {
+      display: inline-block; padding: 5px 10px; border-radius: 6px; font-weight: 700;
+      font-size: 0.82em; text-transform: uppercase; letter-spacing: 0.5px; color: #fff; text-align: center;
     }
-    .badge-dispo { background: #d4edda; color: #155724; }
-    .badge-sorti { background: #fff3cd; color: #856404; }
-    .badge-sav { background: #f8d7da; color: #721c24; }
-    .badge-resa { background: #cce5ff; color: #004085; }
+    .tag-dispo { background: #28a745; } /* Vert plein */
+    .tag-sorti { background: #dc3545; } /* Rouge plein */
+    .tag-sav { background: #fd7e14; }   /* Orange SAV */
+
+    /* GROS BOUTON BLEU RÉSERVÉ */
+    .btn-resa-tag {
+      background: #007bff; color: #fff; border: none; border-radius: 6px;
+      padding: 6px 12px; font-size: 0.82em; font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,123,255,0.25);
+      transition: background 0.2s;
+    }
+    .btn-resa-tag:hover { background: #0056b3; }
+
+    /* Modal Calendrier */
+    #calModal {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 14px;
+    }
+    .cal-box {
+      background: #fff; border-radius: 8px; padding: 18px; width: 100%; max-width: 400px;
+    }
+    .cal-nav {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold;
+    }
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: 0.85em;
+    }
+    .cal-cell {
+      padding: 8px 0; border-radius: 4px; background: #f8f9fa;
+    }
+    .cal-head { font-weight: bold; background: none; color: #666; }
+    .cal-reserved {
+      background: #dc3545 !important; color: #fff !important; font-weight: bold;
+    }
+    .cal-empty { background: transparent; }
   </style>
 </head>
 <body>
-<div class="nav-bar">
+
+  <!-- Modal Calendrier -->
+  <div id="calModal">
+    <div class="cal-box">
+      <div class="cal-nav">
+        <button type="button" onclick="changerMois(-1)">&larr;</button>
+        <span id="calTitre"></span>
+        <button type="button" onclick="changerMois(1)">&rarr;</button>
+      </div>
+      <h4 id="calNomItem" style="font-size: 0.9em; margin-bottom: 8px; color: #007bff; text-align: center;"></h4>
+      <div class="cal-grid" id="calGrid"></div>
+      <div style="margin-top: 14px; font-size: 0.8em; display: flex; align-items: center; gap: 8px;">
+        <span style="display:inline-block; width:12px; height:12px; background:#dc3545; border-radius:2px;"></span>
+        <span>Jours réservés / indisponibles</span>
+      </div>
+      <button type="button" onclick="fermerCalendrier()" style="margin-top: 14px; width:100%; padding:8px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;">Fermer</button>
+    </div>
+  </div>
+
+  <div class="nav-bar">
     <a href="index.html">&larr; 📷 Scan & Actions</a>
     <span>&bull;</span>
     <a href="reservation.html">📅 Planning Réservations &rarr;</a>
-  </div>
-
-  <h2>État du Parc en Direct</h2>
-  <div class="nav-bar">
-    <a href="index.html">&larr; Scan & Actions</a>
-    <span>&bull;</span>
-    <a href="reservation.html">Planning Réservations &rarr;</a>
   </div>
 
   <h2>État du Parc en Direct</h2>
@@ -82,19 +126,19 @@
   <!-- Compteurs en haut cliquables -->
   <div class="kpi-grid">
     <div class="kpi-card" id="cardSorti" onclick="filtrerParStatut('Sorti')">
-      <div class="kpi-num" style="color: #856404;" id="numSorti">0</div>
+      <div class="kpi-num" style="color: #dc3545;" id="numSorti">0</div>
       <div class="kpi-label">Sortis plateau</div>
     </div>
     <div class="kpi-card" id="cardSAV" onclick="filtrerParStatut('SAV')">
-      <div class="kpi-num" style="color: #721c24;" id="numSAV">0</div>
+      <div class="kpi-num" style="color: #fd7e14;" id="numSAV">0</div>
       <div class="kpi-label">En SAV / Panne</div>
     </div>
     <div class="kpi-card" id="cardResa" onclick="filtrerParStatut('Resa')">
-      <div class="kpi-num" style="color: #004085;" id="numResa">0</div>
+      <div class="kpi-num" style="color: #007bff;" id="numResa">0</div>
       <div class="kpi-label">Réservés</div>
     </div>
     <div class="kpi-card" id="cardDispo" onclick="filtrerParStatut('Dispo')">
-      <div class="kpi-num" style="color: #155724;" id="numDispo">0</div>
+      <div class="kpi-num" style="color: #28a745;" id="numDispo">0</div>
       <div class="kpi-label">En stock</div>
     </div>
   </div>
@@ -109,23 +153,24 @@
       <button class="chip-btn" onclick="filtrerParCat('Structure', this)">🏗️ Structure</button>
       <button class="chip-btn" onclick="filtrerParCat('Câblage', this)">🔌 Câblage</button>
     </div>
-    <input type="search" id="inputSearch" placeholder="🔍 Filtrer par ID, modèle, nom de l'étudiant, lieu..." oninput="actualiserAffichage()">
+    <input type="search" id="inputSearch" placeholder="🔍 Filtrer par ID, modèle, lieu, emprunteur..." oninput="actualiserAffichage()">
   </div>
 
-  <!-- Tableau -->
+  <!-- Tableau Réaménagé -->
   <div class="table-container">
     <table id="tableMat">
       <thead>
         <tr>
           <th>ID</th>
           <th>Matériel</th>
-          <th>Statut</th>
-          <th>Localisation / Emprunteur</th>
-          <th>Détail / SAV</th>
+          <th>État physique</th>
+          <th>Emplacement actuel</th>
+          <th>Détenu par</th>
+          <th>Réservation</th>
         </tr>
       </thead>
       <tbody id="tableBody">
-        <tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">Chargement de l'inventaire...</td></tr>
+        <tr><td colspan="6" style="text-align:center; padding:20px; color:#888;">Chargement de l'inventaire...</td></tr>
       </tbody>
     </table>
   </div>
@@ -135,14 +180,14 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let parc = [];
-    let statutFiltre = "Sorti"; // Par défaut, la page s'ouvre sur ce qui est actuellement sorti !
+    let statutFiltre = "Sorti";
     let catFiltre = "TOUS";
 
     fetch(`${SCRIPT_URL}?action=getAll`)
       .then(r => r.json())
       .then(res => {
         if (!res.success) {
-          document.getElementById("tableBody").innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Erreur serveur.</td></tr>';
+          document.getElementById("tableBody").innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Erreur serveur.</td></tr>';
           return;
         }
         parc = res.items || [];
@@ -150,21 +195,24 @@
         actualiserAffichage();
       })
       .catch(() => {
-        document.getElementById("tableBody").innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Impossible de joindre le serveur.</td></tr>';
+        document.getElementById("tableBody").innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Impossible de joindre le serveur.</td></tr>';
       });
 
-    // Calcul des compteurs KPI
+    function estEnReservation(item) {
+      const r = (item.statutResa || "").toLowerCase();
+      return (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
+    }
+
     function calculerCompteurs() {
       let sortis = 0, sav = 0, resas = 0, dispos = 0;
       parc.forEach(it => {
         const s = (it.statut || "").toLowerCase();
-        const r = (it.statutResa || "").toLowerCase();
 
         if (s.includes("sorti")) sortis++;
         else if (s.includes("sav")) sav++;
         else dispos++;
 
-        if (r.includes("réservé") || r.includes("reserve")) resas++;
+        if (estEnReservation(it)) resas++;
       });
 
       document.getElementById("numSorti").innerText = sortis;
@@ -177,7 +225,7 @@
 
     function filtrerParStatut(statut) {
       if (statutFiltre === statut) {
-        statutFiltre = "TOUS"; // Si on reclique sur la carte, on désactive le filtre
+        statutFiltre = "TOUS";
       } else {
         statutFiltre = statut;
       }
@@ -206,19 +254,16 @@
 
       const itemsFiltres = parc.filter(it => {
         const statut = (it.statut || "").toLowerCase();
-        const resa = (it.statutResa || "").toLowerCase();
         const cat = (it.categorie || "").toLowerCase();
+        const estResa = estEnReservation(it);
 
-        // 1. Filtre KPI
         if (statutFiltre === "Sorti" && !statut.includes("sorti")) return false;
         if (statutFiltre === "SAV" && !statut.includes("sav")) return false;
         if (statutFiltre === "Dispo" && (statut.includes("sorti") || statut.includes("sav"))) return false;
-        if (statutFiltre === "Resa" && !resa.includes("réservé") && !resa.includes("reserve")) return false;
+        if (statutFiltre === "Resa" && !estResa) return false;
 
-        // 2. Filtre Catégorie
         if (catFiltre !== "TOUS" && !cat.includes(catFiltre.toLowerCase())) return false;
 
-        // 3. Barre de recherche
         if (recherche) {
           const texte = `${it.id} ${it.nom} ${it.localisation} ${it.emprunteur || ""} ${it.panne || ""}`.toLowerCase();
           if (!texte.includes(recherche)) return false;
@@ -228,26 +273,30 @@
       });
 
       if (itemsFiltres.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">Aucun équipement trouvé avec ces critères.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#888;">Aucun équipement trouvé avec ces critères.</td></tr>';
         return;
       }
 
       tbody.innerHTML = itemsFiltres.map(it => {
-        let badgeHtml = '';
         const st = (it.statut || "").toLowerCase();
-        const re = (it.statutResa || "").toLowerCase();
+        let etiquetteHtml = '';
 
-        if (st.includes("sorti")) badgeHtml = '<span class="badge badge-sorti">Sorti</span>';
-        else if (st.includes("sav")) badgeHtml = '<span class="badge badge-sav">SAV</span>';
-        else badgeHtml = '<span class="badge badge-dispo">En stock</span>';
-
-        if (re.includes("réservé") || re.includes("reserve")) {
-          badgeHtml += ' <span class="badge badge-resa">Réservé</span>';
+        if (st.includes("sorti")) {
+          etiquetteHtml = '<span class="tag-statut tag-sorti">Sorti</span>';
+        } else if (st.includes("sav")) {
+          etiquetteHtml = '<span class="tag-statut tag-sav">SAV</span>';
+        } else {
+          etiquetteHtml = '<span class="tag-statut tag-dispo">En stock</span>';
         }
 
-        const loc = it.localisation || "Stock";
-        const emp = it.emprunteur && it.emprunteur !== "-" ? `<strong>${it.emprunteur}</strong>` : "";
-        const locEmp = emp ? `${loc} &bull; ${emp}` : loc;
+        // Colonne Réservation : gros bouton bleu ou tiret
+        let resaHtml = '<span style="color:#aaa;">-</span>';
+        if (estEnReservation(it)) {
+          resaHtml = `<button type="button" class="btn-resa-tag" onclick="ouvrirCalendrier('${it.id}', '${it.nom.replace(/'/g, "\\'")}')">📅 RÉSERVÉ</button>`;
+        }
+
+        const emprunteur = (it.emprunteur && it.emprunteur !== "-") ? `<strong>${it.emprunteur}</strong>` : '<span style="color:#aaa;">-</span>';
+        const localisation = it.localisation || "Stock";
 
         return `
           <tr>
@@ -255,13 +304,100 @@
             <td>
               <strong>${it.nom}</strong>
               <div style="font-size:0.78em; color:#666;">${it.categorie || ""} &bull; ${it.sousCategorie || ""}</div>
+              ${it.panne && it.panne !== "-" ? `<div style="font-size:0.75em; color:#dc3545; font-weight:600; margin-top:2px;">⚠️ ${it.panne}</div>` : ""}
             </td>
-            <td>${badgeHtml}</td>
-            <td>${locEmp}</td>
-            <td style="color:#dc3545; font-size:0.85em;">${it.panne && it.panne !== "-" ? it.panne : "-"}</td>
+            <td>${etiquetteHtml}</td>
+            <td>${localisation}</td>
+            <td>${emprunteur}</td>
+            <td>${resaHtml}</td>
           </tr>
         `;
       }).join("");
+    }
+
+    // GESTION DU CALENDRIER MODAL (AVEC SAUT DIRECT AU MOIS RÉSERVÉ)
+    let calDateCourante = new Date();
+    let calItemIdEnCours = null;
+    let calResasEnCours = [];
+
+    function ouvrirCalendrier(id, nom) {
+      calItemIdEnCours = id;
+      document.getElementById("calNomItem").innerText = `${nom} (${id})`;
+      document.getElementById("calModal").style.display = "flex";
+      document.getElementById("calGrid").innerHTML = "Chargement des dates...";
+
+      fetch(`${SCRIPT_URL}?action=getDatesResa&id=${encodeURIComponent(id)}`)
+        .then(r => r.json())
+        .then(res => {
+          calResasEnCours = res.reservations || [];
+
+          // Détection automatique du mois de la réservation
+          if (calResasEnCours.length > 0) {
+            // Prend la date de début de la première réservation
+            const parts = calResasEnCours[0].debut.split("-"); // YYYY, MM, DD
+            if (parts.length === 3) {
+              calDateCourante = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, 1);
+            }
+          } else {
+            calDateCourante = new Date();
+          }
+
+          genererGrilleCalendrier();
+        });
+    }
+
+    function fermerCalendrier() {
+      document.getElementById("calModal").style.display = "none";
+    }
+
+    function changerMois(delta) {
+      calDateCourante.setMonth(calDateCourante.getMonth() + delta);
+      genererGrilleCalendrier();
+    }
+
+    function genererGrilleCalendrier() {
+      const annee = calDateCourante.getFullYear();
+      const mois = calDateCourante.getMonth();
+
+      const moisNoms = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+      document.getElementById("calTitre").innerText = `${moisNoms[mois]} ${annee}`;
+
+      const grid = document.getElementById("calGrid");
+      grid.innerHTML = "";
+
+      const joursSemaine = ["L", "M", "M", "J", "V", "S", "D"];
+      joursSemaine.forEach(j => {
+        const h = document.createElement("div");
+        h.className = "cal-cell cal-head";
+        h.innerText = j;
+        grid.appendChild(h);
+      });
+
+      const premierJourMois = new Date(annee, mois, 1).getDay();
+      const offset = (premierJourMois === 0 ? 6 : premierJourMois - 1);
+      const nbJoursMois = new Date(annee, mois + 1, 0).getDate();
+
+      for (let i = 0; i < offset; i++) {
+        const vide = document.createElement("div");
+        vide.className = "cal-cell cal-empty";
+        grid.appendChild(vide);
+      }
+
+      for (let d = 1; d <= nbJoursMois; d++) {
+        const cell = document.createElement("div");
+        cell.className = "cal-cell";
+        cell.innerText = d;
+
+        const dateStr = `${annee}-${String(mois + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const matchResa = calResasEnCours.find(r => dateStr >= r.debut && dateStr <= r.fin);
+
+        if (matchResa) {
+          cell.className += " cal-reserved";
+          cell.title = `Réservé pour : ${matchResa.projet} (${matchResa.demandeur})`;
+        }
+
+        grid.appendChild(cell);
+      }
     }
   </script>
 </body>

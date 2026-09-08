@@ -3,173 +3,270 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Régie - Scan & Actions</title>
+  <title>Régie - Suivi de Stock DNMADe Marseille</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 16px; margin: 0 auto; max-width: 520px; background: #f0f2f5; color: #212529;
-    }
-    h2, h3 { margin-top: 0; }
     
-    /* Barre utilisateur & Navigation */
-    .user-bar {
+    :root {
+      --bg-body: #0d0f12;
+      --bg-surface: #171a21;
+      --bg-surface-elevated: #20242e;
+      --border: #292e3b;
+      --text-main: #f1f3f7;
+      --text-muted: #8b949e;
+      
+      --status-dispo: #10b981;
+      --status-sorti: #ef4444;
+      --status-sav: #f59e0b;
+      --status-blue: #3b82f6;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      margin: 0 auto; max-width: 520px;
+      background-color: var(--bg-body); color: var(--text-main);
+      padding: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* HEADER PRO RÉGIE */
+    .app-header {
       display: flex; justify-content: space-between; align-items: center;
-      background: #e9ecef; padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; font-size: 0.88em; gap: 8px; flex-wrap: wrap;
+      padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
     }
-    .user-info { display: flex; align-items: center; gap: 8px; }
-    .btn-logout {
-      background: #fff; border: 1px solid #ced4da; border-radius: 4px;
-      padding: 3px 8px; font-size: 0.8em; color: #dc3545; cursor: pointer; font-weight: 700;
+    .brand-group {
+      display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;
     }
-    .btn-logout:hover { background: #ffebee; }
-    .nav-links { display: flex; gap: 10px; align-items: center; }
-    .nav-links a { color: #007bff; text-decoration: none; font-weight: 600; }
+    .brand-logo {
+      height: 36px; max-width: 70px; object-fit: contain; border-radius: 4px;
+    }
+    .brand-fallback {
+      background: #fff; color: #000; font-weight: 900; font-size: 0.65em;
+      line-height: 1; padding: 5px 6px; border-radius: 4px; letter-spacing: 0.5px;
+    }
+    .brand-text h1 {
+      margin: 0; font-size: 0.95em; font-weight: 800; color: #fff; letter-spacing: -0.2px;
+    }
+    .brand-text span {
+      display: block; font-size: 0.72em; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
+    }
 
+    /* PASTILLE UTILISATEUR CLIQUABLE */
+    .user-pill-btn {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      padding: 6px 10px; border-radius: 20px; color: var(--text-main);
+      cursor: pointer; font-size: 0.82em; font-weight: 600; font-family: inherit;
+      transition: all 0.15s ease;
+    }
+    .user-pill-btn:hover {
+      background: var(--bg-surface-elevated); border-color: #3b4252;
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--status-dispo); box-shadow: 0 0 6px var(--status-dispo);
+    }
+
+    /* MENU DÉROULANT UTILISATEUR */
+    #userMenu {
+      position: absolute; right: 14px; top: 62px; width: 220px;
+      background: var(--bg-surface-elevated); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 0; z-index: 1000;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none;
+    }
+    .menu-header {
+      padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 0.8em; color: var(--text-muted);
+    }
+    .menu-item {
+      display: flex; align-items: center; gap: 8px; width: 100%;
+      padding: 10px 14px; background: none; border: none; color: var(--text-main);
+      text-align: left; font-size: 0.86em; cursor: pointer; text-decoration: none;
+      font-family: inherit;
+    }
+    .menu-item:hover { background: rgba(255,255,255,0.06); }
+    .menu-item.danger { color: var(--status-sorti); }
+
+    /* NAVIGATION SECONDAIRE RAPIDE */
+    .quick-nav {
+      display: flex; gap: 6px; margin-bottom: 14px;
+    }
+    .quick-nav a {
+      flex: 1; text-align: center; padding: 7px 4px; border-radius: 6px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      color: var(--text-muted); text-decoration: none; font-size: 0.78em; font-weight: 700;
+      transition: color 0.15s ease;
+    }
+    .quick-nav a:hover { color: #fff; border-color: #3f4758; }
+
+    /* CARTES & SURFACES */
     .card {
-      background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 14px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.06);
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; margin-bottom: 12px;
     }
 
-    /* Cartes pleines selon statut */
-    .card-dispo { background: #e8f5e9 !important; border-left: 6px solid #28a745 !important; }
-    .card-sorti { background: #ffebee !important; border-left: 6px solid #dc3545 !important; }
-    .card-sav   { background: #fff3e0 !important; border-left: 6px solid #fd7e14 !important; }
-
-    /* Scanner & Saisie */
+    /* SCANNER & INPUTS */
     #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
     .search-row { display: flex; gap: 8px; margin-top: 10px; }
     input[type="text"], input[type="password"], select {
-      width: 100%; padding: 11px; border: 1px solid #ced4da; border-radius: 6px; font-size: 15px;
+      width: 100%; padding: 11px; border-radius: 8px; border: 1px solid var(--border);
+      background: #0d0f12; color: #fff; font-size: 14px; font-family: inherit;
     }
-    .btn-action {
-      padding: 10px 16px; background: #212529; color: #fff; border: none;
-      border-radius: 6px; font-weight: 700; cursor: pointer;
+    input:focus, select:focus { outline: none; border-color: var(--status-blue); }
+    .btn-search {
+      padding: 0 16px; background: #2e3440; border: 1px solid var(--border);
+      color: #fff; border-radius: 8px; font-weight: 700; cursor: pointer;
     }
 
-    /* Badges */
-    .badge-resa-static {
-      background: #007bff; color: #fff; padding: 5px 10px; border-radius: 6px;
-      font-size: 0.8em; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;
+    /* IDENTIFIANTS TECHNIQUES */
+    code, .code-tag {
+      font-family: 'JetBrains Mono', monospace; font-weight: 700;
+      background: #090a0d; border: 1px solid #232731; color: #38bdf8;
+      padding: 2px 6px; border-radius: 4px; font-size: 0.85em;
     }
-    .btn-manuel {
-      display: inline-flex; align-items: center; gap: 4px; background: #495057;
-      color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 6px;
-      font-size: 0.82em; font-weight: 700;
-    }
-    .btn-manuel:hover { background: #343a40; }
 
-    /* Commandes */
+    /* VARIATIONS D'ÉTAT CARTE MATÉRIEL */
+    .card-dispo {
+      border-left: 5px solid var(--status-dispo) !important;
+      background: linear-gradient(90deg, rgba(16,185,129,0.08) 0%, var(--bg-surface) 60%) !important;
+    }
+    .card-sorti {
+      border-left: 5px solid var(--status-sorti) !important;
+      background: linear-gradient(90deg, rgba(239,68,68,0.1) 0%, var(--bg-surface) 60%) !important;
+    }
+    .card-sav {
+      border-left: 5px solid var(--status-sav) !important;
+      background: linear-gradient(90deg, rgba(245,158,11,0.09) 0%, var(--bg-surface) 60%) !important;
+    }
+
+    /* BADGES */
+    .badge-static-resa {
+      background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3);
+      padding: 3px 8px; border-radius: 5px; font-size: 0.75em; font-weight: 700;
+    }
+    .btn-doc-link {
+      display: inline-flex; align-items: center; gap: 4px; background: #262b36;
+      border: 1px solid var(--border); color: #fff; text-decoration: none;
+      padding: 4px 9px; border-radius: 6px; font-size: 0.78em; font-weight: 700;
+    }
+
+    /* BOUTONS ACTIONS RETRO-ÉCLAIRÉS */
     .actions-grid { display: flex; gap: 8px; margin-top: 14px; }
     .btn-cmd {
-      flex: 1; padding: 12px 6px; border: none; border-radius: 6px; font-weight: 700;
-      font-size: 0.9em; color: #fff; cursor: pointer; text-align: center;
+      flex: 1; padding: 13px 4px; border: none; border-radius: 8px;
+      font-weight: 800; font-size: 0.88em; color: #fff; cursor: pointer;
+      letter-spacing: 0.3px; transition: transform 0.08s ease, filter 0.15s ease;
+      font-family: inherit;
     }
-    .btn-sortie { background: #28a745; }
-    .btn-retour { background: #007bff; }
-    .btn-sav    { background: #fd7e14; }
+    .btn-cmd:active { transform: scale(0.97); }
+    .btn-sortie { background: #059669; }
+    .btn-retour { background: #2563eb; }
+    .btn-sav    { background: #d97706; }
 
     .btn-submit-action {
-      width: 100%; padding: 12px; background: #28a745; color: #fff;
-      border: none; border-radius: 6px; font-weight: 700; font-size: 1em; cursor: pointer; margin-top: 8px;
+      width: 100%; padding: 12px; background: #059669; color: #fff;
+      border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 8px;
+      font-family: inherit;
     }
   </style>
 </head>
-<body>
+<body onclick="fermerMenuSiClicExterieur(event)">
 
-  <!-- Modal Rappel Rangement Nominal -->
-  <div id="modalRangement" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.75); z-index:3000; align-items:center; justify-content:center; padding:16px;">
-    <div style="background:#fff; border-radius:12px; padding:24px; max-width:400px; width:100%; text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.25);">
-      <div style="font-size:3em; margin-bottom:8px;">📦</div>
-      <h3 style="margin:0 0 6px 0;">Rangement matériel</h3>
-      <p style="font-size:0.88em; color:#666; margin:0 0 16px 0;">Merci de replacer l'équipement à son emplacement attitré :</p>
+  <!-- HEADER AVEC LOGO & SUIVI DE STOCK DNMADE MARSEILLE -->
+  <header class="app-header">
+    <div class="brand-group">
+      <!-- Logo DNMADe : place "logo-dnmade.png" à la racine de ton site -->
+      <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+      <div id="logoFallback" class="brand-fallback" style="display:none;">DN<br>MADE</div>
       
-      <div style="background:#e8f5e9; border:2px dashed #28a745; border-radius:8px; padding:14px; margin-bottom:18px;">
-        <div style="font-size:0.75em; text-transform:uppercase; color:#2e7d32; font-weight:700;">Emplacement nominal</div>
-        <div id="locNominaleTxt" style="font-size:1.3em; font-weight:800; color:#1b5e20; margin-top:4px;">Stock Régie</div>
+      <div class="brand-text">
+        <h1>Suivi de Stock</h1>
+        <span>DNMADe Marseille</span>
       </div>
-
-      <button type="button" onclick="fermerRangementEtReset()" style="width:100%; padding:13px; background:#28a745; color:#fff; border:none; border-radius:6px; font-weight:700; font-size:1em; cursor:pointer;">
-        ✅ Rangement vérifié & Continuer
-      </button>
     </div>
+
+    <!-- Pastille Utilisateur Cliquable -->
+    <button type="button" class="user-pill-btn" onclick="toggleUserMenu(event)">
+      <span class="status-dot"></span>
+      <span id="userName">...</span>
+      <span style="font-size:0.7em; color:var(--text-muted);">▼</span>
+    </button>
+  </header>
+
+  <!-- MENU DÉROULANT DE L'UTILISATEUR -->
+  <div id="userMenu">
+    <div class="menu-header">
+      Profil : <strong id="userRoleTxt">Étudiant</strong>
+    </div>
+    <a href="reservation.html" class="menu-item">
+      <span>📅</span> Mes réservations
+    </a>
+    <div id="adminMenuOptions" style="display:none;">
+      <a href="admin.html" class="menu-item" style="color:#f87171;">
+        <span>⚙️</span> Panneau Admin
+      </a>
+      <a href="express.html" class="menu-item" style="color:#fbbf24;">
+        <span>⚡</span> Mode Camion Express
+      </a>
+    </div>
+    <button type="button" class="menu-item danger" onclick="deconnexion()" style="border-top:1px solid var(--border); margin-top:4px;">
+      <span>🚪</span> Se déconnecter
+    </button>
   </div>
 
-  <!-- Modal Connexion -->
-  <div id="authModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:#f4f5f7; z-index:2000; align-items:center; justify-content:center; padding:16px;">
-    <div class="card" style="max-width:380px; width:100%; text-align:center;">
-      <h3 style="margin-top:0;">Connexion Régie</h3>
-      <p style="font-size:0.85em; color:#666;">Indique ton Nom et ton Code PIN :</p>
-      <input type="text" id="loginNom" placeholder="Nom complet" style="margin-bottom:10px;">
-      <input type="password" id="loginPin" maxlength="6" placeholder="Code PIN" style="text-align:center; font-size:1.3em; letter-spacing:3px; margin-bottom:14px;">
-      <button type="button" onclick="validerConnexion()" class="btn-action" style="width:100%; padding:12px; background:#007bff;">Se connecter</button>
-    </div>
-  </div>
+  <!-- BARRE DE NAVIGATION RAPIDE -->
+  <nav class="quick-nav">
+    <a href="reservation.html">Planning Résas</a>
+    <a href="dashboard.html">Vue Parc & Sorties</a>
+  </nav>
 
-  <!-- Barre supérieure utilisateur avec Déconnexion -->
-  <div class="user-bar">
-    <div class="user-info">
-      <span>Connecté : <strong id="userName">...</strong></span>
-      <button type="button" class="btn-logout" onclick="deconnexion()">🚪 Déconnexion</button>
-    </div>
-    <div class="nav-links">
-      <a href="reservation.html">📅 Planning</a>
-      <span style="color:#bbb;">|</span>
-      <a href="dashboard.html">📊 Vue Parc</a>
-      <span id="lienAdminNav" style="display:none;">
-        <span style="color:#bbb;">|</span>
-        <a href="admin.html" style="color:#dc3545; font-weight:700;">⚙️ Admin</a>
-      </span>
-      <span id="lienExpressNav" style="display:none;">
-        <span style="color:#bbb;">|</span>
-        <a href="express.html" style="color:#ffc107; font-weight:700;">⚡ Camion</a>
-      </span>
-    </div>
-  </div>
-
-  <!-- Scanner & Saisie -->
+  <!-- SCANNER & SAISIE MANUELLE -->
   <div class="card">
     <div id="reader"></div>
     <div class="search-row">
       <input type="text" id="inputId" placeholder="Scannez ou saisissez l'ID (ex: DM7_001)...">
-      <button type="button" class="btn-action" onclick="chercherMateriel(document.getElementById('inputId').value)">OK</button>
+      <button type="button" class="btn-search" onclick="chercherMateriel(document.getElementById('inputId').value)">OK</button>
     </div>
   </div>
 
-  <!-- Fiche Matériel -->
+  <!-- FICHE MATÉRIEL -->
   <div id="cardDetails" class="card" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:8px;">
       <div>
-        <h3 id="itemNom" style="margin:0; font-size:1.15em;">-</h3>
-        <div style="font-size:0.82em; color:#444; margin-top:2px;">
-          ID : <code id="itemId" style="font-weight:700; background:#fff; padding:1px 5px; border-radius:4px;">-</code> &bull; <span id="itemCat">-</span>
+        <h3 id="itemNom" style="margin:0; font-size:1.15em; color:#fff;">-</h3>
+        <div style="margin-top:4px;">
+          <code id="itemId">-</code> &bull; <span id="itemCat" style="font-size:0.8em; color:var(--text-muted);">-</span>
         </div>
       </div>
       
       <div style="display:flex; gap:6px; align-items:center;">
-        <span id="badgeResaStatic" class="badge-resa-static" style="display:none;">📅 Réservé</span>
-        <a id="btnDoc" href="#" target="_blank" class="btn-manuel" style="display:none;">📄 Manuel</a>
+        <span id="badgeResaStatic" class="badge-static-resa" style="display:none;">📅 Réservé</span>
+        <a id="btnDoc" href="#" target="_blank" class="btn-doc-link" style="display:none;">📄 Manuel</a>
       </div>
     </div>
 
-    <div style="background:rgba(255,255,255,0.7); padding:10px 12px; border-radius:8px; font-size:0.88em; margin-bottom:12px; border:1px solid rgba(0,0,0,0.05);">
-      <div style="margin-bottom:4px;">État : <strong id="itemStatutTxt">-</strong></div>
-      <div style="margin-bottom:4px;">Lieu actuel : <strong id="itemLieu">-</strong></div>
-      <div style="margin-bottom:4px;">Détenteur : <strong id="itemUser">-</strong></div>
-      <div id="lignePanne" style="display:none; color:#dc3545; font-weight:700; margin-top:4px;">
+    <div style="background:#0e1014; border:1px solid var(--border); padding:10px 12px; border-radius:8px; font-size:0.86em; margin-bottom:12px;">
+      <div style="margin-bottom:5px;">État : <strong id="itemStatutTxt">-</strong></div>
+      <div style="margin-bottom:5px; color:#cbd5e1;">Lieu actuel : <strong id="itemLieu" style="color:#fff;">-</strong></div>
+      <div style="margin-bottom:5px; color:#cbd5e1;">Détenteur : <strong id="itemUser" style="color:#fff;">-</strong></div>
+      <div id="lignePanne" style="display:none; color:var(--status-sorti); font-weight:700; margin-top:6px;">
         ⚠️ Panne : <span id="itemPanne">-</span>
       </div>
     </div>
 
+    <!-- 3 ACTIONS RAPIDES -->
     <div class="actions-grid">
       <button type="button" class="btn-cmd btn-sortie" onclick="ouvrirZoneSortie()">Sortie</button>
       <button type="button" class="btn-cmd btn-retour" onclick="confirmerRetourDirect()">Retour stock</button>
       <button type="button" class="btn-cmd btn-sav" onclick="declarerPanne()">Panne SAV</button>
     </div>
 
-    <div id="zoneLieuSortie" style="display:none; margin-top:14px; border-top:1px solid rgba(0,0,0,0.1); padding-top:12px;">
-      <label style="font-weight:700; font-size:0.88em;">Destination / Lieu :</label>
+    <!-- CHOIX LIEU SORTIE -->
+    <div id="zoneLieuSortie" style="display:none; margin-top:14px; border-top:1px solid var(--border); padding-top:12px;">
+      <label style="font-weight:700; font-size:0.85em; color:var(--text-muted);">Destination / Plateau :</label>
       <select id="selectLieu" onchange="gererChangementLieu(this.value)" style="margin-top:6px; margin-bottom:8px;">
         <option value="Atelier A">Atelier A</option>
         <option value="Atelier B">Atelier B</option>
@@ -182,7 +279,7 @@
         <option value="AUTRE">Autre (préciser)...</option>
       </select>
 
-      <input type="text" id="inputLieuAutre" placeholder="Précisez le lieu (ex: Scène Extérieure)..." style="display:none; margin-bottom:8px;">
+      <input type="text" id="inputLieuAutre" placeholder="Précisez le lieu (ex: Régie Extérieure)..." style="display:none; margin-bottom:8px;">
 
       <button type="button" id="btnConfirmerSortie" onclick="validerSortieMateriel()" class="btn-submit-action">
         Confirmer la sortie
@@ -190,9 +287,38 @@
     </div>
   </div>
 
+  <!-- MODAL RAPPEL RANGEMENT NOMINAL (COLONNE P) -->
+  <div id="modalRangement" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:3000; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:var(--bg-surface-elevated); border:1px solid var(--border); border-radius:14px; padding:24px; max-width:380px; width:100%; text-align:center;">
+      <div style="font-size:2.8em; margin-bottom:6px;">📦</div>
+      <h3 style="margin:0 0 6px 0; color:#fff;">Rangement Matériel</h3>
+      <p style="font-size:0.86em; color:var(--text-muted); margin:0 0 16px 0;">Emplacement assigné en stock :</p>
+      
+      <div style="background:rgba(16,185,129,0.1); border:2px dashed var(--status-dispo); border-radius:8px; padding:14px; margin-bottom:18px;">
+        <div style="font-size:0.75em; text-transform:uppercase; color:#34d399; font-weight:700;">Emplacement nominal</div>
+        <div id="locNominaleTxt" style="font-size:1.35em; font-weight:800; color:#10b981; margin-top:4px;">Stock Régie</div>
+      </div>
+
+      <button type="button" onclick="fermerRangementEtReset()" style="width:100%; padding:13px; background:var(--status-dispo); color:#fff; border:none; border-radius:8px; font-weight:800; font-size:0.95em; cursor:pointer;">
+        ✅ Rangement vérifié & Continuer
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL CONNEXION INITIALE -->
+  <div id="authModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg-body); z-index:2000; align-items:center; justify-content:center; padding:16px;">
+    <div class="card" style="max-width:360px; width:100%; text-align:center; background:var(--bg-surface-elevated);">
+      <h3 style="margin-top:0; color:#fff;">Connexion Régie</h3>
+      <p style="font-size:0.85em; color:var(--text-muted);">Indique ton Nom et ton Code PIN :</p>
+      <input type="text" id="loginNom" placeholder="Nom complet" style="margin-bottom:10px;">
+      <input type="password" id="loginPin" maxlength="6" placeholder="Code PIN" style="text-align:center; font-size:1.3em; letter-spacing:3px; margin-bottom:14px;">
+      <button type="button" onclick="validerConnexion()" class="btn-cmd btn-retour" style="width:100%; padding:12px;">Se connecter</button>
+    </div>
+  </div>
+
   <script>
-    // COLLE TON URL APPS SCRIPT ICI
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+    // COLLE TON URL OFFICIELLE APPS SCRIPT ICI
+    const SCRIPT_URL = "https://script.google.com/macros/s/VOTRE_ID_DEPLOIEMENT/exec";
 
     let currentItem = null;
     let html5QrCode = null;
@@ -204,6 +330,20 @@
       document.getElementById("authModal").style.display = "flex";
     } else {
       initialiserInterface();
+    }
+
+    // GESTION DU MENU UTILISATEUR
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      const menu = document.getElementById("userMenu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
+
+    function fermerMenuSiClicExterieur(e) {
+      const menu = document.getElementById("userMenu");
+      if (menu && menu.style.display === "block" && !menu.contains(e.target)) {
+        menu.style.display = "none";
+      }
     }
 
     function deconnexion() {
@@ -240,15 +380,16 @@
 
     function initialiserInterface() {
       document.getElementById("userName").innerText = user;
+      document.getElementById("userRoleTxt").innerText = (role === "admin") ? "Administrateur" : "Étudiant";
 
       if (role === "admin") {
-        document.getElementById("lienAdminNav").style.display = "inline";
-        document.getElementById("lienExpressNav").style.display = "inline";
+        document.getElementById("adminMenuOptions").style.display = "block";
       }
 
       demarrerCamera();
     }
 
+    // SCANNER CAMERA
     function demarrerCamera() {
       html5QrCode = new Html5Qrcode("reader");
       html5QrCode.start(
@@ -289,6 +430,7 @@
       document.getElementById("itemLieu").innerText = item.localisation || "Stock";
       document.getElementById("itemUser").innerText = (item.emprunteur && item.emprunteur !== "-") ? item.emprunteur : "-";
 
+      // Manuel
       const btnDoc = document.getElementById("btnDoc");
       if (item.docUrl && item.docUrl.startsWith("http")) {
         btnDoc.href = item.docUrl;
@@ -297,11 +439,13 @@
         btnDoc.style.display = "none";
       }
 
+      // Réservation
       const badgeResa = document.getElementById("badgeResaStatic");
       const r = (item.statutResa || "").toLowerCase();
       const estReserve = (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
       badgeResa.style.display = estReserve ? "inline-flex" : "none";
 
+      // Styles & Statuts
       card.classList.remove("card-dispo", "card-sorti", "card-sav");
       const st = (item.statut || "").toLowerCase();
       const txtStatut = document.getElementById("itemStatutTxt");
@@ -309,17 +453,18 @@
       if (st.includes("sorti")) {
         card.classList.add("card-sorti");
         txtStatut.innerText = "Sorti";
-        txtStatut.style.color = "#dc3545";
+        txtStatut.style.color = "var(--status-sorti)";
       } else if (st.includes("sav")) {
         card.classList.add("card-sav");
         txtStatut.innerText = "En SAV / Panne";
-        txtStatut.style.color = "#fd7e14";
+        txtStatut.style.color = "var(--status-sav)";
       } else {
         card.classList.add("card-dispo");
         txtStatut.innerText = "En stock";
-        txtStatut.style.color = "#28a745";
+        txtStatut.style.color = "var(--status-dispo)";
       }
 
+      // Panne
       const lignePanne = document.getElementById("lignePanne");
       if (item.panne && item.panne !== "-") {
         document.getElementById("itemPanne").innerText = item.panne;
@@ -378,12 +523,13 @@
         btnSortie.disabled = true;
         btnSortie.innerText = "Enregistrement...";
       }
-const payload = {
+
+      const payload = {
         id: currentItem.id,
         action: (statut === "Dispo") ? "RETOUR" : (statut === "SAV" ? "SAV" : "SORTIE"),
         nouveauStatut: statut,
         lieu: lieu,
-        user: user, // <-- C'est l'étudiant connecté qui réalise l'action !
+        user: user,
         panne: panne
       };
 

@@ -295,7 +295,8 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+    // COLLE TON URL APPS SCRIPT ICI
+    const SCRIPT_URL = "https://script.google.com/macros/s/VOTRE_ID_DEPLOIEMENT/exec";
 
     let currentItem = null;
     let html5QrCode = null;
@@ -455,9 +456,8 @@
       const totalPhysique = parseInt(currentItem.qte, 10) || 1;
       const statut = (currentItem.statut || "");
 
-      // Calcule ce qui est déjà emprunté
       let dejaSorti = 0;
-      if (statut === "Sorti") {
+      if (statut.toLowerCase() === "sorti") {
         dejaSorti = totalPhysique;
       } else if (statut.includes("Partiel")) {
         const m = statut.match(/\((\d+)\//);
@@ -480,7 +480,7 @@
       if (totalPhysique > 1) {
         zoneQte.style.display = "block";
         inputQte.max = resteEnStock;
-        inputQte.value = 1; // Propose 1
+        inputQte.value = 1;
         document.getElementById("txtQteMax").innerText = `/ ${resteEnStock} restant(s) au stock`;
         inputQte.focus();
         inputQte.select();
@@ -490,6 +490,7 @@
         document.getElementById("selectLieu").focus();
       }
     }
+
     function gererChangementLieu(val) {
       const inputAutre = document.getElementById("inputLieuAutre");
       if (val === "AUTRE") {
@@ -512,30 +513,36 @@
         }
       }
 
-      const totalDispo = parseInt(currentItem.qte, 10) || 1;
+      const totalPhysique = parseInt(currentItem.qte, 10) || 1;
+      const statut = (currentItem.statut || "");
+      let dejaSorti = 0;
+      if (statut.toLowerCase() === "sorti") dejaSorti = totalPhysique;
+      else if (statut.includes("Partiel")) {
+        const m = statut.match(/\((\d+)\//);
+        if (m) dejaSorti = parseInt(m[1], 10);
+      }
+      const resteEnStock = Math.max(0, totalPhysique - dejaSorti);
+
       const qteChoisie = parseInt(document.getElementById("inputQteSortie").value, 10) || 1;
 
-      if (qteChoisie <= 0 || qteChoisie > totalDispo) {
-        alert(`Quantité invalide (doit être comprise entre 1 et ${totalDispo}).`);
+      if (qteChoisie <= 0 || qteChoisie > resteEnStock) {
+        alert(`Quantité invalide. Vous ne pouvez pas prendre plus que les ${resteEnStock} unités restantes.`);
         return;
       }
 
-      const statutFinal = (qteChoisie >= totalDispo) ? "Sorti" : `Partiel (${qteChoisie}/${totalDispo})`;
-      executerAction(statutFinal, lieuFinal, "-", qteChoisie);
+      executerAction("Sorti", lieuFinal, "-", qteChoisie, "SORTIE");
     }
 
-   function confirmerRetourDirect() {
+    function confirmerRetourDirect() {
       const qteTotale = parseInt(currentItem.qte, 10) || 1;
       const statut = (currentItem.statut || "");
       const locNominale = currentItem.locNominale || "Stock Régie";
 
-      // Si article unitaire -> retour direct
       if (qteTotale === 1) {
         executerAction("Dispo", locNominale, "-", 1, "RETOUR");
         return;
       }
 
-      // Pour un lot : calculer combien sont dehors
       let totalSorti = 0;
       if (statut.toLowerCase() === "sorti") {
         totalSorti = qteTotale;
@@ -549,7 +556,6 @@
         return;
       }
 
-      // Demande combien d'unités sont rapportées
       const reponse = prompt(`Combien d'unités retournez-vous au stock ? (${totalSorti} actuellement dehors) :`, totalSorti);
       if (reponse === null) return;
 
@@ -561,15 +567,14 @@
 
       executerAction("Dispo", locNominale, "-", qteARendre, "RETOUR");
     }
-    }
 
     function declarerPanne() {
       const motif = prompt("Précisez la panne ou le défaut constaté :");
       if (!motif) return;
-      executerAction("SAV", "Atelier SAV", motif);
+      executerAction("SAV", "Atelier SAV", motif, 1, "SAV");
     }
 
-  function executerAction(statut, lieu, panne = "-", qte = 1, actionType = "") {
+    function executerAction(statut, lieu, panne = "-", qte = 1, actionType = "SORTIE") {
       const btnSortie = document.getElementById("btnConfirmerSortie");
       if (btnSortie) {
         btnSortie.disabled = true;
@@ -578,7 +583,7 @@
 
       const payload = {
         id: currentItem.id,
-        action: actionType ? actionType : ((statut === "Dispo") ? "RETOUR" : (statut === "SAV" ? "SAV" : "SORTIE")),
+        action: actionType,
         nouveauStatut: statut,
         lieu: lieu,
         user: user,
@@ -593,41 +598,7 @@
         body: JSON.stringify(payload)
       })
       .then(() => {
-        if (payload.action === "RETOUR") {
-          const locCible = currentItem.locNominale || "Stock Régie";
-          afficherConfirmationRangement(locCible);
-        } else {
-          alert("Action enregistrée !");
-          location.reload();
-        }
-      })
-      .catch(err => {
-        alert("Erreur réseau : " + err);
-        if (btnSortie) {
-          btnSortie.disabled = false;
-          btnSortie.innerText = "Confirmer la sortie";
-        }
-      });
-    }
-
-      const payload = {
-        id: currentItem.id,
-        action: (statut === "Dispo") ? "RETOUR" : (statut === "SAV" ? "SAV" : "SORTIE"),
-        nouveauStatut: statut,
-        lieu: lieu,
-        user: user,
-        panne: panne,
-        qte: qte
-      };
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      })
-      .then(() => {
-        if (statut === "Dispo") {
+        if (actionType === "RETOUR") {
           const locCible = currentItem.locNominale || "Stock Régie";
           afficherConfirmationRangement(locCible);
         } else {

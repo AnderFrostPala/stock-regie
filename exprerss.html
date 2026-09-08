@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Régie - Retour Express Supervisé</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 14px; margin: 0 auto; max-width: 500px; background: #121212; color: #f8f9fa;
+    }
+    h2 { margin: 0 0 4px 0; color: #fff; }
+    .badge-mode {
+      display: inline-block; background: #ffc107; color: #000; font-size: 0.75em;
+      font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .card {
+      background: #1e1e1e; border-radius: 10px; padding: 14px; margin-bottom: 12px;
+      border: 1px solid #333;
+    }
+    #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
+    input[type="text"], input[type="password"] {
+      width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #444;
+      background: #2a2a2a; color: #fff; font-size: 15px;
+    }
+    .scanned-list {
+      max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;
+    }
+    .scanned-item {
+      background: #28a745; color: #fff; padding: 10px 12px; border-radius: 6px;
+      display: flex; justify-content: space-between; align-items: center; font-size: 0.88em;
+      animation: flash 0.3s ease;
+    }
+    @keyframes flash {
+      from { transform: scale(1.03); background: #34ce57; }
+      to { transform: scale(1); background: #28a745; }
+    }
+    .nav-link { color: #007bff; text-decoration: none; font-size: 0.85em; display: block; margin-top: 10px; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <!-- Overlay Code Prof -->
+  <div id="pinOverlay" style="position:fixed; top:0; left:0; right:0; bottom:0; background:#121212; z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px;">
+    <div class="card" style="width:100%; max-width:340px; text-align:center;">
+      <div style="font-size:2.5em; margin-bottom:6px;">⚡</div>
+      <h3 style="margin-top:0;">Déchargement express</h3>
+      <p style="font-size:0.85em; color:#aaa;">Saisie du code enseignant régie :</p>
+      <input type="password" id="codeProfInput" maxlength="6" placeholder="••••" style="text-align:center; font-size:1.4em; letter-spacing:4px; margin-bottom:12px;">
+      <button type="button" onclick="activerModeExpress()" style="width:100%; padding:12px; background:#ffc107; color:#000; border:none; border-radius:6px; font-weight:800; cursor:pointer;">Activer le scan continu</button>
+      <a href="index.html" class="nav-link">&larr; Retourner à l'accueil</a>
+    </div>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <h2>Retour Camion</h2>
+      <span class="badge-mode">Supervisé enseignant</span>
+    </div>
+    <a href="index.html" style="color:#aaa; text-decoration:none; font-size:0.85em;">Quitter &rarr;</a>
+  </div>
+
+  <!-- Caméra -->
+  <div class="card">
+    <div id="reader"></div>
+    <form onsubmit="traiterSaisieManuelle(event)" style="margin-top:10px; display:flex; gap:8px;">
+      <input type="text" id="manualId" placeholder="ID manuel ou douchette...">
+      <button type="submit" style="padding:0 14px; background:#ffc107; border:none; border-radius:6px; font-weight:700; cursor:pointer;">OK</button>
+    </form>
+  </div>
+
+  <!-- Historique en direct de la session -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <strong style="font-size:0.9em;">Matériels traités en direct</strong>
+      <span id="compteurSession" style="font-size:0.85em; color:#ffc107; font-weight:700;">0 rentré(s)</span>
+    </div>
+    <div id="listeScans" class="scanned-list"></div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+    let codeProf = "";
+    let html5QrCode = null;
+    let dernierScanId = "";
+    let dernierScanTemps = 0;
+    let totalTraites = 0;
+
+    function activerModeExpress() {
+      const code = document.getElementById("codeProfInput").value.trim();
+      if (!code) return;
+      codeProf = code;
+      document.getElementById("pinOverlay").style.display = "none";
+      demarrerCamera();
+    }
+
+    function demarrerCamera() {
+      html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        (decodedText) => {
+          const now = Date.now();
+          // Évite le double-scan accidentel du même code en moins de 2 secondes
+          if (decodedText === dernierScanId && (now - dernierScanTemps) < 2000) return;
+
+          dernierScanId = decodedText;
+          dernierScanTemps = now;
+          envoyerRetourRapide(decodedText);
+        }
+      ).catch(() => {});
+    }
+
+    function traiterSaisieManuelle(e) {
+      e.preventDefault();
+      const input = document.getElementById("manualId");
+      const id = input.value.trim();
+      if (!id) return;
+      input.value = "";
+      envoyerRetourRapide(id);
+    }
+
+    function envoyerRetourRapide(id) {
+      // Bip sonore court pour confirmation auditive
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime); // La aigu
+      osc.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1);
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          actionType: "BULK_FAST_RETURN",
+          pinProf: codeProf,
+          id: id
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          totalTraites++;
+          document.getElementById("compteurSession").innerText = `${totalTraites} rentré(s)`;
+
+          const conteneur = document.getElementById("listeScans");
+          const div = document.createElement("div");
+          div.className = "scanned-item";
+          div.innerHTML = `
+            <div>
+              <strong>${res.nom}</strong> (${res.id})<br>
+              <span style="font-size:0.8em; opacity:0.9;">👉 ${res.loc}</span>
+            </div>
+            <span>✅</span>
+          `;
+          conteneur.prepend(div);
+        } else {
+          alert(`Erreur [${id}] : ${res.message}`);
+        }
+      })
+      .catch(err => alert("Erreur réseau : " + err));
+    }
+  </script>
+</body>
+</html>

@@ -452,18 +452,36 @@
     }
 
     function ouvrirZoneSortie() {
+      const totalPhysique = parseInt(currentItem.qte, 10) || 1;
+      const statut = (currentItem.statut || "");
+
+      // Calcule ce qui est déjà emprunté
+      let dejaSorti = 0;
+      if (statut === "Sorti") {
+        dejaSorti = totalPhysique;
+      } else if (statut.includes("Partiel")) {
+        const m = statut.match(/\((\d+)\//);
+        if (m) dejaSorti = parseInt(m[1], 10);
+      }
+
+      const resteEnStock = Math.max(0, totalPhysique - dejaSorti);
+
+      if (resteEnStock <= 0) {
+        alert("Tout le lot est déjà sorti ! Aucun exemplaire disponible.");
+        return;
+      }
+
       const zoneSortie = document.getElementById("zoneLieuSortie");
       zoneSortie.style.display = "block";
 
-      const totalDispo = parseInt(currentItem.qte, 10) || 1;
       const zoneQte = document.getElementById("zoneQuantiteSortie");
       const inputQte = document.getElementById("inputQteSortie");
 
-      if (totalDispo > 1) {
+      if (totalPhysique > 1) {
         zoneQte.style.display = "block";
-        inputQte.max = totalDispo;
-        inputQte.value = 1;
-        document.getElementById("txtQteMax").innerText = `/ ${totalDispo} dispo(s)`;
+        inputQte.max = resteEnStock;
+        inputQte.value = 1; // Propose 1
+        document.getElementById("txtQteMax").innerText = `/ ${resteEnStock} restant(s) au stock`;
         inputQte.focus();
         inputQte.select();
       } else {
@@ -472,7 +490,6 @@
         document.getElementById("selectLieu").focus();
       }
     }
-
     function gererChangementLieu(val) {
       const inputAutre = document.getElementById("inputLieuAutre");
       if (val === "AUTRE") {

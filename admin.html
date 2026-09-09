@@ -233,11 +233,12 @@
     let rawStats = [];
     const localRole = localStorage.getItem("regie_role") || "etudiant";
 
-    // 1. CONTRÔLE D'ACCÈS LOCAL
-    if (localRole !== "admin") {
-      alert("Accès strictement réservé aux administrateurs régie.");
-      window.location.href = "index.html";
-    }
+  // Autoriser à la fois admin ET dev
+const userRole = localStorage.getItem("regie_role");
+if (userRole !== "admin" && userRole !== "dev") {
+  alert("Accès réservé aux administrateurs.");
+  window.location.href = "index.html";
+}
 
     // 2. VÉRIFICATION DU MOT DE PASSE MAÎTRE
     function validerMotDePasseMaster() {

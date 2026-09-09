@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Régie - Session Autonomie</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg-body: #0d0f12;
+      --bg-surface: #171a21;
+      --bg-surface-elevated: #20242e;
+      --border: #2e3442;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --status-dispo: #10b981;
+      --status-sorti: #ef4444;
+      --status-blue: #38bdf8;
+      --status-amber: #f59e0b;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0 auto; max-width: 580px; background: var(--bg-body);
+      color: var(--text-main); padding: 16px; -webkit-font-smoothing: antialiased;
+    }
+    .app-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--border);
+    }
+    .quick-nav { display: flex; gap: 6px; margin-bottom: 14px; }
+    .quick-nav a {
+      flex: 1; text-align: center; padding: 8px 4px; border-radius: 6px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      color: var(--text-muted); text-decoration: none; font-size: 0.8em; font-weight: 700;
+    }
+    .quick-nav a.active { color: #fff; background: var(--bg-surface-elevated); border-color: #64748b; }
+    .card {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-bottom: 14px;
+    }
+    h3 { margin-top: 0; margin-bottom: 10px; font-size: 1.1em; color: #fff; font-weight: 800; }
+    select, input[type="text"] {
+      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);
+      background: #090a0d; color: #fff; font-size: 14px; font-family: inherit; margin-bottom: 10px;
+    }
+    .btn-action {
+      width: 100%; padding: 14px; border: none; border-radius: 8px;
+      font-weight: 800; font-size: 1em; cursor: pointer; font-family: inherit;
+    }
+    .btn-green { background: var(--status-dispo); color: #fff; }
+    .btn-red { background: var(--status-sorti); color: #fff; }
+    .code-tag {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.85em; font-weight: 800;
+      color: var(--status-blue); background: #000; padding: 2px 6px; border-radius: 4px;
+    }
+    .basket-item {
+      background: #090a0d; border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div>
+      <h1 style="margin:0; font-size:1.1em; font-weight:800; color:#fff;">Mode Autonomie</h1>
+      <span style="font-size:0.75em; color:var(--status-amber); font-weight:700; text-transform:uppercase;">Gestion de Lot Atelier</span>
+    </div>
+    <div style="font-size:0.85em; color:var(--text-muted);">👤 <strong id="userName" style="color:#fff;">...</strong></div>
+  </header>
+
+  <nav class="quick-nav">
+    <a href="index.html">Scan</a>
+    <a href="autonomie.html" class="active">⚡ Autonomie</a>
+    <a href="reservation.html">Réservations</a>
+    <a href="dashboard.html">Vue Parc</a>
+  </nav>
+
+  <!-- CAS 1 : SESSION EN COURS -> BOUTON DE RANGEMENT DU LOT ENTIER -->
+  <div id="vueSessionActive" class="card" style="display:none; border-left:5px solid var(--status-amber);">
+    <h3 style="color:var(--status-amber);">⚠️ Session Autonomie en cours</h3>
+    <p style="font-size:0.88em; color:var(--text-muted); margin:4px 0 12px 0;">
+      Lieu : <strong id="activeLieu" style="color:#fff;">-</strong><br>
+      Démarrée le : <strong id="activeDate" style="color:#fff;">-</strong>
+    </p>
+
+    <div style="font-size:0.85em; font-weight:700; margin-bottom:6px;">Matériel sorti dans ce lot :</div>
+    <div id="listeItemsActifs" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;"></div>
+
+    <button type="button" class="btn-action btn-green" onclick="cloturerSessionAutonomie()">
+      📦 Ranger tout le lot au stock
+    </button>
+  </div>
+
+  <!-- CAS 2 : PAS DE SESSION -> CRÉATION DU LOT PAR SCAN -->
+  <div id="vueNouvelleSession">
+    <div class="card">
+      <h3>1. Lieu de travail</h3>
+      <select id="selectLieuAuto">
+        <option value="Atelier A">Atelier A</option>
+        <option value="Atelier B">Atelier B</option>
+        <option value="Amphi Bas">Amphi Bas</option>
+        <option value="Amphi Haut">Amphi Haut</option>
+        <option value="Studio Lumière">Studio Lumière</option>
+        <option value="Studio Son">Studio Son</option>
+        <option value="D00">D00</option>
+        <option value="D07">D07</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <h3>2. Scanner le matériel du lot</h3>
+      <div id="reader" style="width:100%; border-radius:8px; overflow:hidden; background:#000;"></div>
+
+      <div style="display:flex; gap:6px; margin-top:10px;">
+        <input type="text" id="manualInput" placeholder="Saisie manuelle d'un ID..." style="margin:0;">
+        <button type="button" onclick="ajouterAuLot(document.getElementById('manualInput').value)" style="padding:0 14px; background:#2e3440; border:1px solid var(--border); color:#fff; border-radius:8px; font-weight:700; cursor:pointer;">Ajouter</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3 style="margin:0;">Équipements du lot</h3>
+        <span id="compteurLot" style="font-size:0.85em; font-weight:800; color:var(--status-blue);">0 élément(s)</span>
+      </div>
+
+      <div id="panierLot">
+        <div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:12px;">Scannez vos machines pour constituer le lot.</div>
+      </div>
+
+      <button type="button" id="btnValiderLot" class="btn-action btn-green" onclick="validerDepartAutonomie()" style="margin-top:12px; display:none;">
+        🚀 Valider la sortie du lot
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+    const user = localStorage.getItem("regie_user") || "Inconnu";
+    document.getElementById("userName").innerText = user;
+
+    let lotIds = [];
+    let sessionActiveData = null;
+    let html5QrCode = null;
+
+    // 1. Vérifier si l'élève a déjà une autonomie en cours
+    verifierSessionEnCours();
+
+    function verifierSessionEnCours() {
+      fetch(`${SCRIPT_URL}?action=getActiveAutonomie&user=${encodeURIComponent(user)}`)
+        .then(r => r.json())
+        .then(res => {
+          if (res.success && res.active) {
+            sessionActiveData = res.session;
+            afficherSessionActive();
+          } else {
+            demarrerScanner();
+          }
+        });
+    }
+
+    function afficherSessionActive() {
+      document.getElementById("vueNouvelleSession").style.display = "none";
+      const vue = document.getElementById("vueSessionActive");
+      vue.style.display = "block";
+
+      document.getElementById("activeLieu").innerText = sessionActiveData.lieu;
+      document.getElementById("activeDate").innerText = sessionActiveData.dateDebut;
+
+      const container = document.getElementById("listeItemsActifs");
+      container.innerHTML = "";
+      sessionActiveData.items.forEach(id => {
+        container.innerHTML += `<span class="code-tag">${id}</span>`;
+      });
+    }
+
+    // 2. Scanner pour nouveau lot
+    function demarrerScanner() {
+      html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        (decodedText) => {
+          ajouterAuLot(decodedText);
+        }
+      ).catch(() => {});
+    }
+
+    function ajouterAuLot(id) {
+      const cleanId = (id || "").trim().toUpperCase();
+      if (!cleanId) return;
+      document.getElementById("manualInput").value = "";
+
+      if (lotIds.includes(cleanId)) {
+        alert("Cet équipement est déjà dans votre lot.");
+        return;
+      }
+
+      lotIds.push(cleanId);
+      majPanier();
+    }
+
+    function retirerDuLot(id) {
+      lotIds = lotIds.filter(item => item !== id);
+      majPanier();
+    }
+
+    function majPanier() {
+      const conteneur = document.getElementById("panierLot");
+      const btn = document.getElementById("btnValiderLot");
+      const compteur = document.getElementById("compteurLot");
+
+      compteur.innerText = `${lotIds.length} élément(s)`;
+
+      if (lotIds.length === 0) {
+        conteneur.innerHTML = '<div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:12px;">Scannez vos machines pour constituer le lot.</div>';
+        btn.style.display = "none";
+        return;
+      }
+
+      btn.style.display = "block";
+      conteneur.innerHTML = "";
+
+      lotIds.forEach(id => {
+        const div = document.createElement("div");
+        div.className = "basket-item";
+        div.innerHTML = `
+          <span class="code-tag">${id}</span>
+          <button type="button" onclick="retirerDuLot('${id}')" style="background:none; border:none; color:var(--status-sorti); font-weight:800; cursor:pointer;">✕</button>
+        `;
+        conteneur.appendChild(div);
+      });
+    }
+
+    function validerDepartAutonomie() {
+      const lieu = document.getElementById("selectLieuAuto").value;
+      if (lotIds.length === 0) return;
+
+      const btn = document.getElementById("btnValiderLot");
+      btn.disabled = true;
+      btn.innerText = "Validation du lot...";
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          actionType: "START_AUTONOMIE",
+          user: user,
+          lieu: lieu,
+          ids: lotIds
+        })
+      }).then(() => {
+        alert("Lot validé ! Bon travail en autonomie.");
+        location.reload();
+      });
+    }
+
+    function cloturerSessionAutonomie() {
+      if (!confirm("Confirmez-vous que tout le matériel a été rangé au stock ?")) return;
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          actionType: "END_AUTONOMIE",
+          user: user,
+          sessionRow: sessionActiveData.row
+        })
+      }).then(() => {
+        alert("Session clôturée ! Tout le matériel est à nouveau disponible au stock.");
+        location.reload();
+      });
+    }
+  </script>
+</body>
+</html>

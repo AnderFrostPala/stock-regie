@@ -3,126 +3,561 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Régie - Espace Dev</title>
+  <title>Régie - Espace Console Développeur</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     * { box-sizing: border-box; }
+
     :root {
-      --bg-body: #0a0c10;
-      --bg-surface: #141720;
-      --border: #272d3b;
+      --bg-body: #090a0f;
+      --bg-surface: #11131a;
+      --bg-surface-elevated: #1a1d26;
+      --border: #262a36;
+      --border-accent: #373e52;
       --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent-color: #38bdf8;
+      --text-muted: #8491a5;
+
+      --dev-purple: #a855f7;
+      --dev-purple-dark: #7e22ce;
+      --dev-cyan: #06b6d4;
+      --dev-emerald: #10b981;
+      --dev-rose: #f43f5e;
+      --dev-amber: #f59e0b;
     }
+
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      max-width: 600px; margin: 0 auto;
-      background: var(--bg-body); color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      margin: 0 auto;
+      max-width: 680px;
+      background-color: var(--bg-body);
+      color: var(--text-main);
       padding: 16px;
+      padding-bottom: 80px;
+      -webkit-font-smoothing: antialiased;
     }
+
+    /* HEADER */
+    .header-dev {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .badge-dev {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #c084fc;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75em;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.5px;
+    }
+    .badge-dev .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #a855f7;
+      box-shadow: 0 0 8px #a855f7;
+    }
+
+    .btn-nav-back {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82em;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--bg-surface);
+      transition: all 0.15s ease;
+    }
+    .btn-nav-back:hover {
+      color: #fff;
+      border-color: var(--border-accent);
+    }
+
+    /* CARDS */
     .card {
-      background: var(--bg-surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 18px; margin-bottom: 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
     }
-    h2, h3 { margin-top: 0; color: #fff; }
-    label { font-size: 0.8em; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px; text-transform: uppercase; }
-    input[type="text"], textarea {
-      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);
-      background: #090a0d; color: #fff; font-family: inherit; margin-bottom: 12px;
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 0.98em;
+      font-weight: 800;
+      color: #fff;
     }
-    .color-swatches { display: flex; gap: 10px; margin-bottom: 14px; }
-    .swatch {
-      width: 38px; height: 38px; border-radius: 8px; cursor: pointer; border: 2px solid transparent;
+    .card-title span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .swatch.active { border-color: #fff; transform: scale(1.1); }
+
+    label {
+      font-size: 0.75em;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], textarea, select {
+      width: 100%;
+      padding: 11px 12px;
+      background: #090a0e;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 13.5px;
+      margin-bottom: 12px;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--dev-purple);
+    }
+
     .btn-dev {
-      width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer;
-      background: #8b5cf6; color: #fff; font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px 16px;
+      background: var(--dev-purple-dark);
+      color: #fff;
+      border: 1px solid var(--dev-purple);
+      border-radius: 8px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.88em;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .btn-dev:hover { background: #9333ea; }
+    .btn-dev:active { transform: scale(0.98); }
+    .btn-dev:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-sub {
+      background: #181b24;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8em;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-sub:hover { color: #fff; border-color: var(--border-accent); }
+
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      color: #fb7185;
+    }
+    .btn-danger:hover {
+      background: rgba(244, 63, 94, 0.25);
+    }
+
+    /* MONITEUR SANTÉ */
+    .health-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .health-stat {
+      background: #090a0e;
+      border: 1px solid var(--border);
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.15em;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    /* CODE & TERMINAL */
+    .terminal-box {
+      background: #050608;
+      border: 1px solid #1c202a;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78em;
+      color: #94a3b8;
+      max-height: 240px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .key-val-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 0.82em;
+      margin-bottom: 12px;
+    }
+    .key-card {
+      background: #090a0e;
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      border-radius: 6px;
+      word-break: break-all;
+    }
+    .key-name {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--dev-cyan);
+      font-weight: 700;
+      font-size: 0.9em;
+    }
+
+    .role-switcher {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .role-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #090a0e;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.8em;
+      cursor: pointer;
+    }
+    .role-btn.active {
+      border-color: var(--dev-purple);
+      color: #fff;
+      background: rgba(168, 85, 247, 0.2);
     }
   </style>
 </head>
 <body>
 
-  <div class="card" style="border-left: 4px solid #8b5cf6;">
-    <h2>🛠️ Console Développeur</h2>
-    <p style="font-size:0.85em; color:var(--text-muted); margin:0;">Réservé aux profils avec le rôle <code>dev</code>.</p>
-  </div>
-
-  <!-- OUTIL 1 : THÈME & COULEURS ACCENT -->
-  <div class="card">
-    <h3>🎨 Thème d'accentuation</h3>
-    <label>Couleur principale de l'interface :</label>
-    <div class="color-swatches">
-      <div class="swatch" style="background:#38bdf8;" onclick="changerTheme('#38bdf8')"></div>
-      <div class="swatch" style="background:#818cf8;" onclick="changerTheme('#818cf8')"></div>
-      <div class="swatch" style="background:#34d399;" onclick="changerTheme('#34d399')"></div>
-      <div class="swatch" style="background:#f43f5e;" onclick="changerTheme('#f43f5e')"></div>
-      <div class="swatch" style="background:#fbbf24;" onclick="changerTheme('#fbbf24')"></div>
+  <!-- HEADER -->
+  <div class="header-dev">
+    <div>
+      <div class="badge-dev"><span class="dot"></span> DEV CONSOLE</div>
+      <h2 style="margin:6px 0 0 0; font-size:1.15em;">Outils Système & Versioning</h2>
     </div>
-    <button type="button" class="btn-dev" onclick="appliquerThemeGlobal()">Appliquer au navigateur</button>
+    <a href="index.html" class="btn-nav-back">&larr; Retour Régie</a>
   </div>
 
-  <!-- OUTIL 2 : GÉNÉRATEUR DE CHANGELOG -->
+  <!-- MODULE 1 : PUBLICATION CHANGELOG -->
+  <div class="card" style="border-left: 4px solid var(--dev-purple);">
+    <div class="card-title">
+      <span>🚀 Publier une nouvelle version en direct</span>
+    </div>
+    <p style="font-size:0.82em; color:var(--text-muted); margin:0 0 14px 0;">
+      Écrit automatiquement en ligne 2 de l'onglet Sheets <code>Changelog</code>. La modale du site sera mise à jour instantanément pour tous les étudiants.
+    </p>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <div>
+        <label>Version (Tag) :</label>
+        <input type="text" id="clVersion" placeholder="ex: v1.4.0">
+      </div>
+      <div>
+        <label>Date affichée :</label>
+        <input type="text" id="clDate" placeholder="ex: Octobre 2026">
+      </div>
+    </div>
+
+    <label>Notes de mise à jour (1 ligne = 1 puce sur le site) :</label>
+    <textarea id="clNotes" rows="4" placeholder="- Support des batteries V-Mount&#10;- Amélioration du scanner QR&#10;- Correction du bug d'acceptation autonomie"></textarea>
+
+    <button type="button" class="btn-dev" id="btnPublish" onclick="publierChangelog()">
+      ⚡ Mettre en ligne la version immédiatement
+    </button>
+  </div>
+
+  <!-- MODULE 2 : MONITORING API & SANTÉ APPS SCRIPT -->
   <div class="card">
-    <h3>📝 Générateur de Version (Changelog)</h3>
-    <label>Numéro de version :</label>
-    <input type="text" id="clVersion" placeholder="ex: v1.4.0">
+    <div class="card-title">
+      <span>📡 Statut du Backend Google Apps Script</span>
+      <button type="button" class="btn-sub" onclick="testerSanteApi()">Tester (Ping)</button>
+    </div>
 
-    <label>Date :</label>
-    <input type="text" id="clDate" placeholder="ex: Octobre 2026">
+    <div class="health-grid">
+      <div class="health-stat">
+        <label>Statut</label>
+        <div id="statStatus" class="stat-val" style="color:var(--text-muted);">-</div>
+      </div>
+      <div class="health-stat">
+        <label>Latence</label>
+        <div id="statLatency" class="stat-val" style="color:var(--text-muted);">- ms</div>
+      </div>
+      <div class="health-stat">
+        <label>Format</label>
+        <div id="statPayload" class="stat-val" style="color:var(--text-muted);">-</div>
+      </div>
+    </div>
 
-    <label>Modifications (1 ligne = 1 puce) :</label>
-    <textarea id="clNotes" rows="4" placeholder="- Ajout du mode Dev&#10;- Sélecteur de couleurs&#10;- Correction d'affichage"></textarea>
-
-    <button type="button" class="btn-dev" onclick="genererBlocJson()">Générer l'entrée JSON</button>
-
-    <label style="margin-top:14px;">Extrait à coller dans <code>changelog.json</code> :</label>
-    <textarea id="clResultat" rows="6" readonly style="font-family:'JetBrains Mono', monospace; font-size:0.82em; color:#38bdf8;"></textarea>
+    <div style="font-size:0.75em; color:var(--text-muted); word-break:break-all;">
+      Endpoint actif : <code id="txtEndpoint" style="color:var(--dev-cyan);"></code>
+    </div>
   </div>
 
-  <a href="index.html" style="color:var(--text-muted); text-decoration:none; font-size:0.85em;">&larr; Revenir à l'application</a>
+  <!-- MODULE 3 : TESTEUR D'ENDPOINTS (MINI-POSTMAN) -->
+  <div class="card">
+    <div class="card-title">
+      <span>🧪 Inspecteur de requêtes GET</span>
+    </div>
+    
+    <label>Action doGet :</label>
+    <div style="display:flex; gap:8px; margin-bottom:10px;">
+      <select id="selectAction" style="margin:0; flex:2;">
+        <option value="getAll">getAll (Inventaire complet)</option>
+        <option value="getChangelog">getChangelog (Historique des versions)</option>
+        <option value="getAdminStats">getAdminStats (Statistiques étudiants)</option>
+        <option value="getPendingAutonomies">getPendingAutonomies (Demandes en attente)</option>
+        <option value="getItem">getItem (ID spécifique)</option>
+      </select>
+      <input type="text" id="inputCustomParam" placeholder="ID (ex: DM7_001)" style="margin:0; flex:1; display:none;">
+      <button type="button" class="btn-dev" style="width:auto; padding:0 16px;" onclick="executerRequeteApi()">Exécuter</button>
+    </div>
+
+    <label>Réponse JSON brute du serveur :</label>
+    <div id="terminalResult" class="terminal-box">// Les résultats de la requête s'afficheront ici...</div>
+  </div>
+
+  <!-- MODULE 4 : BAC À SABLE DE SESSIONS & DIAGNOSTIC LOCAL -->
+  <div class="card">
+    <div class="card-title">
+      <span>⚙️ Session Locale & Cache PWA</span>
+    </div>
+
+    <label>Simulateur d'usurpation de rôle (sur ce navigateur) :</label>
+    <div class="role-switcher">
+      <button type="button" id="roleBtn_etudiant" class="role-btn" onclick="forcerRoleLocal('etudiant')">Étudiant</button>
+      <button type="button" id="roleBtn_admin" class="role-btn" onclick="forcerRoleLocal('admin')">Admin</button>
+      <button type="button" id="roleBtn_dev" class="role-btn active" onclick="forcerRoleLocal('dev')">Dev</button>
+    </div>
+
+    <div style="margin-top:14px;">
+      <label>Données en cache local (localStorage) :</label>
+      <div id="localStorageGrid" class="key-val-grid"></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:10px;">
+      <button type="button" class="btn-sub btn-danger" onclick="purgerLocalStorage()">🧹 Nettoyer le LocalStorage</button>
+      <button type="button" class="btn-sub" onclick="forcerResetPWA()">🔄 Désinstaller Service Worker</button>
+    </div>
+  </div>
 
   <script>
-    // Sécurité d'accès
-    const role = localStorage.getItem("regie_role");
-    if (role !== "dev") {
-      alert("Accès réservé au développeur.");
+    // URL Web App
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+
+    // 1. VÉRIFICATION D'ACCÈS AU RÔLE DEV
+    const currentRole = localStorage.getItem("regie_role") || "etudiant";
+    if (currentRole !== "dev") {
+      alert("Accès refusé : cette zone est strictement réservée au profil Développeur.");
       window.location.href = "index.html";
     }
 
-    let couleurSelectionnee = localStorage.getItem("regie_theme_color") || "#38bdf8";
+    document.getElementById("txtEndpoint").innerText = SCRIPT_URL;
 
-    function changerTheme(hex) {
-      couleurSelectionnee = hex;
-      document.querySelectorAll(".swatch").forEach(s => s.classList.remove("active"));
-      event.target.classList.add("active");
-    }
+    // Initialisation
+    window.addEventListener("DOMContentLoaded", () => {
+      // Pré-remplir date changelog avec le mois actuel
+      const dateFr = new Date().toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+      document.getElementById("clDate").value = dateFr.charAt(0).toUpperCase() + dateFr.slice(1);
 
-    function appliquerThemeGlobal() {
-      localStorage.setItem("regie_theme_color", couleurSelectionnee);
-      alert("Nouvelle couleur enregistrée ! Elle s'appliquera sur toute l'application.");
-    }
+      afficherVariablesLocales();
+      testerSanteApi();
 
-    function genererBlocJson() {
+      document.getElementById("selectAction").addEventListener("change", (e) => {
+        const inputId = document.getElementById("inputCustomParam");
+        inputId.style.display = (e.target.value === "getItem") ? "block" : "none";
+      });
+    });
+
+    // 2. PUBLICATION DU CHANGELOG EN DIRECT
+    function publierChangelog() {
       const v = document.getElementById("clVersion").value.trim();
       const d = document.getElementById("clDate").value.trim();
-      const rawNotes = document.getElementById("clNotes").value.trim();
+      const notes = document.getElementById("clNotes").value.trim();
 
-      const notes = rawNotes.split("\n")
-        .map(l => l.replace(/^[-\s*]+/, "").trim())
-        .filter(l => l.length > 0);
+      if (!v || !notes) {
+        alert("Veuillez remplir au moins la version (ex: v1.4.0) et les notes.");
+        return;
+      }
 
-      const bloc = {
+      const btn = document.getElementById("btnPublish");
+      btn.disabled = true;
+      btn.innerText = "Publication vers Google Sheets...";
+
+      const payload = {
+        actionType: "ADD_CHANGELOG",
         version: v,
-        date: d,
-        isLatest: true,
+        date: d || "Récemment",
         notes: notes
       };
 
-      document.getElementById("clResultat").value = JSON.stringify(bloc, null, 2) + ",";
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert(`✅ Version ${v} publiée avec succès !\nElle apparaît immédiatement dans la modale de tout le monde.`);
+        document.getElementById("clVersion").value = "";
+        document.getElementById("clNotes").value = "";
+        btn.disabled = false;
+        btn.innerText = "⚡ Mettre en ligne la version immédiatement";
+      })
+      .catch(err => {
+        alert("Erreur de communication : " + err);
+        btn.disabled = false;
+        btn.innerText = "⚡ Mettre en ligne la version immédiatement";
+      });
+    }
+
+    // 3. MONITORING / HEALTH CHECK
+    function testerSanteApi() {
+      const statSt = document.getElementById("statStatus");
+      const statLat = document.getElementById("statLatency");
+      const statPay = document.getElementById("statPayload");
+
+      statSt.innerText = "Test...";
+      statSt.style.color = "var(--dev-amber)";
+      statLat.innerText = "...";
+      statPay.innerText = "...";
+
+      const t0 = performance.now();
+
+      fetch(`${SCRIPT_URL}?action=getChangelog&t=${Date.now()}`)
+        .then(r => {
+          const t1 = performance.now();
+          const lat = Math.round(t1 - t0);
+          statLat.innerText = `${lat} ms`;
+          statLat.style.color = lat < 1200 ? "var(--dev-emerald)" : "var(--dev-amber)";
+
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.json();
+        })
+        .then(data => {
+          statSt.innerText = "ONLINE";
+          statSt.style.color = "var(--dev-emerald)";
+          statPay.innerText = data.success ? "VALIDE" : "ERR_JSON";
+          statPay.style.color = data.success ? "var(--dev-emerald)" : "var(--dev-rose)";
+        })
+        .catch(err => {
+          statSt.innerText = "OFFLINE";
+          statSt.style.color = "var(--dev-rose)";
+          statLat.innerText = "Timeout";
+          statPay.innerText = "FAIL";
+          statPay.style.color = "var(--dev-rose)";
+        });
+    }
+
+    // 4. TESTEUR D'ENDPOINTS
+    function executerRequeteApi() {
+      const action = document.getElementById("selectAction").value;
+      const term = document.getElementById("terminalResult");
+      term.innerText = `Exécution : GET ?action=${action}...`;
+
+      let url = `${SCRIPT_URL}?action=${action}`;
+      if (action === "getItem") {
+        const id = document.getElementById("inputCustomParam").value.trim() || "DM7_001";
+        url += `&id=${encodeURIComponent(id)}`;
+      }
+
+      fetch(url)
+        .then(r => r.json())
+        .then(res => {
+          term.innerText = JSON.stringify(res, null, 2);
+        })
+        .catch(err => {
+          term.innerText = "Erreur lors de l'appel :\n" + err.toString();
+        });
+    }
+
+    // 5. BAC À SABLE / DIAGNOSTICS LOCAUX
+    function afficherVariablesLocales() {
+      const grid = document.getElementById("localStorageGrid");
+      grid.innerHTML = "";
+
+      if (localStorage.length === 0) {
+        grid.innerHTML = '<div style="color:var(--text-muted); font-size:0.8em;">Aucune donnée dans le localStorage.</div>';
+        return;
+      }
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const val = localStorage.getItem(key);
+
+        const card = document.createElement("div");
+        card.className = "key-card";
+        card.innerHTML = `<span class="key-name">${key}</span><br><span style="color:#cbd5e1; font-size:0.85em;">${val}</span>`;
+        grid.appendChild(card);
+      }
+
+      // Mise à jour des boutons de rôle
+      const activeRole = localStorage.getItem("regie_role") || "etudiant";
+      document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("active"));
+      const btn = document.getElementById(`roleBtn_${activeRole}`);
+      if (btn) btn.classList.add("active");
+    }
+
+    function forcerRoleLocal(newRole) {
+      localStorage.setItem("regie_role", newRole);
+      afficherVariablesLocales();
+      alert(`Rôle local modifié en : "${newRole}".\nRetournez sur l'application pour tester les accès.`);
+    }
+
+    function purgerLocalStorage() {
+      if (!confirm("Vider tout le localStorage de ce domaine ? Tu seras déconnecté.")) return;
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+
+    function forcerResetPWA() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          for (let registration of registrations) {
+            registration.unregister();
+          }
+          if ('caches' in window) {
+            caches.keys().then(names => {
+              for (let name of names) caches.delete(name);
+            });
+          }
+          alert("Service Worker désenregistré et caches effacés !\nLa page va se recharger pour récupérer le code frais.");
+          location.reload();
+        });
+      } else {
+        alert("Aucun Service Worker actif sur ce navigateur.");
+      }
     }
   </script>
 </body>

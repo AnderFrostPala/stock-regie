@@ -844,27 +844,21 @@
     }
 
     // CHANGELOG DYNAMIQUE
-    function ouvrirChangelog() {
-      fetch("./changelog.json?v=" + Date.now())
-        .then(r => r.json())
-        .then(data => {
-          genererContenuChangelog(data);
-          document.getElementById("changelogOverlay").style.display = "flex";
-        })
-        .catch(() => {
-          // Secours si changelog.json n'est pas encore déployé
-          document.getElementById("changelogList").innerHTML = `
-            <div class="version-entry latest">
-              <span class="version-tag">v1.3.0</span> <span class="version-date">Septembre 2026</span>
-              <ul class="version-list">
-                <li>Module Autonomie : validation avec alertes email et retour groupé.</li>
-                <li>Support du rôle Développeur et thèmes personnalisés.</li>
-              </ul>
-            </div>
-          `;
-          document.getElementById("changelogOverlay").style.display = "flex";
-        });
-    }
+   function ouvrirChangelog() {
+  document.getElementById("changelogOverlay").style.display = "flex";
+  
+  fetch(`${SCRIPT_URL}?action=getChangelog`)
+    .then(r => r.json())
+    .then(res => {
+      if (res.success && res.releases) {
+        genererContenuChangelog(res.releases);
+      }
+    })
+    .catch(() => {
+      document.getElementById("changelogList").innerHTML = 
+        '<div style="text-align:center; padding:12px; color:#f87171;">Impossible de charger les notes.</div>';
+    });
+}
 
     function fermerChangelog() {
       document.getElementById("changelogOverlay").style.display = "none";

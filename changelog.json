@@ -1,0 +1,21 @@
+[
+  {
+    "version": "v1.3.0",
+    "date": "Septembre 2026",
+    "isLatest": true,
+    "notes": [
+      "Module Autonomie : gestion de lots sur plateau et retour groupé.",
+      "Validation des réservations d'autonomie avec notification e-mail.",
+      "Suppression définitive d'un profil étudiant depuis l'Admin."
+    ]
+  },
+  {
+    "version": "v1.2.0",
+    "date": "Août 2026",
+    "isLatest": false,
+    "notes": [
+      "Gestion des sorties partielles sur les lots.",
+      "Dashboard : affichage détaillé des détenteurs par lieu."
+    ]
+  }
+]

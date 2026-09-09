@@ -297,7 +297,28 @@
       ⚡ Mettre en ligne la version immédiatement
     </button>
   </div>
+<!-- MODULE ALERTE GLOBALE -->
+  <div class="card" style="border-left: 4px solid var(--dev-rose);">
+    <div class="card-title">
+      <span>🚨 Bandeau d'alerte urgent (Bannière rouge)</span>
+      <span id="badgeAlertState" style="font-size:0.75em; padding:2px 8px; border-radius:12px; font-weight:800; background:#20242e; color:var(--text-muted);">Inactif</span>
+    </div>
+    <p style="font-size:0.82em; color:var(--text-muted); margin:0 0 12px 0;">
+      Affiche un bandeau défilant rouge vif tout en haut de toutes les pages de l'application (Réservations HS, fermeture plateau, etc.).
+    </p>
 
+    <label>Message d'alerte :</label>
+    <input type="text" id="inputAlertMsg" placeholder="ex: ⚠️ Réservations suspendues jusqu'à vendredi 18h">
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+      <button type="button" class="btn-dev" style="background:#e11d48; border-color:#f43f5e;" onclick="sauvegarderAlerte(true)">
+        🔴 Activer l'alerte
+      </button>
+      <button type="button" class="btn-sub" onclick="sauvegarderAlerte(false)">
+        ⚪ Désactiver
+      </button>
+    </div>
+  </div>
   <!-- MODULE 2 : MONITORING API & SANTÉ APPS SCRIPT -->
   <div class="card">
     <div class="card-title">

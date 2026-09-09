@@ -23,6 +23,7 @@
       --status-sorti: #ef4444;
       --status-sav: #f59e0b;
       --status-blue: #3b82f6;
+      --status-blue-light: #38bdf8;
     }
 
     body {
@@ -31,8 +32,10 @@
       background-color: var(--bg-body); color: var(--text-main);
       padding: 14px;
       -webkit-font-smoothing: antialiased;
+      padding-bottom: 70px; /* Espace pour la pastille changelog */
     }
 
+    /* HEADER */
     .app-header {
       display: flex; justify-content: space-between; align-items: center;
       padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
@@ -54,6 +57,7 @@
       display: block; font-size: 0.72em; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
     }
 
+    /* PASTILLE UTILISATEUR */
     .user-pill-btn {
       display: flex; align-items: center; gap: 7px;
       background: var(--bg-surface); border: 1px solid var(--border);
@@ -69,6 +73,7 @@
       background: var(--status-dispo); box-shadow: 0 0 6px var(--status-dispo);
     }
 
+    /* MENU UTILISATEUR */
     #userMenu {
       position: absolute; right: 14px; top: 62px; width: 220px;
       background: var(--bg-surface-elevated); border: 1px solid var(--border);
@@ -87,17 +92,19 @@
     .menu-item:hover { background: rgba(255,255,255,0.06); }
     .menu-item.danger { color: var(--status-sorti); }
 
+    /* NAVIGATION RAPIDE */
     .quick-nav {
-      display: flex; gap: 6px; margin-bottom: 14px;
+      display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;
     }
     .quick-nav a {
-      flex: 1; text-align: center; padding: 7px 4px; border-radius: 6px;
+      flex: 1; min-width: 80px; text-align: center; padding: 7px 4px; border-radius: 6px;
       background: var(--bg-surface); border: 1px solid var(--border);
       color: var(--text-muted); text-decoration: none; font-size: 0.78em; font-weight: 700;
       transition: color 0.15s ease;
     }
     .quick-nav a:hover { color: #fff; border-color: #3f4758; }
 
+    /* CARTES & SCANNER */
     .card {
       background: var(--bg-surface); border: 1px solid var(--border);
       border-radius: 12px; padding: 14px; margin-bottom: 12px;
@@ -121,6 +128,7 @@
       padding: 2px 6px; border-radius: 4px; font-size: 0.85em;
     }
 
+    /* ÉTATS FICHE MATÉRIEL */
     .card-dispo {
       border-left: 5px solid var(--status-dispo) !important;
       background: linear-gradient(90deg, rgba(16,185,129,0.08) 0%, var(--bg-surface) 60%) !important;
@@ -160,10 +168,162 @@
       border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 8px;
       font-family: inherit;
     }
+
+    /* PASTILLE CHANGELOG EN BAS À DROITE */
+    .changelog-pill-btn {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 7px 12px;
+      border-radius: 20px;
+      font-size: 0.8em;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 2000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      transition: all 0.2s ease;
+    }
+    .changelog-pill-btn:hover {
+      color: #fff;
+      border-color: #4b5563;
+      transform: translateY(-2px);
+    }
+    .changelog-pill-btn .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--status-blue-light);
+      box-shadow: 0 0 6px var(--status-blue-light);
+    }
+
+    /* FOND TRANSPARENT OBSCURCI */
+    .changelog-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 15, 18, 0.78);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 4000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: fadeIn 0.15s ease-out;
+    }
+
+    /* MODALE DU CHANGELOG */
+    .changelog-modal {
+      background: #171a21;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 460px;
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 35px rgba(0,0,0,0.7);
+      overflow: hidden;
+    }
+
+    .changelog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: #1c202a;
+    }
+    .changelog-header h3 {
+      margin: 0;
+      font-size: 1.05em;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-close-cl {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.3em;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .btn-close-cl:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .changelog-body {
+      padding: 16px 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .version-entry {
+      border-left: 2px solid #334155;
+      padding-left: 14px;
+      margin-left: 4px;
+      position: relative;
+    }
+    .version-entry::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 3px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #38bdf8;
+      border: 2px solid #171a21;
+    }
+    .version-entry.latest::before {
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+    .version-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88em;
+      font-weight: 800;
+      color: #fff;
+    }
+    .version-date {
+      font-size: 0.78em;
+      color: #8b949e;
+      margin-left: 6px;
+    }
+    .version-list {
+      margin: 8px 0 0 0;
+      padding-left: 18px;
+      font-size: 0.84em;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .version-list li {
+      margin-bottom: 4px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
   </style>
 </head>
 <body onclick="fermerMenuSiClicExterieur(event)">
 
+  <!-- HEADER -->
   <header class="app-header">
     <div class="brand-group">
       <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
@@ -182,6 +342,7 @@
     </button>
   </header>
 
+  <!-- MENU UTILISATEUR -->
   <div id="userMenu">
     <div class="menu-header">Profil : <strong id="userRoleTxt">Étudiant</strong></div>
     <a href="reservation.html" class="menu-item"><span>📅</span> Mes réservations</a>
@@ -194,11 +355,14 @@
     </button>
   </div>
 
+  <!-- NAVIGATION RAPIDE -->
   <nav class="quick-nav">
+    <a href="autonomie.html" style="color:var(--status-blue-light);">⚡ Autonomie</a>
     <a href="reservation.html">Planning Résas</a>
     <a href="dashboard.html">Vue Parc & Sorties</a>
   </nav>
 
+  <!-- SCANNER & RECHERCHE -->
   <div class="card">
     <div id="reader"></div>
     <div class="search-row">
@@ -207,6 +371,7 @@
     </div>
   </div>
 
+  <!-- FICHE MATÉRIEL -->
   <div id="cardDetails" class="card" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:8px;">
       <div>
@@ -237,6 +402,7 @@
       <button type="button" class="btn-cmd btn-sav" onclick="declarerPanne()">Panne SAV</button>
     </div>
 
+    <!-- FORMULAIRE SORTIE -->
     <div id="zoneLieuSortie" style="display:none; margin-top:14px; border-top:1px solid var(--border); padding-top:12px;">
       <div id="zoneQuantiteSortie" style="display:none; margin-bottom:10px;">
         <label style="font-weight:700; font-size:0.82em; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px; display:block;">Quantité sortie :</label>
@@ -267,6 +433,7 @@
     </div>
   </div>
 
+  <!-- RAPPEL EMPLACEMENT NOMINAL -->
   <div id="modalRangement" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:3000; align-items:center; justify-content:center; padding:16px;">
     <div style="background:var(--bg-surface-elevated); border:1px solid var(--border); border-radius:14px; padding:24px; max-width:380px; width:100%; text-align:center;">
       <div style="font-size:2.8em; margin-bottom:6px;">📦</div>
@@ -284,6 +451,7 @@
     </div>
   </div>
 
+  <!-- MODAL AUTHENTIFICATION -->
   <div id="authModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg-body); z-index:2000; align-items:center; justify-content:center; padding:16px;">
     <div class="card" style="max-width:360px; width:100%; text-align:center; background:var(--bg-surface-elevated);">
       <h3 style="margin-top:0; color:#fff;">Connexion Régie</h3>
@@ -294,9 +462,26 @@
     </div>
   </div>
 
+  <!-- BOUTON FLOTTANT DU CHANGELOG -->
+  <button type="button" class="changelog-pill-btn" onclick="ouvrirChangelog()">
+    <span class="badge-dot"></span>
+    <span>v1.3.0</span>
+  </button>
+
+  <!-- MODALE CHANGELOG AVEC FOND TRANSLUCIDE -->
+  <div id="changelogOverlay" class="changelog-overlay" onclick="fermerChangelogSiExterieur(event)">
+    <div class="changelog-modal">
+      <div class="changelog-header">
+        <h3>🚀 Notes de version</h3>
+        <button type="button" class="btn-close-cl" onclick="fermerChangelog()">&times;</button>
+      </div>
+      <div class="changelog-body" id="changelogList"></div>
+    </div>
+  </div>
+
   <script>
     // COLLE TON URL APPS SCRIPT ICI
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx05GhAv_qU32TZ-rTBw_DBPD6nKFDyypXXPMoCKDOV1nD9AXO_eFDWF-_Nx99bSHUS/exec";
 
     let currentItem = null;
     let html5QrCode = null;
@@ -625,6 +810,87 @@
       document.getElementById("cardDetails").style.display = "none";
       document.getElementById("inputId").value = "";
       currentItem = null;
+    }
+
+    // GESTION DU CHANGELOG
+    const CHANGELOG_DATA = [
+      {
+        version: "v1.3.0",
+        date: "Septembre 2026",
+        isLatest: true,
+        notes: [
+          "Mode Autonomie : gestion de lots plateaux et retour groupé en 1 clic.",
+          "Validation des réservations d'autonomie avec envoi d'e-mail de confirmation.",
+          "Suppression définitive de compte étudiant depuis le panneau Admin.",
+          "Catalogue de réservation organisé par catégories et sous-catégories dépliables."
+        ]
+      },
+      {
+        version: "v1.2.0",
+        date: "Août 2026",
+        isLatest: false,
+        notes: [
+          "Gestion des quantités et sorties partielles sur les lots.",
+          "Dashboard : affichage détaillé de qui détient quoi et sur quel lieu.",
+          "Représentation visuelle des stocks par barres de segments.",
+          "Tuiles KPI du tableau de bord directement cliquables comme filtres rapides."
+        ]
+      },
+      {
+        version: "v1.1.0",
+        date: "Juin 2026",
+        isLatest: false,
+        notes: [
+          "Déchargement Rapide (mode douchette pour enseignants et régisseurs).",
+          "Thème sombre intégral Régie Tech.",
+          "Rappel de l'emplacement nominal de rangement au stock."
+        ]
+      },
+      {
+        version: "v1.0.0",
+        date: "Mai 2026",
+        isLatest: false,
+        notes: [
+          "Lancement de la première version de l'application de stock.",
+          "Scan de QR Codes et fiches techniques intégrées.",
+          "Système de réservation de matériel et connexion par PIN."
+        ]
+      }
+    ];
+
+    function ouvrirChangelog() {
+      genererContenuChangelog();
+      document.getElementById("changelogOverlay").style.display = "flex";
+    }
+
+    function fermerChangelog() {
+      document.getElementById("changelogOverlay").style.display = "none";
+    }
+
+    function fermerChangelogSiExterieur(e) {
+      if (e.target.id === "changelogOverlay") {
+        fermerChangelog();
+      }
+    }
+
+    function genererContenuChangelog() {
+      const conteneur = document.getElementById("changelogList");
+      conteneur.innerHTML = "";
+
+      CHANGELOG_DATA.forEach(release => {
+        const div = document.createElement("div");
+        div.className = `version-entry ${release.isLatest ? 'latest' : ''}`;
+        const itemsHtml = release.notes.map(n => `<li>${n}</li>`).join("");
+
+        div.innerHTML = `
+          <div>
+            <span class="version-tag">${release.version}</span>
+            <span class="version-date">${release.date}</span>
+          </div>
+          <ul class="version-list">${itemsHtml}</ul>
+        `;
+        conteneur.appendChild(div);
+      });
     }
   </script>
 </body>

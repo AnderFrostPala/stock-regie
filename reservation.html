@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Régie - Planning & Réservations</title>
 
-  <!-- PWA & Métas -->
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#171a21">
   <meta name="mobile-web-app-capable" content="yes">
@@ -47,7 +46,6 @@
       padding-bottom: 90px;
     }
 
-    /* HEADER */
     .app-header {
       display: flex;
       justify-content: space-between;
@@ -63,318 +61,150 @@
       text-decoration: none;
       color: inherit;
     }
-    .brand-logo {
-      height: 36px;
-      max-width: 70px;
-      object-fit: contain;
-    }
+    .brand-logo { height: 36px; max-width: 70px; object-fit: contain; }
     .brand-fallback {
-      background: #fff;
-      color: #000;
-      font-weight: 900;
-      font-size: 0.7em;
-      padding: 5px 6px;
-      border-radius: 4px;
-      line-height: 1;
+      background: #fff; color: #000; font-weight: 900; font-size: 0.7em;
+      padding: 5px 6px; border-radius: 4px; line-height: 1;
     }
-    .brand-text h1 {
-      margin: 0;
-      font-size: 1.05em;
-      font-weight: 800;
-      color: #fff;
-    }
+    .brand-text h1 { margin: 0; font-size: 1.05em; font-weight: 800; color: #fff; }
     .brand-text span {
-      display: block;
-      font-size: 0.72em;
-      font-weight: 700;
-      color: var(--status-blue-light);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      display: block; font-size: 0.72em; font-weight: 700;
+      color: var(--status-blue-light); text-transform: uppercase; letter-spacing: 0.5px;
     }
 
     .btn-quit {
-      font-size: 0.82em;
-      color: var(--text-muted);
-      text-decoration: none;
-      border: 1px solid var(--border);
-      padding: 6px 12px;
-      border-radius: 8px;
-      background: var(--bg-surface);
-      font-weight: 700;
+      font-size: 0.82em; color: var(--text-muted); text-decoration: none;
+      border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px;
+      background: var(--bg-surface); font-weight: 700;
     }
-    .btn-quit:hover {
-      color: #fff;
-      border-color: #64748b;
-    }
+    .btn-quit:hover { color: #fff; border-color: #64748b; }
 
-    /* NAVIGATION */
-    .quick-nav {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
+    .quick-nav { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
     .quick-nav a {
-      flex: 1;
-      min-width: 80px;
-      text-align: center;
-      padding: 8px 4px;
-      border-radius: 8px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.8em;
-      font-weight: 700;
+      flex: 1; min-width: 80px; text-align: center; padding: 8px 4px; border-radius: 8px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      color: var(--text-muted); text-decoration: none; font-size: 0.8em; font-weight: 700;
     }
     .quick-nav a.active {
-      color: var(--status-blue-light);
-      border-color: var(--status-blue-light);
+      color: var(--status-blue-light); border-color: var(--status-blue-light);
       background: rgba(56, 189, 248, 0.1);
     }
 
     .card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; margin-bottom: 16px;
     }
-    h2, h3 {
-      margin-top: 0;
-      margin-bottom: 12px;
-      font-size: 1.05em;
-      color: #fff;
-      font-weight: 800;
-    }
+    h2 { margin-top: 0; margin-bottom: 12px; font-size: 1.05em; color: #fff; font-weight: 800; }
 
-    /* FORMULAIRE DE DEMANDE */
     label {
-      font-size: 0.78em;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      display: block;
-      margin-bottom: 6px;
+      font-size: 0.78em; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; display: block; margin-bottom: 6px;
     }
-    input[type="text"], input[type="date"], select {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #090a0d;
-      color: #fff;
-      font-family: inherit;
-      font-size: 14px;
-      margin-bottom: 12px;
+    input[type="text"], input[type="date"] {
+      width: 100%; padding: 12px 14px; border-radius: 10px;
+      border: 1px solid var(--border); background: #090a0d; color: #fff;
+      font-family: inherit; font-size: 14px; margin-bottom: 12px;
     }
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--status-blue-light);
-    }
+    input:focus { outline: none; border-color: var(--status-blue-light); }
 
-    .dates-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    .dates-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     .autonomie-banner {
-      display: none;
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid var(--status-amber);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 0.84em;
-      color: #fbbf24;
-      margin-bottom: 14px;
-      line-height: 1.4;
+      display: none; background: rgba(245, 158, 11, 0.12);
+      border: 1px solid var(--status-amber); border-radius: 10px;
+      padding: 10px 14px; font-size: 0.84em; color: #fbbf24; margin-bottom: 14px;
     }
 
-    /* GROSSES TUILES MATÉRIEL (Faciles à lire et à cliquer) */
-    .search-filter-box {
-      margin-bottom: 12px;
+    /* ACCORDÉONS PAR CATÉGORIE */
+    .accordion-group {
+      border: 1px solid var(--border); border-radius: 10px;
+      margin-bottom: 8px; overflow: hidden; background: #0a0c10;
     }
-    .items-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 440px;
-      overflow-y: auto;
-      padding-right: 4px;
+    .accordion-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 14px; background: var(--bg-surface-elevated);
+      cursor: pointer; user-select: none; font-weight: 800; font-size: 0.9em;
     }
+    .accordion-header:hover { background: #262b37; }
+    .accordion-title { display: flex; align-items: center; gap: 8px; color: #fff; }
+    .accordion-badge {
+      background: #11141c; border: 1px solid var(--border);
+      padding: 2px 7px; border-radius: 12px; font-size: 0.78em; color: var(--text-muted);
+    }
+    .accordion-arrow { transition: transform 0.2s ease; font-size: 0.8em; color: var(--text-muted); }
+    .accordion-group.open .accordion-arrow { transform: rotate(180deg); }
+    .accordion-content {
+      display: none; padding: 10px; flex-direction: column; gap: 8px;
+    }
+    .accordion-group.open .accordion-content { display: flex; }
 
+    /* GROSSES TUILES TACTILES */
     .big-item-card {
-      background: #0d1016;
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.15s ease;
+      background: #12151d; border: 2px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; cursor: pointer; user-select: none; transition: all 0.12s ease;
     }
-    .big-item-card:hover {
-      border-color: #475569;
-      background: #141822;
-    }
+    .big-item-card:hover { border-color: #475569; }
     .big-item-card.selected {
-      border-color: var(--status-dispo);
-      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--status-dispo); background: rgba(16, 185, 129, 0.1);
     }
-
-    .item-main-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      flex: 1;
-    }
-    .item-title {
-      font-size: 1.05em;
-      font-weight: 800;
-      color: #fff;
-    }
+    .item-main-info { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+    .item-title { font-size: 0.98em; font-weight: 800; color: #fff; }
     .item-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.82em;
-      color: var(--text-muted);
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px; font-size: 0.8em;
+      color: var(--text-muted); flex-wrap: wrap;
     }
     .code-pill {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 800;
-      color: var(--status-blue-light);
-      background: #000;
-      padding: 2px 7px;
-      border-radius: 5px;
-      border: 1px solid #1e293b;
+      font-family: 'JetBrains Mono', monospace; font-weight: 800;
+      color: var(--status-blue-light); background: #000;
+      padding: 2px 6px; border-radius: 4px; border: 1px solid #1e293b;
     }
-    .stock-badge {
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.75em;
-      text-transform: uppercase;
-    }
-    .stock-ok {
-      background: rgba(16, 185, 129, 0.18);
-      color: #34d399;
-    }
-    .stock-busy {
-      background: rgba(239, 68, 68, 0.18);
-      color: #f87171;
-    }
+    .stock-badge { font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.75em; text-transform: uppercase; }
+    .stock-ok { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+    .stock-busy { background: rgba(239, 68, 68, 0.18); color: #f87171; }
 
-    /* GROSSE CASE À COCHER CUSTOM */
     .big-checkbox {
-      width: 28px;
-      height: 28px;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      font-size: 16px;
-      color: transparent;
-      transition: all 0.15s ease;
+      width: 26px; height: 26px; border: 2px solid var(--border);
+      border-radius: 7px; display: flex; align-items: center;
+      justify-content: center; background: #000; font-size: 15px; color: transparent;
       flex-shrink: 0;
     }
     .big-item-card.selected .big-checkbox {
-      background: var(--status-dispo);
-      border-color: var(--status-dispo);
-      color: #fff;
+      background: var(--status-dispo); border-color: var(--status-dispo); color: #fff;
     }
 
     .btn-submit-resa {
-      width: 100%;
-      padding: 15px;
-      background: var(--status-blue);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-weight: 800;
-      font-size: 1em;
-      cursor: pointer;
-      font-family: inherit;
-      margin-top: 14px;
-      transition: background 0.15s ease;
+      width: 100%; padding: 15px; background: var(--status-blue);
+      color: #fff; border: none; border-radius: 10px; font-weight: 800;
+      font-size: 1em; cursor: pointer; font-family: inherit; margin-top: 14px;
     }
-    .btn-submit-resa:hover {
-      background: #1d4ed8;
-    }
-    .btn-submit-resa:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    .btn-submit-resa:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* BLOCS MES RÉSERVATIONS */
+    /* RÉSERVATIONS */
     .section-title {
-      font-size: 0.9em;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin: 16px 0 8px 0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text-muted); margin: 12px 0 8px 0; display: flex; align-items: center; gap: 6px;
     }
     .resa-row-card {
-      background: #090a0d;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
+      background: #090a0d; border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
     .resa-row-card.en-attente {
-      border-left: 4px solid var(--status-amber);
-      background: rgba(245, 158, 11, 0.05);
+      border-left: 4px solid var(--status-amber); background: rgba(245, 158, 11, 0.05);
     }
-    .resa-row-card.valide {
-      border-left: 4px solid var(--status-dispo);
-    }
+    .resa-row-card.valide { border-left: 4px solid var(--status-dispo); }
 
     .badge-status {
-      font-size: 0.72em;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-weight: 800;
-      text-transform: uppercase;
-      display: inline-block;
-      margin-bottom: 4px;
+      font-size: 0.72em; padding: 3px 8px; border-radius: 4px; font-weight: 800;
+      text-transform: uppercase; display: inline-block; margin-bottom: 4px;
     }
-    .badge-attente {
-      background: rgba(245, 158, 11, 0.2);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.35);
-    }
-    .badge-valide {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
+    .badge-attente { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .badge-valide { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
 
     .btn-cancel-resa {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #f87171;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.8em;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .btn-cancel-resa:hover {
-      background: rgba(239, 68, 68, 0.25);
+      background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171; padding: 6px 10px; border-radius: 6px; font-size: 0.8em; font-weight: 700; cursor: pointer;
     }
   </style>
 </head>
@@ -399,15 +229,43 @@
     <a href="reservation.html" class="active">Planning</a>
   </nav>
 
-  <!-- FORMULAIRE DE RÉSERVATION -->
+  <!-- 1. MES RÉSERVATIONS DIRECTEMENT EN HAUT -->
   <div class="card">
-    <h2>Nouvelle Réservation</h2>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>Mes Réservations en cours</h2>
+      <button type="button" onclick="chargerMesReservations()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:4px 8px; border-radius:6px; font-size:0.75em; cursor:pointer;">↻</button>
+    </div>
+
+    <div id="loadingUserResas" style="text-align:center; padding:14px; color:var(--text-muted); font-size:0.85em;">Récupération de vos réservations...</div>
+
+    <div id="containerAttente" style="display:none;">
+      <div class="section-title" style="color:#fbbf24;">
+        <span>⏳ En attente de validation prof / régie (<span id="countAttente">0</span>)</span>
+      </div>
+      <div id="listAttente"></div>
+    </div>
+
+    <div id="containerValide" style="display:none;">
+      <div class="section-title" style="color:#34d399;">
+        <span>✅ Réservations Validées (<span id="countValide">0</span>)</span>
+      </div>
+      <div id="listValide"></div>
+    </div>
+
+    <div id="emptyResasMsg" style="display:none; text-align:center; padding:14px; color:var(--text-muted); font-size:0.85em;">
+      Aucune réservation active pour le moment.
+    </div>
+  </div>
+
+  <!-- 2. FORMULAIRE DE DEMANDE AVEC ACCORDÉONS FLUIDES -->
+  <div class="card">
+    <h2>Nouvelle Demande de Matériel</h2>
     <form onsubmit="soumettreReservation(event)">
-      <label>Projet ou Atelier (indiquer "Autonomie" si travail hors régie) :</label>
+      <label>Projet ou Atelier (indiquer "Autonomie" si hors régie) :</label>
       <input type="text" id="inputProjet" placeholder="ex: Scénographie Plateau / Autonomie Atelier B" oninput="verifierMotCleAutonomie(this.value)" required>
 
       <div id="bannerAutonomie" class="autonomie-banner">
-        ⚠️ <strong>Demande en Autonomie détectée :</strong> Cette réservation devra être acceptée par un administrateur ou enseignant dans le panneau Admin avant d'être validée.
+        ⚠️ <strong>Demande en Autonomie :</strong> Cette demande sera soumise à validation administrateur avant confirmation.
       </div>
 
       <div class="dates-row">
@@ -421,128 +279,142 @@
         </div>
       </div>
 
-      <label style="margin-top:6px;">Sélectionner les équipements (<span id="countSelected">0</span> sélectionné) :</label>
-      <input type="text" id="searchItemInput" class="search-filter-box" placeholder="🔍 Rechercher un matériel (ex: Découpe, DM7, Émetteur)..." oninput="filtrerCatalogue()">
+      <label style="margin-top:6px;">Matériel sélectionné (<span id="countSelected" style="color:var(--status-dispo); font-weight:800;">0</span>) :</label>
+      <input type="text" id="searchItemInput" placeholder="🔍 Filtrer par nom ou référence..." oninput="filtrerCatalogue()">
 
-      <div class="items-grid" id="catalogueItemsList">
-        <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9em;">Chargement du parc matériel...</div>
+      <!-- CONTENEUR DES ACCORDÉONS -->
+      <div id="accordionsContainer">
+        <div style="text-align:center; padding:16px; color:var(--text-muted); font-size:0.85em;">Chargement du stock...</div>
       </div>
 
-      <button type="submit" id="btnSubmitResa" class="btn-submit-resa">Confirmer la demande</button>
+      <button type="submit" id="btnSubmitResa" class="btn-submit-resa">Envoyer la demande</button>
     </form>
   </div>
 
-  <!-- MES RÉSERVATIONS AVEC CLASSEMENT ATTENTE / VALIDÉ -->
-  <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2 style="margin:0;">Mes Réservations en cours</h2>
-      <button type="button" onclick="chargerMesReservations()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:4px 8px; border-radius:6px; font-size:0.75em; cursor:pointer;">↻</button>
-    </div>
-
-    <div id="loadingUserResas" style="text-align:center; padding:16px; color:var(--text-muted); font-size:0.88em;">Récupération de vos réservations...</div>
-
-    <!-- SOUS-BLOC EN ATTENTE -->
-    <div id="containerAttente" style="display:none;">
-      <div class="section-title" style="color:#fbbf24;">
-        <span>⏳ En attente d'approbation prof / régie (<span id="countAttente">0</span>)</span>
-      </div>
-      <div id="listAttente"></div>
-    </div>
-
-    <!-- SOUS-BLOC VALIDÉES -->
-    <div id="containerValide" style="display:none;">
-      <div class="section-title" style="color:#34d399;">
-        <span>✅ Réservations Validées (<span id="countValide">0</span>)</span>
-      </div>
-      <div id="listValide"></div>
-    </div>
-
-    <div id="emptyResasMsg" style="display:none; text-align:center; padding:18px; color:var(--text-muted); font-size:0.88em;">
-      Vous n'avez aucune réservation enregistrée pour le moment.
-    </div>
-  </div>
-
   <script>
-    // URL Web App Google Apps Script
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     const user = localStorage.getItem("regie_user");
     if (!user) {
-      alert("Veuillez d'abord vous connecter sur la page d'accueil.");
+      alert("Veuillez vous connecter.");
       window.location.href = "index.html";
     }
 
     let allCatalogueItems = [];
     const selectedItemIds = new Set();
 
-    // Initialisation des dates par défaut (aujourd'hui -> demain)
     const today = new Date().toISOString().split("T")[0];
     document.getElementById("inputDateDebut").value = today;
     document.getElementById("inputDateDebut").min = today;
     document.getElementById("inputDateFin").value = today;
     document.getElementById("inputDateFin").min = today;
 
-    // Chargement initial
     window.addEventListener("DOMContentLoaded", () => {
+      // 1. Chargement immédiat du cache pour affichage instantané
+      const cachedStock = sessionStorage.getItem("regie_stock_cache");
+      if (cachedStock) {
+        try {
+          allCatalogueItems = JSON.parse(cachedStock);
+          afficherCatalogueEnAccordeons(allCatalogueItems);
+        } catch (e) {}
+      }
+
+      // 2. Requêtes réseau
       chargerCatalogue();
       chargerMesReservations();
     });
 
     function verifierMotCleAutonomie(val) {
       const clean = String(val || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const banner = document.getElementById("bannerAutonomie");
-      if (clean.includes("autonomie") || clean.includes("autonome")) {
-        banner.style.display = "block";
-      } else {
-        banner.style.display = "none";
-      }
+      document.getElementById("bannerAutonomie").style.display = 
+        (clean.includes("autonomie") || clean.includes("autonome")) ? "block" : "none";
     }
 
-    // 1. CATALOGUE & SÉLECTION GROSSES CARTES
     function chargerCatalogue() {
       fetch(`${SCRIPT_URL}?action=getAll`)
         .then(r => r.json())
         .then(res => {
           if (res.success && res.items) {
             allCatalogueItems = res.items;
-            afficherCatalogue(allCatalogueItems);
+            sessionStorage.setItem("regie_stock_cache", JSON.stringify(res.items));
+            afficherCatalogueEnAccordeons(allCatalogueItems);
           }
         })
         .catch(() => {
-          document.getElementById("catalogueItemsList").innerHTML = '<div style="text-align:center; padding:14px; color:#f87171;">Impossible de charger le catalogue.</div>';
+          if (!allCatalogueItems.length) {
+            document.getElementById("accordionsContainer").innerHTML = '<div style="text-align:center; padding:14px; color:#f87171;">Erreur réseau stock.</div>';
+          }
         });
     }
 
-    function afficherCatalogue(items) {
-      const conteneur = document.getElementById("catalogueItemsList");
+    function afficherCatalogueEnAccordeons(items) {
+      const conteneur = document.getElementById("accordionsContainer");
       conteneur.innerHTML = "";
 
-      if (items.length === 0) {
+      if (!items || items.length === 0) {
         conteneur.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted);">Aucun matériel trouvé.</div>';
         return;
       }
 
-      items.forEach(item => {
-        const isSelected = selectedItemIds.has(item.id);
-        const card = document.createElement("div");
-        card.className = `big-item-card ${isSelected ? 'selected' : ''}`;
-        card.onclick = () => toggleSelection(item.id, card);
+      // Regroupement par catégorie
+      const groupes = {};
+      items.forEach(it => {
+        const cat = it.categorie || "Autres";
+        if (!groupes[cat]) groupes[cat] = [];
+        groupes[cat].push(it);
+      });
 
-        const isDispo = (item.statut || "").toLowerCase().includes("dispo");
+      const categories = Object.keys(groupes).sort();
 
-        card.innerHTML = `
-          <div class="item-main-info">
-            <div class="item-title">${item.nom}</div>
-            <div class="item-meta">
-              <span class="code-pill">${item.id}</span>
-              <span>${item.categorie || "Général"}</span>
-              <span class="stock-badge ${isDispo ? 'stock-ok' : 'stock-busy'}">${item.statut || "Dispo"}</span>
-              <span style="color:#64748b;">(Qté: ${item.qte || 1})</span>
-            </div>
+      categories.forEach((cat, index) => {
+        const liste = groupes[cat];
+        const groupEl = document.createElement("div");
+        // Ouvre le premier accordéon par défaut
+        groupEl.className = `accordion-group ${index === 0 ? 'open' : ''}`;
+
+        const header = document.createElement("div");
+        header.className = "accordion-header";
+        header.onclick = () => groupEl.classList.toggle("open");
+
+        header.innerHTML = `
+          <div class="accordion-title">
+            <span>${cat}</span>
+            <span class="accordion-badge">${liste.length}</span>
           </div>
-          <div class="big-checkbox">${isSelected ? '✓' : ''}</div>
+          <span class="accordion-arrow">▼</span>
         `;
-        conteneur.appendChild(card);
+
+        const content = document.createElement("div");
+        content.className = "accordion-content";
+
+        liste.forEach(item => {
+          const isSelected = selectedItemIds.has(item.id);
+          const card = document.createElement("div");
+          card.className = `big-item-card ${isSelected ? 'selected' : ''}`;
+          card.onclick = (e) => {
+            e.stopPropagation();
+            toggleSelection(item.id, card);
+          };
+
+          const isDispo = (item.statut || "").toLowerCase().includes("dispo");
+
+          card.innerHTML = `
+            <div class="item-main-info">
+              <div class="item-title">${item.nom}</div>
+              <div class="item-meta">
+                <span class="code-pill">${item.id}</span>
+                <span class="stock-badge ${isDispo ? 'stock-ok' : 'stock-busy'}">${item.statut || "Dispo"}</span>
+                <span style="color:#64748b;">(Total: ${item.qte || 1})</span>
+              </div>
+            </div>
+            <div class="big-checkbox">${isSelected ? '✓' : ''}</div>
+          `;
+          content.appendChild(card);
+        });
+
+        groupEl.appendChild(header);
+        groupEl.appendChild(content);
+        conteneur.appendChild(groupEl);
       });
     }
 
@@ -561,20 +433,28 @@
 
     function filtrerCatalogue() {
       const q = document.getElementById("searchItemInput").value.trim().toLowerCase();
+      if (!q) {
+        afficherCatalogueEnAccordeons(allCatalogueItems);
+        return;
+      }
+
       const filtered = allCatalogueItems.filter(it => 
         (it.nom || "").toLowerCase().includes(q) || 
         (it.id || "").toLowerCase().includes(q) ||
         (it.categorie || "").toLowerCase().includes(q)
       );
-      afficherCatalogue(filtered);
+
+      afficherCatalogueEnAccordeons(filtered);
+
+      // Ouvre automatiquement tous les tiroirs lors d'une recherche
+      document.querySelectorAll(".accordion-group").forEach(g => g.classList.add("open"));
     }
 
-    // 2. ENVOI DE LA RÉSERVATION
     function soumettreReservation(e) {
       e.preventDefault();
 
       if (selectedItemIds.size === 0) {
-        alert("Veuillez sélectionner au moins un équipement dans la liste.");
+        alert("Veuillez sélectionner au moins un équipement.");
         return;
       }
 
@@ -592,7 +472,7 @@
 
       const btn = document.getElementById("btnSubmitResa");
       btn.disabled = true;
-      btn.innerText = "Transmission de la demande...";
+      btn.innerText = "Envoi en cours...";
 
       const payload = {
         actionType: "RESERVATION",
@@ -610,28 +490,23 @@
         body: JSON.stringify(payload)
       })
       .then(() => {
-        if (estAutonomie) {
-          alert("Demande en autonomie transmise ! Elle est placée 'En attente de vérification' par l'équipe régie.");
-        } else {
-          alert("Réservation confirmée avec succès !");
-        }
+        alert(estAutonomie ? "Demande transmise (En attente de validation prof)." : "Réservation validée !");
         selectedItemIds.clear();
         document.getElementById("countSelected").innerText = "0";
         document.getElementById("inputProjet").value = "";
         document.getElementById("bannerAutonomie").style.display = "none";
         btn.disabled = false;
-        btn.innerText = "Confirmer la demande";
-        afficherCatalogue(allCatalogueItems);
+        btn.innerText = "Envoyer la demande";
+        afficherCatalogueEnAccordeons(allCatalogueItems);
         chargerMesReservations();
       })
       .catch(err => {
         alert("Erreur réseau : " + err);
         btn.disabled = false;
-        btn.innerText = "Confirmer la demande";
+        btn.innerText = "Envoyer la demande";
       });
     }
 
-    // 3. AFFICHAGE DES RÉSERVATIONS SÉPARÉES (EN ATTENTE vs VALIDÉES)
     function chargerMesReservations() {
       document.getElementById("loadingUserResas").style.display = "block";
       document.getElementById("containerAttente").style.display = "none";
@@ -650,7 +525,7 @@
           const resasAttente = [];
           const resasValidees = [];
 
-          resas.reservations.forEach(r => {
+          res.reservations.forEach(r => {
             const statut = String(r.validation || "Validé").trim().toLowerCase();
             if (statut.includes("attente")) {
               resasAttente.push(r);
@@ -659,7 +534,6 @@
             }
           });
 
-          // Rendu des demandes en attente
           if (resasAttente.length > 0) {
             document.getElementById("containerAttente").style.display = "block";
             document.getElementById("countAttente").innerText = resasAttente.length;
@@ -668,7 +542,6 @@
             resasAttente.forEach(r => cont.appendChild(creerLigneReservation(r, true)));
           }
 
-          // Rendu des réservations validées
           if (resasValidees.length > 0) {
             document.getElementById("containerValide").style.display = "block";
             document.getElementById("countValide").innerText = resasValidees.length;
@@ -682,7 +555,7 @@
           }
         })
         .catch(() => {
-          document.getElementById("loadingUserResas").innerText = "Erreur de chargement des réservations.";
+          document.getElementById("loadingUserResas").innerText = "Erreur de connexion aux réservations.";
         });
     }
 
@@ -694,7 +567,7 @@
         <div style="flex:1;">
           <div>
             <span class="badge-status ${estEnAttente ? 'badge-attente' : 'badge-valide'}">
-              ${estEnAttente ? '⏳ En attente de vérification' : '✅ Réservation validée'}
+              ${estEnAttente ? '⏳ En attente de validation' : '✅ Réservation validée'}
             </span>
           </div>
           <strong style="color:#fff; font-size:0.95em;">${r.nom}</strong>
@@ -711,7 +584,7 @@
     }
 
     function annulerReservation(rowNumber, nomMat) {
-      if (!confirm(`Souhaitez-vous annuler la demande pour : "${nomMat}" ?`)) return;
+      if (!confirm(`Annuler la réservation pour : "${nomMat}" ?`)) return;
 
       fetch(SCRIPT_URL, {
         method: "POST",
@@ -723,7 +596,6 @@
         })
       })
       .then(() => {
-        alert("Réservation retirée !");
         chargerMesReservations();
       })
       .catch(err => alert("Erreur réseau : " + err));

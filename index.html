@@ -4,23 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Régie - Suivi de Stock DNMADe Marseille</title>
-  <title>Régie - Suivi de Stock DNMADe Marseille</title>
 
-  <!-- === DÉBUT CONFIGURATION PWA === -->
-  <link rel="manifest" href="manifest.json">
+  <!-- CONFIGURATION PWA (Android & iOS) -->
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#171a21">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Régie">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <!-- === FIN CONFIGURATION PWA === -->
 
-  <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     * { box-sizing: border-box; }
     
@@ -36,7 +34,7 @@
       --status-sorti: #ef4444;
       --status-sav: #f59e0b;
       --status-blue: #3b82f6;
-      --status-blue-light: #38bdf8;
+      --status-blue-light: #38bdf8; /* Surchargeable via dev.html */
     }
 
     body {
@@ -45,7 +43,7 @@
       background-color: var(--bg-body); color: var(--text-main);
       padding: 14px;
       -webkit-font-smoothing: antialiased;
-      padding-bottom: 70px; /* Espace pour la pastille changelog */
+      padding-bottom: 74px; /* Dégagement pour le bouton flottant */
     }
 
     /* HEADER */
@@ -86,7 +84,7 @@
       background: var(--status-dispo); box-shadow: 0 0 6px var(--status-dispo);
     }
 
-    /* MENU UTILISATEUR */
+    /* MENU UTILISATEUR DÉROULANT */
     #userMenu {
       position: absolute; right: 14px; top: 62px; width: 220px;
       background: var(--bg-surface-elevated); border: 1px solid var(--border);
@@ -129,7 +127,7 @@
       width: 100%; padding: 11px; border-radius: 8px; border: 1px solid var(--border);
       background: #0d0f12; color: #fff; font-size: 14px; font-family: inherit;
     }
-    input:focus, select:focus { outline: none; border-color: var(--status-blue); }
+    input:focus, select:focus { outline: none; border-color: var(--status-blue-light); }
     .btn-search {
       padding: 0 16px; background: #2e3440; border: 1px solid var(--border);
       color: #fff; border-radius: 8px; font-weight: 700; cursor: pointer;
@@ -137,7 +135,7 @@
 
     code, .code-tag {
       font-family: 'JetBrains Mono', monospace; font-weight: 700;
-      background: #090a0d; border: 1px solid #232731; color: #38bdf8;
+      background: #090a0d; border: 1px solid #232731; color: var(--status-blue-light);
       padding: 2px 6px; border-radius: 4px; font-size: 0.85em;
     }
 
@@ -299,7 +297,7 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: #38bdf8;
+      background: var(--status-blue-light);
       border: 2px solid #171a21;
     }
     .version-entry.latest::before {
@@ -362,6 +360,9 @@
     <div id="adminMenuOptions" style="display:none;">
       <a href="admin.html" class="menu-item" style="color:#f87171;"><span>⚙️</span> Panneau Admin</a>
       <a href="express.html" class="menu-item" style="color:#fbbf24;"><span>⚡</span> Déchargement Rapide</a>
+    </div>
+    <div id="devMenuOptions" style="display:none;">
+      <a href="dev.html" class="menu-item" style="color:#a78bfa;"><span>🛠️</span> Outils Développeur</a>
     </div>
     <button type="button" class="menu-item danger" onclick="deconnexion()" style="border-top:1px solid var(--border); margin-top:4px;">
       <span>🚪</span> Se déconnecter
@@ -478,7 +479,7 @@
   <!-- BOUTON FLOTTANT DU CHANGELOG -->
   <button type="button" class="changelog-pill-btn" onclick="ouvrirChangelog()">
     <span class="badge-dot"></span>
-    <span>v1.3.0</span>
+    <span id="pillVersionTxt">v1.3.0</span>
   </button>
 
   <!-- MODALE CHANGELOG AVEC FOND TRANSLUCIDE -->
@@ -488,12 +489,14 @@
         <h3>🚀 Notes de version</h3>
         <button type="button" class="btn-close-cl" onclick="fermerChangelog()">&times;</button>
       </div>
-      <div class="changelog-body" id="changelogList"></div>
+      <div class="changelog-body" id="changelogList">
+        <div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:12px;">Chargement des notes...</div>
+      </div>
     </div>
   </div>
 
   <script>
-    // COLLE TON URL APPS SCRIPT ICI
+    // COLLE TON URL APPS SCRIPT DÉPLOYÉE ICI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let currentItem = null;
@@ -501,6 +504,12 @@
 
     let user = localStorage.getItem("regie_user");
     let role = localStorage.getItem("regie_role") || "etudiant";
+
+    // Application de la couleur d'accentuation dynamique enregistrée
+    const savedThemeColor = localStorage.getItem("regie_theme_color");
+    if (savedThemeColor) {
+      document.documentElement.style.setProperty('--status-blue-light', savedThemeColor);
+    }
 
     if (!user) {
       document.getElementById("authModal").style.display = "flex";
@@ -555,10 +564,19 @@
 
     function initialiserInterface() {
       document.getElementById("userName").innerText = user;
-      document.getElementById("userRoleTxt").innerText = (role === "admin") ? "Administrateur" : "Étudiant";
 
-      if (role === "admin") {
+      // Affichage du rôle
+      let libelleRole = "Étudiant";
+      if (role === "admin") libelleRole = "Administrateur";
+      if (role === "dev") libelleRole = "Développeur";
+      document.getElementById("userRoleTxt").innerText = libelleRole;
+
+      // Privilèges Admin & Dev
+      if (role === "admin" || role === "dev") {
         document.getElementById("adminMenuOptions").style.display = "block";
+      }
+      if (role === "dev") {
+        document.getElementById("devMenuOptions").style.display = "block";
       }
 
       demarrerCamera();
@@ -825,55 +843,27 @@
       currentItem = null;
     }
 
-    // GESTION DU CHANGELOG
-    const CHANGELOG_DATA = [
-      {
-        version: "v1.3.0",
-        date: "Septembre 2026",
-        isLatest: true,
-        notes: [
-          "Mode Autonomie : gestion de lots plateaux et retour groupé en 1 clic.",
-          "Validation des réservations d'autonomie avec envoi d'e-mail de confirmation.",
-          "Suppression définitive de compte étudiant depuis le panneau Admin.",
-          "Catalogue de réservation organisé par catégories et sous-catégories dépliables."
-        ]
-      },
-      {
-        version: "v1.2.0",
-        date: "Août 2026",
-        isLatest: false,
-        notes: [
-          "Gestion des quantités et sorties partielles sur les lots.",
-          "Dashboard : affichage détaillé de qui détient quoi et sur quel lieu.",
-          "Représentation visuelle des stocks par barres de segments.",
-          "Tuiles KPI du tableau de bord directement cliquables comme filtres rapides."
-        ]
-      },
-      {
-        version: "v1.1.0",
-        date: "Juin 2026",
-        isLatest: false,
-        notes: [
-          "Déchargement Rapide (mode douchette pour enseignants et régisseurs).",
-          "Thème sombre intégral Régie Tech.",
-          "Rappel de l'emplacement nominal de rangement au stock."
-        ]
-      },
-      {
-        version: "v1.0.0",
-        date: "Mai 2026",
-        isLatest: false,
-        notes: [
-          "Lancement de la première version de l'application de stock.",
-          "Scan de QR Codes et fiches techniques intégrées.",
-          "Système de réservation de matériel et connexion par PIN."
-        ]
-      }
-    ];
-
+    // CHANGELOG DYNAMIQUE
     function ouvrirChangelog() {
-      genererContenuChangelog();
-      document.getElementById("changelogOverlay").style.display = "flex";
+      fetch("./changelog.json?v=" + Date.now())
+        .then(r => r.json())
+        .then(data => {
+          genererContenuChangelog(data);
+          document.getElementById("changelogOverlay").style.display = "flex";
+        })
+        .catch(() => {
+          // Secours si changelog.json n'est pas encore déployé
+          document.getElementById("changelogList").innerHTML = `
+            <div class="version-entry latest">
+              <span class="version-tag">v1.3.0</span> <span class="version-date">Septembre 2026</span>
+              <ul class="version-list">
+                <li>Module Autonomie : validation avec alertes email et retour groupé.</li>
+                <li>Support du rôle Développeur et thèmes personnalisés.</li>
+              </ul>
+            </div>
+          `;
+          document.getElementById("changelogOverlay").style.display = "flex";
+        });
     }
 
     function fermerChangelog() {
@@ -886,11 +876,15 @@
       }
     }
 
-    function genererContenuChangelog() {
+    function genererContenuChangelog(releases) {
       const conteneur = document.getElementById("changelogList");
       conteneur.innerHTML = "";
 
-      CHANGELOG_DATA.forEach(release => {
+      if (releases && releases.length > 0) {
+        document.getElementById("pillVersionTxt").innerText = releases[0].version;
+      }
+
+      releases.forEach(release => {
         const div = document.createElement("div");
         div.className = `version-entry ${release.isLatest ? 'latest' : ''}`;
         const itemsHtml = release.notes.map(n => `<li>${n}</li>`).join("");
@@ -905,16 +899,14 @@
         conteneur.appendChild(div);
       });
     }
-    // Activation de la PWA
+
+    // ENREGISTREMENT DU SERVICE WORKER (PWA)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
           .catch(err => console.error('Erreur Service Worker :', err));
       });
     }
-  </script>
-</body>
-</html>
   </script>
 </body>
 </html>

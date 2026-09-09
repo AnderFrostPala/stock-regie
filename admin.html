@@ -458,6 +458,11 @@
         btn.innerText = "Enregistrer l'utilisateur";
       });
     }
+    // Chargement automatique au démarrage si déjà authentifié
+    window.addEventListener("DOMContentLoaded", () => {
+      chargerDemandesAutonomie();
+      chargerStats();
+    });
   </script>
 </body>
 </html>

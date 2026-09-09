@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Régie - Espace Dev</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg-body: #0a0c10;
+      --bg-surface: #141720;
+      --border: #272d3b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-color: #38bdf8;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      max-width: 600px; margin: 0 auto;
+      background: var(--bg-body); color: var(--text-main);
+      padding: 16px;
+    }
+    .card {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px; margin-bottom: 16px;
+    }
+    h2, h3 { margin-top: 0; color: #fff; }
+    label { font-size: 0.8em; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px; text-transform: uppercase; }
+    input[type="text"], textarea {
+      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);
+      background: #090a0d; color: #fff; font-family: inherit; margin-bottom: 12px;
+    }
+    .color-swatches { display: flex; gap: 10px; margin-bottom: 14px; }
+    .swatch {
+      width: 38px; height: 38px; border-radius: 8px; cursor: pointer; border: 2px solid transparent;
+    }
+    .swatch.active { border-color: #fff; transform: scale(1.1); }
+    .btn-dev {
+      width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer;
+      background: #8b5cf6; color: #fff; font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" style="border-left: 4px solid #8b5cf6;">
+    <h2>🛠️ Console Développeur</h2>
+    <p style="font-size:0.85em; color:var(--text-muted); margin:0;">Réservé aux profils avec le rôle <code>dev</code>.</p>
+  </div>
+
+  <!-- OUTIL 1 : THÈME & COULEURS ACCENT -->
+  <div class="card">
+    <h3>🎨 Thème d'accentuation</h3>
+    <label>Couleur principale de l'interface :</label>
+    <div class="color-swatches">
+      <div class="swatch" style="background:#38bdf8;" onclick="changerTheme('#38bdf8')"></div>
+      <div class="swatch" style="background:#818cf8;" onclick="changerTheme('#818cf8')"></div>
+      <div class="swatch" style="background:#34d399;" onclick="changerTheme('#34d399')"></div>
+      <div class="swatch" style="background:#f43f5e;" onclick="changerTheme('#f43f5e')"></div>
+      <div class="swatch" style="background:#fbbf24;" onclick="changerTheme('#fbbf24')"></div>
+    </div>
+    <button type="button" class="btn-dev" onclick="appliquerThemeGlobal()">Appliquer au navigateur</button>
+  </div>
+
+  <!-- OUTIL 2 : GÉNÉRATEUR DE CHANGELOG -->
+  <div class="card">
+    <h3>📝 Générateur de Version (Changelog)</h3>
+    <label>Numéro de version :</label>
+    <input type="text" id="clVersion" placeholder="ex: v1.4.0">
+
+    <label>Date :</label>
+    <input type="text" id="clDate" placeholder="ex: Octobre 2026">
+
+    <label>Modifications (1 ligne = 1 puce) :</label>
+    <textarea id="clNotes" rows="4" placeholder="- Ajout du mode Dev&#10;- Sélecteur de couleurs&#10;- Correction d'affichage"></textarea>
+
+    <button type="button" class="btn-dev" onclick="genererBlocJson()">Générer l'entrée JSON</button>
+
+    <label style="margin-top:14px;">Extrait à coller dans <code>changelog.json</code> :</label>
+    <textarea id="clResultat" rows="6" readonly style="font-family:'JetBrains Mono', monospace; font-size:0.82em; color:#38bdf8;"></textarea>
+  </div>
+
+  <a href="index.html" style="color:var(--text-muted); text-decoration:none; font-size:0.85em;">&larr; Revenir à l'application</a>
+
+  <script>
+    // Sécurité d'accès
+    const role = localStorage.getItem("regie_role");
+    if (role !== "dev") {
+      alert("Accès réservé au développeur.");
+      window.location.href = "index.html";
+    }
+
+    let couleurSelectionnee = localStorage.getItem("regie_theme_color") || "#38bdf8";
+
+    function changerTheme(hex) {
+      couleurSelectionnee = hex;
+      document.querySelectorAll(".swatch").forEach(s => s.classList.remove("active"));
+      event.target.classList.add("active");
+    }
+
+    function appliquerThemeGlobal() {
+      localStorage.setItem("regie_theme_color", couleurSelectionnee);
+      alert("Nouvelle couleur enregistrée ! Elle s'appliquera sur toute l'application.");
+    }
+
+    function genererBlocJson() {
+      const v = document.getElementById("clVersion").value.trim();
+      const d = document.getElementById("clDate").value.trim();
+      const rawNotes = document.getElementById("clNotes").value.trim();
+
+      const notes = rawNotes.split("\n")
+        .map(l => l.replace(/^[-\s*]+/, "").trim())
+        .filter(l => l.length > 0);
+
+      const bloc = {
+        version: v,
+        date: d,
+        isLatest: true,
+        notes: notes
+      };
+
+      document.getElementById("clResultat").value = JSON.stringify(bloc, null, 2) + ",";
+    }
+  </script>
+</body>
+</html>

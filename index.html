@@ -901,6 +901,46 @@
           .catch(err => console.error('Erreur Service Worker :', err));
       });
     }
+    // Chargement du statut actuel au démarrage
+  fetch(`${SCRIPT_URL}?action=getAlertBanner`)
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        document.getElementById("inputAlertMsg").value = res.message || "";
+        const badge = document.getElementById("badgeAlertState");
+        if (res.active) {
+          badge.innerText = "EN LIGNE";
+          badge.style.background = "rgba(244, 63, 94, 0.2)";
+          badge.style.color = "#fb7185";
+        }
+      }
+    });
+
+  function sauvegarderAlerte(activer) {
+    const msg = document.getElementById("inputAlertMsg").value.trim();
+    if (activer && !msg) {
+      alert("Veuillez saisir un texte d'alerte.");
+      return;
+    }
+
+    const payload = {
+      actionType: "SET_ALERT_BANNER",
+      active: activer,
+      message: msg
+    };
+
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    })
+    .then(() => {
+      alert(activer ? "🚨 Bandeau rouge déployé sur tout le site !" : "Bandeau désactivé.");
+      location.reload();
+    })
+    .catch(err => alert("Erreur réseau : " + err));
+  }
   </script>
 </body>
 </html>

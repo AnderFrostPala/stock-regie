@@ -905,6 +905,16 @@
         conteneur.appendChild(div);
       });
     }
+    // Activation de la PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .catch(err => console.error('Erreur Service Worker :', err));
+      });
+    }
+  </script>
+</body>
+</html>
   </script>
 </body>
 </html>

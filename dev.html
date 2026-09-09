@@ -105,11 +105,6 @@
       font-weight: 800;
       color: #fff;
     }
-    .card-title span {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
 
     label {
       font-size: 0.75em;
@@ -270,18 +265,41 @@
     <a href="index.html" class="btn-nav-back">&larr; Retour Régie</a>
   </div>
 
-  <!-- MODULE 1 : PUBLICATION CHANGELOG -->
+  <!-- MODULE 1 : BANDEAU D'ALERTE ROUGE -->
+  <div class="card" style="border-left: 4px solid var(--dev-rose);">
+    <div class="card-title">
+      <span>🚨 Bandeau d'alerte urgent (Bannière rouge)</span>
+      <span id="badgeAlertState" style="font-size:0.75em; padding:2px 8px; border-radius:12px; font-weight:800; background:#20242e; color:var(--text-muted);">Inactif</span>
+    </div>
+    <p style="font-size:0.82em; color:var(--text-muted); margin:0 0 12px 0;">
+      Affiche un bandeau défilant rouge tout en haut de l'application (Réservations suspendues, inventaire, fermeture, etc.).
+    </p>
+
+    <label>Message d'alerte :</label>
+    <input type="text" id="inputAlertMsg" placeholder="ex: ⚠️ Réservations suspendues jusqu'à vendredi 18h">
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+      <button type="button" class="btn-dev" id="btnActiveAlert" style="background:#e11d48; border-color:#f43f5e;" onclick="sauvegarderAlerte(true)">
+        🔴 Activer
+      </button>
+      <button type="button" class="btn-sub" id="btnDisableAlert" onclick="sauvegarderAlerte(false)">
+        ⚪ Désactiver
+      </button>
+    </div>
+  </div>
+
+  <!-- MODULE 2 : PUBLICATION DU CHANGELOG -->
   <div class="card" style="border-left: 4px solid var(--dev-purple);">
     <div class="card-title">
-      <span>🚀 Publier une nouvelle version en direct</span>
+      <span>🚀 Publier une version sur le site</span>
     </div>
     <p style="font-size:0.82em; color:var(--text-muted); margin:0 0 14px 0;">
-      Écrit automatiquement en ligne 2 de l'onglet Sheets <code>Changelog</code>. La modale du site sera mise à jour instantanément pour tous les étudiants.
+      Ajoute l'entrée en haut de l'onglet <code>Changelog</code>. Elle apparaîtra immédiatement dans la fenêtre modale du site.
     </p>
 
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
       <div>
-        <label>Version (Tag) :</label>
+        <label>Version :</label>
         <input type="text" id="clVersion" placeholder="ex: v1.4.0">
       </div>
       <div>
@@ -290,36 +308,15 @@
       </div>
     </div>
 
-    <label>Notes de mise à jour (1 ligne = 1 puce sur le site) :</label>
-    <textarea id="clNotes" rows="4" placeholder="- Support des batteries V-Mount&#10;- Amélioration du scanner QR&#10;- Correction du bug d'acceptation autonomie"></textarea>
+    <label>Notes de version (1 ligne = 1 puce) :</label>
+    <textarea id="clNotes" rows="4" placeholder="- Amélioration des accordéons&#10;- Bandeau d'alerte dynamique&#10;- Correction des statuts d'autonomie"></textarea>
 
     <button type="button" class="btn-dev" id="btnPublish" onclick="publierChangelog()">
-      ⚡ Mettre en ligne la version immédiatement
+      ⚡ Commits the changelog
     </button>
   </div>
-<!-- MODULE ALERTE GLOBALE -->
-  <div class="card" style="border-left: 4px solid var(--dev-rose);">
-    <div class="card-title">
-      <span>🚨 Bandeau d'alerte urgent (Bannière rouge)</span>
-      <span id="badgeAlertState" style="font-size:0.75em; padding:2px 8px; border-radius:12px; font-weight:800; background:#20242e; color:var(--text-muted);">Inactif</span>
-    </div>
-    <p style="font-size:0.82em; color:var(--text-muted); margin:0 0 12px 0;">
-      Affiche un bandeau défilant rouge vif tout en haut de toutes les pages de l'application (Réservations HS, fermeture plateau, etc.).
-    </p>
 
-    <label>Message d'alerte :</label>
-    <input type="text" id="inputAlertMsg" placeholder="ex: ⚠️ Réservations suspendues jusqu'à vendredi 18h">
-
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-      <button type="button" class="btn-dev" style="background:#e11d48; border-color:#f43f5e;" onclick="sauvegarderAlerte(true)">
-        🔴 Activer l'alerte
-      </button>
-      <button type="button" class="btn-sub" onclick="sauvegarderAlerte(false)">
-        ⚪ Désactiver
-      </button>
-    </div>
-  </div>
-  <!-- MODULE 2 : MONITORING API & SANTÉ APPS SCRIPT -->
+  <!-- MODULE 3 : SANTÉ BACKEND (PING & LATENCE) -->
   <div class="card">
     <div class="card-title">
       <span>📡 Statut du Backend Google Apps Script</span>
@@ -346,7 +343,7 @@
     </div>
   </div>
 
-  <!-- MODULE 3 : TESTEUR D'ENDPOINTS (MINI-POSTMAN) -->
+  <!-- MODULE 4 : TESTEUR D'ENDPOINTS (MINI-POSTMAN) -->
   <div class="card">
     <div class="card-title">
       <span>🧪 Inspecteur de requêtes GET</span>
@@ -357,6 +354,7 @@
       <select id="selectAction" style="margin:0; flex:2;">
         <option value="getAll">getAll (Inventaire complet)</option>
         <option value="getChangelog">getChangelog (Historique des versions)</option>
+        <option value="getAlertBanner">getAlertBanner (Bandeau d'alerte)</option>
         <option value="getAdminStats">getAdminStats (Statistiques étudiants)</option>
         <option value="getPendingAutonomies">getPendingAutonomies (Demandes en attente)</option>
         <option value="getItem">getItem (ID spécifique)</option>
@@ -365,17 +363,17 @@
       <button type="button" class="btn-dev" style="width:auto; padding:0 16px;" onclick="executerRequeteApi()">Exécuter</button>
     </div>
 
-    <label>Réponse JSON brute du serveur :</label>
+    <label>Réponse JSON brute :</label>
     <div id="terminalResult" class="terminal-box">// Les résultats de la requête s'afficheront ici...</div>
   </div>
 
-  <!-- MODULE 4 : BAC À SABLE DE SESSIONS & DIAGNOSTIC LOCAL -->
+  <!-- MODULE 5 : SESSION LOCALE & CACHE -->
   <div class="card">
     <div class="card-title">
-      <span>⚙️ Session Locale & Cache PWA</span>
+      <span>⚙️ Session Locale & Diagnostics</span>
     </div>
 
-    <label>Simulateur d'usurpation de rôle (sur ce navigateur) :</label>
+    <label>Simulateur d'usurpation de rôle :</label>
     <div class="role-switcher">
       <button type="button" id="roleBtn_etudiant" class="role-btn" onclick="forcerRoleLocal('etudiant')">Étudiant</button>
       <button type="button" id="roleBtn_admin" class="role-btn" onclick="forcerRoleLocal('admin')">Admin</button>
@@ -389,7 +387,7 @@
 
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:10px;">
       <button type="button" class="btn-sub btn-danger" onclick="purgerLocalStorage()">🧹 Nettoyer le LocalStorage</button>
-      <button type="button" class="btn-sub" onclick="forcerResetPWA()">🔄 Désinstaller Service Worker</button>
+      <button type="button" class="btn-sub" onclick="forcerResetPWA()">🔄 Réinitialiser Service Worker</button>
     </div>
   </div>
 
@@ -397,10 +395,10 @@
     // URL Web App
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
-    // 1. VÉRIFICATION D'ACCÈS AU RÔLE DEV
+    // 1. CONTRÔLE D'ACCÈS DU RÔLE DEV
     const currentRole = localStorage.getItem("regie_role") || "etudiant";
     if (currentRole !== "dev") {
-      alert("Accès refusé : cette zone est strictement réservée au profil Développeur.");
+      alert("Accès refusé : espace réservé au profil Développeur.");
       window.location.href = "index.html";
     }
 
@@ -408,12 +406,12 @@
 
     // Initialisation
     window.addEventListener("DOMContentLoaded", () => {
-      // Pré-remplir date changelog avec le mois actuel
       const dateFr = new Date().toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
       document.getElementById("clDate").value = dateFr.charAt(0).toUpperCase() + dateFr.slice(1);
 
       afficherVariablesLocales();
       testerSanteApi();
+      chargerEtatAlerte();
 
       document.getElementById("selectAction").addEventListener("change", (e) => {
         const inputId = document.getElementById("inputCustomParam");
@@ -421,20 +419,89 @@
       });
     });
 
-    // 2. PUBLICATION DU CHANGELOG EN DIRECT
+    // 2. GESTION DU BANDEAU D'ALERTE ROUGE
+    function chargerEtatAlerte() {
+      fetch(`${SCRIPT_URL}?action=getAlertBanner`)
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) {
+            document.getElementById("inputAlertMsg").value = res.message || "";
+            const badge = document.getElementById("badgeAlertState");
+            if (res.active) {
+              badge.innerText = "EN LIGNE";
+              badge.style.background = "rgba(244, 63, 94, 0.2)";
+              badge.style.color = "#fb7185";
+            } else {
+              badge.innerText = "INACTIF";
+              badge.style.background = "#20242e";
+              badge.style.color = "var(--text-muted)";
+            }
+          }
+        })
+        .catch(() => {});
+    }
+
+    function sauvegarderAlerte(activer) {
+      const champInput = document.getElementById("inputAlertMsg");
+      const msg = champInput ? champInput.value.trim() : "";
+
+      if (activer && !msg) {
+        alert("Veuillez saisir un texte pour le bandeau d'alerte.");
+        return;
+      }
+
+      const btnActive = document.getElementById("btnActiveAlert");
+      const btnDisable = document.getElementById("btnDisableAlert");
+      
+      if (btnActive) btnActive.disabled = true;
+      if (btnDisable) btnDisable.disabled = true;
+
+      if (btnActive && activer) btnActive.innerText = "Activation...";
+      if (btnDisable && !activer) btnDisable.innerText = "Désactivation...";
+
+      const payload = {
+        actionType: "SET_ALERT_BANNER",
+        active: activer,
+        message: msg
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert(activer ? "🚨 Bandeau d'urgence activé sur tout le site !" : "Bandeau désactivé.");
+        location.reload();
+      })
+      .catch(err => {
+        alert("Erreur de connexion : " + err);
+        if (btnActive) {
+          btnActive.disabled = false;
+          btnActive.innerText = "🔴 Activer l'urgence";
+        }
+        if (btnDisable) {
+          btnDisable.disabled = false;
+          btnDisable.innerText = "⚪ Désactiver";
+        }
+      });
+    }
+
+    // 3. PUBLICATION DU CHANGELOG
     function publierChangelog() {
       const v = document.getElementById("clVersion").value.trim();
       const d = document.getElementById("clDate").value.trim();
       const notes = document.getElementById("clNotes").value.trim();
 
       if (!v || !notes) {
-        alert("Veuillez remplir au moins la version (ex: v1.4.0) et les notes.");
+        alert("Veuillez renseigner au moins la version et les notes.");
         return;
       }
 
       const btn = document.getElementById("btnPublish");
       btn.disabled = true;
-      btn.innerText = "Publication vers Google Sheets...";
+      btn.innerText = "Envoi vers Google Sheets...";
 
       const payload = {
         actionType: "ADD_CHANGELOG",
@@ -450,33 +517,33 @@
         body: JSON.stringify(payload)
       })
       .then(() => {
-        alert(`✅ Version ${v} publiée avec succès !\nElle apparaît immédiatement dans la modale de tout le monde.`);
+        alert(`Version ${v} publiée !`);
         document.getElementById("clVersion").value = "";
         document.getElementById("clNotes").value = "";
         btn.disabled = false;
         btn.innerText = "⚡ Mettre en ligne la version immédiatement";
       })
       .catch(err => {
-        alert("Erreur de communication : " + err);
+        alert("Erreur réseau : " + err);
         btn.disabled = false;
         btn.innerText = "⚡ Mettre en ligne la version immédiatement";
       });
     }
 
-    // 3. MONITORING / HEALTH CHECK
+    // 4. SANTÉ DU BACKEND
     function testerSanteApi() {
       const statSt = document.getElementById("statStatus");
       const statLat = document.getElementById("statLatency");
       const statPay = document.getElementById("statPayload");
 
-      statSt.innerText = "Test...";
+      statSt.innerText = "Ping...";
       statSt.style.color = "var(--dev-amber)";
       statLat.innerText = "...";
       statPay.innerText = "...";
 
       const t0 = performance.now();
 
-      fetch(`${SCRIPT_URL}?action=getChangelog&t=${Date.now()}`)
+      fetch(`${SCRIPT_URL}?action=getAlertBanner&t=${Date.now()}`)
         .then(r => {
           const t1 = performance.now();
           const lat = Math.round(t1 - t0);
@@ -492,7 +559,7 @@
           statPay.innerText = data.success ? "VALIDE" : "ERR_JSON";
           statPay.style.color = data.success ? "var(--dev-emerald)" : "var(--dev-rose)";
         })
-        .catch(err => {
+        .catch(() => {
           statSt.innerText = "OFFLINE";
           statSt.style.color = "var(--dev-rose)";
           statLat.innerText = "Timeout";
@@ -501,11 +568,11 @@
         });
     }
 
-    // 4. TESTEUR D'ENDPOINTS
+    // 5. TESTEUR D'ENDPOINTS
     function executerRequeteApi() {
       const action = document.getElementById("selectAction").value;
       const term = document.getElementById("terminalResult");
-      term.innerText = `Exécution : GET ?action=${action}...`;
+      term.innerText = `Appel : GET ?action=${action}...`;
 
       let url = `${SCRIPT_URL}?action=${action}`;
       if (action === "getItem") {
@@ -523,13 +590,13 @@
         });
     }
 
-    // 5. BAC À SABLE / DIAGNOSTICS LOCAUX
+    // 6. SESSIONS ET DIAGNOSTICS LOCAUX
     function afficherVariablesLocales() {
       const grid = document.getElementById("localStorageGrid");
       grid.innerHTML = "";
 
       if (localStorage.length === 0) {
-        grid.innerHTML = '<div style="color:var(--text-muted); font-size:0.8em;">Aucune donnée dans le localStorage.</div>';
+        grid.innerHTML = '<div style="color:var(--text-muted); font-size:0.8em;">Aucune clé dans le localStorage.</div>';
         return;
       }
 
@@ -543,7 +610,6 @@
         grid.appendChild(card);
       }
 
-      // Mise à jour des boutons de rôle
       const activeRole = localStorage.getItem("regie_role") || "etudiant";
       document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("active"));
       const btn = document.getElementById(`roleBtn_${activeRole}`);
@@ -553,11 +619,11 @@
     function forcerRoleLocal(newRole) {
       localStorage.setItem("regie_role", newRole);
       afficherVariablesLocales();
-      alert(`Rôle local modifié en : "${newRole}".\nRetournez sur l'application pour tester les accès.`);
+      alert(`Rôle local défini sur : "${newRole}".`);
     }
 
     function purgerLocalStorage() {
-      if (!confirm("Vider tout le localStorage de ce domaine ? Tu seras déconnecté.")) return;
+      if (!confirm("Voulez-vous réinitialiser le stockage local ? Vous serez déconnecté.")) return;
       localStorage.clear();
       window.location.href = "index.html";
     }
@@ -573,7 +639,7 @@
               for (let name of names) caches.delete(name);
             });
           }
-          alert("Service Worker désenregistré et caches effacés !\nLa page va se recharger pour récupérer le code frais.");
+          alert("Service Worker et caches supprimés. La page va se recharger.");
           location.reload();
         });
       } else {

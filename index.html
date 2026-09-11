@@ -524,7 +524,7 @@
         <div id="logoFallback" class="brand-fallback" style="display:none;">DN<br>MADE</div>
         
         <div class="brand-text">
-          <h1>Suivi de Stock</h1>
+          <h1>TurboStock - Suivi du stock</h1>
           <span>DNMADe Marseille</span>
         </div>
       </div>
@@ -541,11 +541,11 @@
       <div class="menu-header">Profil : <strong id="userRoleTxt">Étudiant</strong></div>
       <a href="reservation.html" class="menu-item"><span>📅</span> Mes réservations</a>
       <div id="adminMenuOptions" style="display:none;">
-        <a href="admin.html" class="menu-item" style="color:#f87171;"><span>⚙️</span> Panneau Admin</a>
-        <a href="express.html" class="menu-item" style="color:#fbbf24;"><span>⚡</span> Déchargement Rapide</a>
+        <a href="admin.html" class="menu-item" style="color:#f87171;"><span>⚙️</span> Pannel Admin</a>
+        <a href="express.html" class="menu-item" style="color:#fbbf24;"><span></span> Pannel prof</a>
       </div>
       <div id="devMenuOptions" style="display:none;">
-        <a href="dev.html" class="menu-item" style="color:#a78bfa;"><span>🛠️</span> Outils Développeur</a>
+        <a href="dev.html" class="menu-item" style="color:#a78bfa;"><span>🛠️</span> Pannel Développeur</a>
       </div>
       <button type="button" class="menu-item danger" onclick="deconnexion()" style="border-top:1px solid var(--border); margin-top:4px;">
         <span>🚪</span> Se déconnecter
@@ -554,16 +554,16 @@
 
     <!-- NAVIGATION RAPIDE -->
     <nav class="quick-nav">
-      <a href="autonomie.html" style="color:var(--status-blue-light);">⚡ Autonomie</a>
-      <a href="reservation.html">Planning Résas</a>
-      <a href="dashboard.html">Vue Parc & Sorties</a>
+      <a href="autonomie.html" style="color:var(--status-blue-light);">Gestion autonomie</a>
+      <a href="reservation.html">Réservations</a>
+      <a href="dashboard.html">Parc Matériel</a>
     </nav>
 
     <!-- SCANNER & RECHERCHE -->
     <div class="card">
       <div id="reader"></div>
       <div class="search-row">
-        <input type="text" id="inputId" placeholder="Scannez ou saisissez l'ID (ex: DM7_001)...">
+        <input type="text" id="inputId" placeholder="Scannez le QR Code">
         <button type="button" class="btn-search" onclick="chercherMateriel(document.getElementById('inputId').value)">OK</button>
       </div>
     </div>
@@ -596,7 +596,7 @@
       <div class="actions-grid">
         <button type="button" class="btn-cmd btn-sortie" onclick="ouvrirZoneSortie()">Sortie</button>
         <button type="button" class="btn-cmd btn-retour" onclick="confirmerRetourDirect()">Retour stock</button>
-        <button type="button" class="btn-cmd btn-sav" onclick="declarerPanne()">Panne SAV</button>
+        <button type="button" class="btn-cmd btn-sav" onclick="declarerPanne()">Mise en SAV</button>
       </div>
 
       <!-- FORMULAIRE SORTIE -->
@@ -609,7 +609,7 @@
           </div>
         </div>
 
-        <label style="font-weight:700; font-size:0.82em; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px; display:block;">Destination / Plateau :</label>
+        <label style="font-weight:700; font-size:0.82em; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px; display:block;">Destination :</label>
         <select id="selectLieu" onchange="gererChangementLieu(this.value)" style="margin-bottom:8px;">
           <option value="Atelier A">Atelier A</option>
           <option value="Atelier B">Atelier B</option>
@@ -644,7 +644,7 @@
       </div>
 
       <button type="button" onclick="fermerRangementEtReset()" style="width:100%; padding:13px; background:var(--status-dispo); color:#fff; border:none; border-radius:8px; font-weight:800; font-size:0.95em; cursor:pointer;">
-        ✅ Rangement vérifié & Continuer
+        ✅ Continuez
       </button>
     </div>
   </div>
@@ -652,8 +652,8 @@
   <!-- MODAL AUTHENTIFICATION -->
   <div id="authModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg-body); z-index:2000; align-items:center; justify-content:center; padding:16px;">
     <div class="card" style="max-width:360px; width:100%; text-align:center; background:var(--bg-surface-elevated);">
-      <h3 style="margin-top:0; color:#fff;">Connexion Régie</h3>
-      <p style="font-size:0.85em; color:var(--text-muted);">Indique ton Nom et ton Code PIN :</p>
+      <h3 style="margin-top:0; color:#fff;">Connexion</h3>
+      <p style="font-size:0.85em; color:var(--text-muted);">Identifiant & Mot de Passe :</p>
       <input type="text" id="loginNom" placeholder="Nom complet" style="margin-bottom:10px;">
       <input type="password" id="loginPin" maxlength="6" placeholder="Code PIN" style="text-align:center; font-size:1.3em; letter-spacing:3px; margin-bottom:14px;">
       <button type="button" onclick="validerConnexion()" class="btn-cmd btn-retour" style="width:100%; padding:12px;">Se connecter</button>
@@ -663,18 +663,18 @@
   <!-- BOUTON FLOTTANT DU CHANGELOG -->
   <button type="button" class="changelog-pill-btn" onclick="ouvrirChangelog()">
     <span class="badge-dot"></span>
-    <span id="pillVersionTxt">v1.3.0</span>
+    <span id="pillVersionTxt">Chargement...</span>
   </button>
 
   <!-- MODALE CHANGELOG -->
   <div id="changelogOverlay" class="changelog-overlay" onclick="fermerChangelogSiExterieur(event)">
     <div class="changelog-modal">
       <div class="changelog-header">
-        <h3>🚀 Notes de version</h3>
+        <h3>Changelog</h3>
         <button type="button" class="btn-close-cl" onclick="fermerChangelog()">&times;</button>
       </div>
       <div class="changelog-body" id="changelogList">
-        <div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:12px;">Chargement des versions...</div>
+        <div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:12px;">Chargement des changelogs...</div>
       </div>
     </div>
   </div>

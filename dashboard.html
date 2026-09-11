@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Régie - Vue Parc & Sorties</title>
+  <title>TurboStock - Parc Matériel </title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -171,7 +171,7 @@
       <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
       <div id="logoFallback" class="brand-fallback" style="display:none;">DN<br>MADE</div>
       <div class="brand-text">
-        <h1>Suivi de Stock</h1>
+        <h1>TurboStock</h1>
         <span>DNMADe Marseille</span>
       </div>
     </div>
@@ -186,8 +186,8 @@
     <div class="menu-header">Profil : <strong id="userRoleTxt">Étudiant</strong></div>
     <a href="reservation.html" class="menu-item"><span>📅</span> Mes réservations</a>
     <div id="adminMenuOptions" style="display:none;">
-      <a href="admin.html" class="menu-item" style="color:#f87171;"><span>⚙️</span> Panneau Admin</a>
-      <a href="express.html" class="menu-item" style="color:#fbbf24;"><span>⚡</span> Déchargement Rapide</a>
+      <a href="admin.html" class="menu-item" style="color:#f87171;"><span>⚙️</span> Pannel Admin</a>
+      <a href="express.html" class="menu-item" style="color:#fbbf24;"><span></span> Pannel Prof</a>
     </div>
     <button type="button" class="menu-item danger" onclick="deconnexion()" style="border-top:1px solid var(--border); margin-top:4px;">
       <span>🚪</span> Se déconnecter
@@ -195,9 +195,9 @@
   </div>
 
   <nav class="quick-nav">
-    <a href="index.html">Scan & Fiche</a>
-    <a href="reservation.html">Planning Résas</a>
-    <a href="dashboard.html" class="active">Vue Parc</a>
+    <a href="index.html">Scan</a>
+    <a href="reservation.html">Réservations</a>
+    <a href="dashboard.html" class="active">Parc Matériel</a>
   </nav>
 
   <!-- TUILES KPI -->
@@ -228,7 +228,7 @@
       <div class="chip" id="chip-RESA" onclick="setFiltreStatut('RESA', this)">Réservés</div>
       <div class="chip" id="chip-STOCK" onclick="setFiltreStatut('STOCK', this)">Au stock</div>
       <div class="chip" id="chip-SORTIS" onclick="setFiltreStatut('SORTIS', this)">Sortis</div>
-      <div class="chip" id="chip-SAV" onclick="setFiltreStatut('SAV', this)">En panne</div>
+      <div class="chip" id="chip-SAV" onclick="setFiltreStatut('SAV', this)">En SAV</div>
     </div>
   </div>
 

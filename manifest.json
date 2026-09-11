@@ -1,6 +1,6 @@
 {
-  "name": "Régie - Suivi de Stock",
-  "short_name": "Régie",
+  "name": "TurboStock",
+  "short_name": "TurboStock",
   "description": "Gestion et suivi de stock pour la régie DNMADe Marseille",
   "start_url": "./index.html",
   "scope": "./",

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Régie - Session Autonomie</title>
+  <title>Gestion Autonomie</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,14 +75,14 @@
 
   <nav class="quick-nav">
     <a href="index.html">Scan</a>
-    <a href="autonomie.html" class="active">⚡ Autonomie</a>
+    <a href="autonomie.html" class="active">Autonomie</a>
     <a href="reservation.html">Réservations</a>
-    <a href="dashboard.html">Vue Parc</a>
+    <a href="dashboard.html">Parc Matériel</a>
   </nav>
 
   <!-- CAS 1 : SESSION EN COURS -> BOUTON DE RANGEMENT DU LOT ENTIER -->
   <div id="vueSessionActive" class="card" style="display:none; border-left:5px solid var(--status-amber);">
-    <h3 style="color:var(--status-amber);">⚠️ Session Autonomie en cours</h3>
+    <h3 style="color:var(--status-amber);">Session Autonomie en cours</h3>
     <p style="font-size:0.88em; color:var(--text-muted); margin:4px 0 12px 0;">
       Lieu : <strong id="activeLieu" style="color:#fff;">-</strong><br>
       Démarrée le : <strong id="activeDate" style="color:#fff;">-</strong>
@@ -133,7 +133,7 @@
       </div>
 
       <button type="button" id="btnValiderLot" class="btn-action btn-green" onclick="validerDepartAutonomie()" style="margin-top:12px; display:none;">
-        🚀 Valider la sortie du lot
+        Valider la sortie du lot
       </button>
     </div>
   </div>

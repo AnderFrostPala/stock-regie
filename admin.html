@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Régie - Panneau Administration</title>
+  <title>Pannel Administration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
@@ -146,12 +146,12 @@
   <!-- MODAL CODE MAÎTRE ADMIN -->
   <div id="adminPassModal" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(13,15,18,0.95); z-index:3000; display:flex; align-items:center; justify-content:center; padding:16px;">
     <div class="card" style="max-width:380px; width:100%; text-align:center; background:var(--bg-surface-elevated);">
-      <div style="font-size:2.8em; margin-bottom:8px;">🔒</div>
+      <div style="font-size:2.8em; margin-bottom:8px;"></div>
       <h3 style="margin-top:0;">Accès Administration</h3>
-      <p style="font-size:0.88em; color:var(--text-muted); margin-bottom:16px;">Saisissez le mot de passe maître de la régie :</p>
+      <p style="font-size:0.88em; color:var(--text-muted); margin-bottom:16px;">Saisissez le mot de passe :</p>
       <input type="password" id="adminPassInput" placeholder="Mot de passe maître..." style="text-align:center; margin-bottom:14px; letter-spacing:2px;">
       <button type="button" onclick="validerMotDePasseMaster()" class="btn-submit" style="background:#dc2626;">Déverrouiller l'accès</button>
-      <a href="index.html" style="display:block; margin-top:14px; font-size:0.82em; color:var(--text-muted); text-decoration:none;">&larr; Retour au scan régie</a>
+      <a href="index.html" style="display:block; margin-top:14px; font-size:0.82em; color:var(--text-muted); text-decoration:none;">&larr; Retour</a>
     </div>
   </div>
 
@@ -161,25 +161,25 @@
       <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
       <div id="logoFallback" class="brand-fallback" style="display:none;">DN<br>MADE</div>
       <div class="brand-text">
-        <h1>Panneau Admin</h1>
-        <span>DNMADe Marseille &bull; Supervision</span>
+        <h1>Pannel Admin</h1>
+        <span></span>
       </div>
     </div>
     <a href="index.html" class="btn-quit">Quitter &rarr;</a>
   </header>
 
   <nav class="quick-nav">
-    <a href="index.html">Scan & Fiche</a>
-    <a href="autonomie.html">⚡ Autonomie</a>
-    <a href="dashboard.html">Vue Parc</a>
-    <a href="reservation.html">Planning</a>
-    <a href="admin.html" class="active">⚙️ Admin</a>
+    <a href="index.html">Scan</a>
+    <a href="autonomie.html">Autonomie</a>
+    <a href="dashboard.html">Parc Matériel</a>
+    <a href="reservation.html">Réservations</a>
+    <a href="admin.html" class="active">Pannel admin</a>
   </nav>
 
   <!-- BLOC 1 : VALIDATION DES DEMANDES D'AUTONOMIE -->
   <div class="card" id="cardDemandesAutonomie" style="border-left: 5px solid var(--status-amber); display:none;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-      <h3 style="margin:0; color:var(--status-amber);">📋 Demandes d'autonomie à valider (<span id="nbDemandesAuto">0</span>)</h3>
+      <h3 style="margin:0; color:var(--status-amber);">Demandes d'autonomie à valider (<span id="nbDemandesAuto">0</span>)</h3>
       <button type="button" onclick="chargerDemandesAutonomie()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:4px 8px; border-radius:4px; font-size:0.75em; cursor:pointer;">↻</button>
     </div>
     <div id="listeDemandesAuto"></div>
@@ -192,7 +192,7 @@
       <label>Nom et Prénom :</label>
       <input type="text" id="newNom" placeholder="ex: Julien Delmas" required>
 
-      <label>Adresse E-mail (pour notifications d'autonomie) :</label>
+      <label>Adresse E-mail :</label>
       <input type="email" id="newEmail" placeholder="ex: julien.delmas@monlycee.fr">
 
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
@@ -216,7 +216,7 @@
   <!-- BLOC 3 : TABLEAU D'ACTIVITÉ & GESTION DES COMPTES -->
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-      <h3 style="margin:0;">Activité des Comptes & Encours</h3>
+      <h3 style="margin:0;">Activité des Comptes et Réservations en cours</h3>
       <button type="button" onclick="chargerStats()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:5px 10px; border-radius:5px; font-size:0.78em; cursor:pointer;">Rafraîchir ↻</button>
     </div>
 

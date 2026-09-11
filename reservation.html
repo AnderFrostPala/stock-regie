@@ -329,23 +329,29 @@
         (clean.includes("autonomie") || clean.includes("autonome")) ? "block" : "none";
     }
 
-    function chargerCatalogue() {
-      fetch(`${SCRIPT_URL}?action=getAll`)
-        .then(r => r.json())
-        .then(res => {
-          if (res.success && res.items) {
-            allCatalogueItems = res.items;
-            sessionStorage.setItem("regie_stock_cache", JSON.stringify(res.items));
-            afficherCatalogueEnAccordeons(allCatalogueItems);
-          }
-        })
-        .catch(() => {
-          if (!allCatalogueItems.length) {
-            document.getElementById("accordionsContainer").innerHTML = '<div style="text-align:center; padding:14px; color:#f87171;">Erreur réseau stock.</div>';
-          }
+  function chargerCatalogue() {
+  fetch(`${SCRIPT_URL}?action=getAll`)
+    .then(r => r.json())
+    .then(res => {
+      if (res.success && res.items) {
+        // Exclut tout le matériel dont le statut contient "sav" ou "panne"
+        allCatalogueItems = res.items.filter(item => {
+          const st = String(item.statut || "").toLowerCase();
+          return !st.includes("sav") && !st.includes("panne");
         });
-    }
 
+        // Mise en cache sessionStorage pour la fluidité
+        sessionStorage.setItem("regie_stock_cache", JSON.stringify(allCatalogueItems));
+        afficherCatalogueEnAccordeons(allCatalogueItems);
+      }
+    })
+    .catch(() => {
+      if (!allCatalogueItems.length) {
+        document.getElementById("accordionsContainer").innerHTML = 
+          '<div style="text-align:center; padding:14px; color:#f87171;">Erreur réseau stock.</div>';
+      }
+    });
+}
     function afficherCatalogueEnAccordeons(items) {
       const conteneur = document.getElementById("accordionsContainer");
       conteneur.innerHTML = "";

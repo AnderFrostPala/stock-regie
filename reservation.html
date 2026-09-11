@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Régie - Planning & Réservations</title>
+  <title>TurboStock - Réservations</title>
 
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#171a21">
@@ -215,17 +215,17 @@
       <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
       <div id="logoFallback" class="brand-fallback" style="display:none;">DN<br>MADE</div>
       <div class="brand-text">
-        <h1>Planning & Réservations</h1>
+        <h1>Réservations</h1>
         <span>DNMADe Marseille</span>
       </div>
     </div>
-    <a href="index.html" class="btn-quit">Retour Scan &rarr;</a>
+    <a href="index.html" class="btn-quit">Retour &rarr;</a>
   </header>
 
   <nav class="quick-nav">
-    <a href="index.html">Scan & Fiche</a>
-    <a href="autonomie.html">⚡ Autonomie</a>
-    <a href="dashboard.html">Vue Parc</a>
+    <a href="index.html">Scan</a>
+    <a href="autonomie.html"> Gestion Autonomie</a>
+    <a href="dashboard.html">Parc Matériel</a>
     <a href="reservation.html" class="active">Planning</a>
   </nav>
 
@@ -240,7 +240,7 @@
 
     <div id="containerAttente" style="display:none;">
       <div class="section-title" style="color:#fbbf24;">
-        <span>⏳ En attente de validation prof / régie (<span id="countAttente">0</span>)</span>
+        <span>⏳ En attente de validation(<span id="countAttente">0</span>)</span>
       </div>
       <div id="listAttente"></div>
     </div>
@@ -261,7 +261,7 @@
   <div class="card">
     <h2>Nouvelle Demande de Matériel</h2>
     <form onsubmit="soumettreReservation(event)">
-      <label>Projet ou Atelier (indiquer "Autonomie" si hors régie) :</label>
+      <label>Projet </label>
       <input type="text" id="inputProjet" placeholder="ex: Scénographie Plateau / Autonomie Atelier B" oninput="verifierMotCleAutonomie(this.value)" required>
 
       <div id="bannerAutonomie" class="autonomie-banner">
@@ -270,11 +270,11 @@
 
       <div class="dates-row">
         <div>
-          <label>Date Début :</label>
+          <label>Date de Début :</label>
           <input type="date" id="inputDateDebut" required>
         </div>
         <div>
-          <label>Date Fin :</label>
+          <label>Date de Fin :</label>
           <input type="date" id="inputDateFin" required>
         </div>
       </div>

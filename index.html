@@ -355,11 +355,38 @@
       font-family: inherit;
     }
 
-    /* PASTILLE CHANGELOG */
-    .changelog-pill-btn {
+    /* BARRE FLOTTANTE BAS DROITE */
+    .bottom-floating-bar {
       position: fixed;
       bottom: 16px;
       right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 2000;
+    }
+
+    .btn-cgu-pill {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 7px 11px;
+      border-radius: 20px;
+      font-size: 0.78em;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s ease;
+    }
+    .btn-cgu-pill:hover {
+      color: #fff;
+      border-color: #4b5563;
+      transform: translateY(-2px);
+    }
+
+    /* PASTILLE CHANGELOG */
+    .changelog-pill-btn {
       background: var(--bg-surface-elevated);
       border: 1px solid var(--border);
       color: var(--text-muted);
@@ -372,7 +399,6 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      z-index: 2000;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
       transition: all 0.2s ease;
     }
@@ -660,11 +686,14 @@
     </div>
   </div>
 
-  <!-- BOUTON FLOTTANT DU CHANGELOG -->
-  <button type="button" class="changelog-pill-btn" onclick="ouvrirChangelog()">
-    <span class="badge-dot"></span>
-    <span id="pillVersionTxt">Chargement...</span>
-  </button>
+  <!-- BARRE FLOTTANTE BAS DROITE (CGU + CHANGELOG) -->
+  <div class="bottom-floating-bar">
+    <a href="cgu.html" class="btn-cgu-pill">CGU</a>
+    <button type="button" class="changelog-pill-btn" onclick="ouvrirChangelog()">
+      <span class="badge-dot"></span>
+      <span id="pillVersionTxt">Chargement...</span>
+    </button>
+  </div>
 
   <!-- MODALE CHANGELOG -->
   <div id="changelogOverlay" class="changelog-overlay" onclick="fermerChangelogSiExterieur(event)">

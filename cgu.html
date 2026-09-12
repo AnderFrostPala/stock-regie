@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurboStock — Conditions Générales d'Utilisation</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#171a21">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg-body: #0d0f12;
+      --bg-surface: #171a21;
+      --bg-surface-elevated: #1f232d;
+      --border: #292e3b;
+      --border-accent: #3b4252;
+      --text-main: #f1f3f7;
+      --text-muted: #8b949e;
+      --brand-red: #e62b33;
+      --brand-red-light: #f87171;
+      --brand-amber: #f59e0b;
+      --brand-blue: #38bdf8;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      margin: 0 auto;
+      max-width: 660px;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      padding: 16px;
+      padding-bottom: 70px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth;
+    }
+
+    /* HEADER */
+    .header-cgu {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand-title-wrap h1 {
+      margin: 0;
+      font-size: 1.2em;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-title-wrap span {
+      display: block;
+      font-size: 0.74em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .btn-back {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82em;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      padding: 7px 13px;
+      border-radius: 8px;
+      background: var(--bg-surface);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-back:hover {
+      color: #fff;
+      border-color: var(--border-accent);
+      background: var(--bg-surface-elevated);
+    }
+
+    /* PRÉAMBULE */
+    .preambule-card {
+      background: linear-gradient(135deg, rgba(230, 43, 51, 0.12) 0%, rgba(23, 26, 33, 0.8) 100%);
+      border: 1px solid rgba(230, 43, 51, 0.35);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      font-size: 0.88em;
+      color: #fecaca;
+      font-weight: 600;
+    }
+
+    /* SOMMAIRE RAPIDE / PILLS */
+    .nav-pills-wrap {
+      margin-bottom: 20px;
+    }
+    .nav-pills-label {
+      font-size: 0.74em;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .nav-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+    .nav-pills::-webkit-scrollbar { display: none; }
+    .nav-pills a {
+      flex-shrink: 0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.74em;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .nav-pills a:hover {
+      color: #fff;
+      border-color: var(--border-accent);
+      background: var(--bg-surface-elevated);
+    }
+
+    /* ARTICLES */
+    .cgu-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .cgu-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .cgu-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74em;
+      font-weight: 800;
+      background: rgba(230, 43, 51, 0.15);
+      color: var(--brand-red-light);
+      border: 1px solid rgba(230, 43, 51, 0.35);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .cgu-title {
+      margin: 0;
+      font-size: 1.02em;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.2px;
+    }
+
+    p {
+      margin: 0 0 10px 0;
+      font-size: 0.88em;
+      color: #cbd5e1;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      margin: 8px 0 12px 0;
+      padding-left: 20px;
+      font-size: 0.86em;
+      color: #cbd5e1;
+    }
+    li {
+      margin-bottom: 6px;
+      padding-left: 2px;
+    }
+
+    /* ENCADRÉ D'EMPHASE (RÈGLE DU SCAN / PROJECTEUR) */
+    .callout-box {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-left: 4px solid var(--brand-amber);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 12px 0;
+      font-size: 0.85em;
+      color: #fde68a;
+    }
+    .callout-box strong {
+      color: #fff;
+    }
+    .callout-quote {
+      font-style: italic;
+      color: #fef08a;
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* ENCADRÉ CONTACT & INFOS ÉDITEUR */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: #090a0d;
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 0.82em;
+    }
+    .meta-item label {
+      display: block;
+      font-size: 0.72em;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 2px;
+    }
+    .meta-item span, .meta-item strong {
+      color: #fff;
+    }
+    .code-tag {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--brand-blue);
+      font-weight: 700;
+    }
+
+    /* FOOTER */
+    .cgu-footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      font-size: 0.76em;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .cgu-footer strong {
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header-cgu">
+    <div class="brand-title-wrap">
+      <h1>Conditions Générales d'Utilisation</h1>
+      <span>TurboStock • DNMADe Spectacle Vivant</span>
+    </div>
+    <a href="index.html" class="btn-back">&larr; Retour Régie</a>
+  </header>
+
+  <!-- PRÉAMBULE -->
+  <div class="preambule-card">
+    L’utilisation de cette application implique l’acceptation pleine et entière des présentes Conditions Générales d’Utilisation (CGU).
+  </div>
+
+  <!-- SOMMAIRE RAPIDE -->
+  <div class="nav-pills-wrap">
+    <div class="nav-pills-label">Accès rapide aux sections :</div>
+    <nav class="nav-pills">
+      <a href="#art1">1. Objet</a>
+      <a href="#art2">2. Conditions</a>
+      <a href="#art3">3. Matériel</a>
+      <a href="#art4">4. Disponibilité</a>
+      <a href="#art5">5. Exactitude</a>
+      <a href="#art6">6. Données</a>
+      <a href="#art7">7. Sécurité</a>
+      <a href="#art8">8. Propriété</a>
+      <a href="#art9">9. IA</a>
+      <a href="#art10">10. Responsabilité</a>
+      <a href="#art13">13. Éditeur</a>
+    </nav>
+  </div>
+
+  <!-- 1. OBJET -->
+  <section class="cgu-card" id="art1">
+    <div class="cgu-header">
+      <span class="cgu-num">01</span>
+      <h2 class="cgu-title">Objet de l’application</h2>
+    </div>
+    <p>
+      L’application <strong>TurboStock</strong> a pour objectif de faciliter la gestion, l’identification et le suivi du matériel utilisé dans le cadre des activités du <strong>DNMADE Mention Spectacle – Spécialité Régie Lumière / Son du Spectacle Vivant</strong>.
+    </p>
+    <p>Elle permet notamment :</p>
+    <ul>
+      <li>D’identifier les équipements au moyen de QR codes ;</li>
+      <li>De consulter les informations relatives au matériel ;</li>
+      <li>D’enregistrer la sortie et le retour des équipements ;</li>
+      <li>D’indiquer la personne ayant pris en charge un équipement ;</li>
+      <li>De renseigner son lieu d’utilisation ou de stockage ;</li>
+      <li>De conserver un historique des mouvements du matériel.</li>
+    </ul>
+    <p style="color:var(--text-muted); font-size:0.84em;">
+      L’application constitue un outil d’aide à la gestion du parc matériel et ne saurait se substituer aux procédures de sécurité, de vérification ou de maintenance applicables aux équipements utilisés.
+    </p>
+  </section>
+
+  <!-- 2. CONDITIONS D'UTILISATION -->
+  <section class="cgu-card" id="art2">
+    <div class="cgu-header">
+      <span class="cgu-num">02</span>
+      <h2 class="cgu-title">Conditions d’utilisation</h2>
+    </div>
+    <p>
+      L’accès à l’application est réservé aux personnes autorisées dans le cadre de la formation. Chaque utilisateur s’engage à utiliser l’application conformément à sa destination et à ne pas tenter d'en contourner les mécanismes de sécurité ou de contrôle d'accès.
+    </p>
+    <p>Il est notamment strictement interdit de :</p>
+    <ul>
+      <li>Utiliser un compte appartenant à un autre utilisateur ;</li>
+      <li>Modifier ou supprimer volontairement des informations sans autorisation ;</li>
+      <li>Falsifier l’état, la localisation ou le responsable d’un équipement ;</li>
+      <li>Supprimer ou détériorer les QR codes apposés sur le matériel ;</li>
+      <li>Utiliser l’application pour accéder à des informations auxquelles l’utilisateur n’est pas habilité à accéder ;</li>
+      <li>Tenter de perturber, dégrader ou compromettre le fonctionnement de l’application.</li>
+    </ul>
+
+    <div class="callout-box">
+      <strong>⚠️ Règle fondamentale de régie :</strong><br>
+      Le fait de scanner un QR code ne constitue pas une autorisation de prendre le matériel correspondant. Un QR code indique où se trouve le matériel : il ne constitue pas, à lui seul, un ordre de sortie.
+      <span class="callout-quote">« Même principe que pour un projecteur : le fait qu'il soit posé là ne signifie pas nécessairement qu'il est disponible. »</span>
+    </div>
+  </section>
+
+  <!-- 3. GESTION DU MATÉRIEL -->
+  <section class="cgu-card" id="art3">
+    <div class="cgu-header">
+      <span class="cgu-num">03</span>
+      <h2 class="cgu-title">Gestion du matériel</h2>
+    </div>
+    <p>
+      L’utilisateur s’engage à renseigner les informations de manière aussi exacte que possible lors de chaque mouvement de matériel. Toute sortie d’un équipement doit, lorsque l’application le permet, être associée à :
+    </p>
+    <ul>
+      <li>L’utilisateur responsable de la sortie ;</li>
+      <li>La date et l’heure de l’opération ;</li>
+      <li>Le lieu d’utilisation ou de destination ;</li>
+      <li>Toute information nécessaire au suivi de l’équipement.</li>
+    </ul>
+    <p>
+      En cas d’erreur de saisie, l’utilisateur doit procéder à sa correction ou en informer la personne responsable de la gestion du matériel. La responsabilité de l’utilisateur peut être engagée en cas de déclaration volontairement fausse ou de modification non autorisée des données.
+    </p>
+  </section>
+
+  <!-- 4. DISPONIBILITÉ DU SERVICE -->
+  <section class="cgu-card" id="art4">
+    <div class="cgu-header">
+      <span class="cgu-num">04</span>
+      <h2 class="cgu-title">Disponibilité du service</h2>
+    </div>
+    <p>
+      L’application est fournie dans le cadre d’un projet pédagogique et peut être amenée à évoluer, être temporairement indisponible ou présenter des dysfonctionnements. Aucune disponibilité permanente du service n’est garantie.
+    </p>
+    <p>L’éditeur se réserve notamment le droit de :</p>
+    <ul>
+      <li>Effectuer des opérations de maintenance ;</li>
+      <li>Modifier certaines fonctionnalités ;</li>
+      <li>Interrompre temporairement le service ;</li>
+      <li>Corriger ou supprimer des fonctionnalités ;</li>
+      <li>Mettre fin au fonctionnement de l’application.</li>
+    </ul>
+    <p style="font-size:0.84em; color:var(--text-muted);">
+      Aucune indemnisation ne pourra être réclamée en cas d’indisponibilité du service.
+    </p>
+  </section>
+
+  <!-- 5. EXACTITUDE DES INFORMATIONS -->
+  <section class="cgu-card" id="art5">
+    <div class="cgu-header">
+      <span class="cgu-num">05</span>
+      <h2 class="cgu-title">Exactitude des informations</h2>
+    </div>
+    <p>
+      Les informations affichées dans l’application dépendent des données renseignées par ses utilisateurs. L’éditeur ne peut garantir que la localisation indiquée pour un équipement correspond à sa position physique à chaque instant.
+    </p>
+    <p>En conséquence, avant toute utilisation d’un équipement, l’utilisateur doit procéder aux vérifications nécessaires, notamment concernant :</p>
+    <ul>
+      <li>Son état et son intégrité physique ;</li>
+      <li>Sa disponibilité réelle ;</li>
+      <li>La présence de ses accessoires (câblage, crochets, élingues, etc.) ;</li>
+      <li>Sa conformité aux besoins de l’utilisation envisagée.</li>
+    </ul>
+  </section>
+
+  <!-- 6. DONNÉES PERSONNELLES -->
+  <section class="cgu-card" id="art6">
+    <div class="cgu-header">
+      <span class="cgu-num">06</span>
+      <h2 class="cgu-title">Données personnelles & RGPD</h2>
+    </div>
+    <p>
+      Dans le cadre de son fonctionnement, l’application peut traiter certaines données permettant d’identifier les utilisateurs (nom, identifiant, historique d’utilisation ou opérations effectuées).
+    </p>
+    <p>Ces données sont traitées exclusivement pour :</p>
+    <ul>
+      <li>L’identification des utilisateurs ;</li>
+      <li>La gestion opérationnelle du matériel ;</li>
+      <li>La traçabilité rigoureuse des mouvements ;</li>
+      <li>La sécurité et le bon fonctionnement de l’application.</li>
+    </ul>
+    <p>
+      Les données ne sont en aucun cas destinées à être utilisées à des fins commerciales ou publicitaires, et restent accessibles uniquement aux personnes habilitées dans la mesure nécessaire à leurs fonctions.
+    </p>
+    <p>
+      Conformément au <em>Règlement général sur la protection des données (RGPD)</em>, chaque utilisateur dispose d’un droit d’accès, de rectification et de suppression sur ses données personnelles.
+    </p>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <label>Responsable du traitement</label>
+        <strong>Petit-Forestier Basile</strong>
+      </div>
+      <div class="meta-item">
+        <label>Contact Support / DPO</label>
+        <span>Sur Discord : <span class="code-tag">anderfrost_</span></span>
+      </div>
+    </div>
+    <p style="font-size:0.8em; color:var(--text-muted); margin-top:10px;">
+      Les durées de conservation des données sont définies en fonction de leur finalité et des besoins stricts de fonctionnement de l’application.
+    </p>
+  </section>
+
+  <!-- 7. SÉCURITÉ DES COMPTES -->
+  <section class="cgu-card" id="art7">
+    <div class="cgu-header">
+      <span class="cgu-num">07</span>
+      <h2 class="cgu-title">Sécurité des comptes</h2>
+    </div>
+    <p>
+      Lorsque l’application nécessite une authentification, chaque utilisateur est garant de la stricte confidentialité de ses identifiants et de son code PIN. Les identifiants ne doivent jamais être communiqués à un tiers.
+    </p>
+    <p>
+      Toute utilisation suspecte ou tout accès non autorisé doit être immédiatement signalé au responsable de l’application. Les droits d'accès sont différenciés selon les rôles attribués (Étudiant, Admin, Dev).
+    </p>
+  </section>
+
+  <!-- 8. PROPRIÉTÉ INTELLECTUELLE -->
+  <section class="cgu-card" id="art8">
+    <div class="cgu-header">
+      <span class="cgu-num">08</span>
+      <h2 class="cgu-title">Propriété intellectuelle</h2>
+    </div>
+    <p>
+      L’ensemble des éléments composant l’application (interface, architecture, textes, identité visuelle, logos, éléments graphiques et code source) est protégé par les dispositions applicables en matière de propriété intellectuelle.
+    </p>
+    <p>
+      Sauf mention contraire, aucun élément de l’application ne peut être reproduit, distribué, modifié ou réutilisé sans autorisation préalable.
+    </p>
+    <p style="color:#fca5a5; font-size:0.86em;">
+      <strong>TurboStock</strong>, son nom, son logo et son identité visuelle sont réservés. Toute reproduction destinée à faire croire à l’existence d’une version officielle, d’un partenariat ou d’une affiliation commerciale est formellement interdite.
+    </p>
+  </section>
+
+  <!-- 9. INTELLIGENCE ARTIFICIELLE -->
+  <section class="cgu-card" id="art9">
+    <div class="cgu-header">
+      <span class="cgu-num">09</span>
+      <h2 class="cgu-title">Utilisation d'outils d'intelligence artificielle</h2>
+    </div>
+    <p>
+      Certaines étapes de conception, de rédaction, de programmation ou de développement de l’application ont pu être réalisées avec l’assistance d’outils d’intelligence artificielle, notamment <strong>Google Gemini</strong>.
+    </p>
+    <p>
+      Cette assistance technique ne transfère aucun droit de propriété intellectuelle sur les éléments originaux de l’application et ne constitue pas une cession de l’application à l’éditeur des outils utilisés. L'utilisation d'outils d'IA ne dispense aucunement de la vérification humaine continue des fonctionnalités et des lignes de code produites.
+    </p>
+  </section>
+
+  <!-- 10. RESPONSABILITÉ -->
+  <section class="cgu-card" id="art10">
+    <div class="cgu-header">
+      <span class="cgu-num">10</span>
+      <h2 class="cgu-title">Limitation de responsabilité</h2>
+    </div>
+    <p>L’éditeur de l’application ne saurait être tenu responsable :</p>
+    <ul>
+      <li>D’une erreur résultant d’une information incorrectement renseignée par un utilisateur ;</li>
+      <li>De la perte ou de la détérioration d’un équipement résultant d’une utilisation indépendante de l’application ;</li>
+      <li>D’une indisponibilité temporaire du service ;</li>
+      <li>D’un dysfonctionnement lié à l’environnement informatique de l’utilisateur (terminal mobile, navigateur, connectivité) ;</li>
+      <li>D’une utilisation de l’application contraire aux présentes CGU.</li>
+    </ul>
+    <p style="font-size:0.84em; color:var(--text-muted);">
+      L’application ayant une vocation de gestion et de traçabilité, elle ne constitue en rien un dispositif physique anti-vol ou anti-dégradation.
+    </p>
+  </section>
+
+  <!-- 11 & 12. ÉVOLUTION & DROIT -->
+  <section class="cgu-card" id="art11">
+    <div class="cgu-header">
+      <span class="cgu-num">11</span>
+      <h2 class="cgu-title">Modification des CGU & Droit applicable</h2>
+    </div>
+    <p>
+      Les présentes CGU peuvent être modifiées à tout moment pour tenir compte des évolutions techniques ou réglementaires. La version applicable est celle publiée au sein de l’application à la date de consultation.
+    </p>
+    <p>
+      Les présentes CGU sont soumises au <strong>droit français</strong>. En cas de litige ou de difficulté d’interprétation, une solution amiable sera systématiquement recherchée en priorité auprès du responsable de l’application.
+    </p>
+  </section>
+
+  <!-- 13. ÉDITEUR DE L'APPLICATION -->
+  <section class="cgu-card" id="art13" style="border-left: 4px solid var(--brand-red);">
+    <div class="cgu-header">
+      <span class="cgu-num">13</span>
+      <h2 class="cgu-title">Éditeur & Mentions légales</h2>
+    </div>
+
+    <div class="meta-grid" style="grid-template-columns: 1fr;">
+      <div class="meta-item">
+        <label>Nom du projet</label>
+        <strong style="font-size:1.1em; color:var(--brand-red-light);">TurboStock</strong>
+      </div>
+      <div class="meta-item">
+        <label>Concepteur & Éditeur responsable</label>
+        <strong>Petit-Forestier Basile</strong>
+      </div>
+      <div class="meta-item">
+        <label>Établissement de rattachement</label>
+        <span>Lycée Professionnel Blaise Pascal — Marseille</span>
+      </div>
+      <div class="meta-item">
+        <label>Cadre</label>
+        <span>DNMADE Mention Spectacle (Régie Lumière / Son)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENTION FINALE & COPYRIGHT -->
+  <footer class="cgu-footer">
+    <p style="margin-bottom:6px; color:#cbd5e1;">
+      Application développée dans le cadre d’un projet pédagogique.
+    </p>
+    <div>
+      &copy; <strong>Petit-Forestier Basile</strong>, 2026. Tous droits réservés.
+    </div>
+  </footer>
+
+</body>
+</html>

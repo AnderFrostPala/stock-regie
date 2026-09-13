@@ -44,7 +44,7 @@
       background-color: var(--bg-body);
       color: var(--text-main);
       -webkit-font-smoothing: antialiased;
-      padding-bottom: 74px; /* Dégagement pour la pastille de version */
+      padding-bottom: 74px;
     }
 
     /* BANDEAU D'ALERTE ROUGE DÉFILANT */
@@ -573,6 +573,9 @@
       <div id="devMenuOptions" style="display:none;">
         <a href="dev.html" class="menu-item" style="color:#a78bfa;"><span>🛠️</span> Pannel Développeur</a>
       </div>
+      <div id="marketingMenuOptions" style="display:none;">
+        <a href="marketing.html" class="menu-item" style="color:#ec4899;"><span>🎬</span> Espace Marketing</a>
+      </div>
       <button type="button" class="menu-item danger" onclick="deconnexion()" style="border-top:1px solid var(--border); margin-top:4px;">
         <span>🚪</span> Se déconnecter
       </button>
@@ -741,7 +744,7 @@
         .catch(() => {});
     }
 
-    // 2. AUTHENTIFICATION & INTERFACE
+    // 2. AUTHENTIFICATION & INITIALISATION
     if (!user) {
       document.getElementById("authModal").style.display = "flex";
     } else {
@@ -793,7 +796,36 @@
         .catch(err => alert("Erreur réseau : " + err));
     }
 
-    function initialiserInterface
+    function initialiserInterface() {
+      document.getElementById("userName").innerText = user;
+
+      let libelleRole = "Étudiant";
+      if (role === "admin") libelleRole = "Administrateur";
+      if (role === "dev") libelleRole = "Développeur";
+      if (role === "marketing") libelleRole = "Équipe Marketing 🎬";
+      document.getElementById("userRoleTxt").innerText = libelleRole;
+
+      if (role === "admin" || role === "dev") {
+        document.getElementById("adminMenuOptions").style.display = "block";
+      }
+      if (role === "dev") {
+        document.getElementById("devMenuOptions").style.display = "block";
+      }
+      if (role === "marketing" || role === "dev") {
+        const mOpt = document.getElementById("marketingMenuOptions");
+        if (mOpt) mOpt.style.display = "block";
+      }
+
+      demarrerCamera();
+      chargerDerniereVersionTag();
+
+      // DÉTECTION SCAN CAMERA EXTERNE (?id=...)
+      const urlParams = new URLSearchParams(window.location.search);
+      const idAuto = urlParams.get("id");
+      if (idAuto) {
+        chercherMateriel(idAuto);
+      }
+    }
 
     // 3. SCAN & FICHE MATÉRIEL
     function demarrerCamera() {
@@ -811,18 +843,16 @@
       let cleanId = (id || "").trim();
       if (!cleanId) return;
 
-      // Si le QR code scanné est une URL complète (ex: https://...index.html?id=DM7_001)
+      // Nettoyage si le scan lit l'URL complète
       if (cleanId.includes("id=")) {
         try {
           const urlObj = new URL(cleanId);
           cleanId = urlObj.searchParams.get("id") || cleanId;
         } catch (e) {
-          // Secours si URL mal formée
           cleanId = cleanId.split("id=")[1].split("&")[0];
         }
       }
 
-      // On inscrit UNIQUEMENT le vrai ID propre dans le champ texte
       document.getElementById("inputId").value = cleanId;
 
       fetch(`${SCRIPT_URL}?action=getItem&id=${encodeURIComponent(cleanId)}`)

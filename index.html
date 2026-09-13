@@ -793,24 +793,7 @@
         .catch(err => alert("Erreur réseau : " + err));
     }
 
-    function initialiserInterface() {
-      document.getElementById("userName").innerText = user;
-
-      let libelleRole = "Étudiant";
-      if (role === "admin") libelleRole = "Administrateur";
-      if (role === "dev") libelleRole = "Développeur";
-      document.getElementById("userRoleTxt").innerText = libelleRole;
-
-      if (role === "admin" || role === "dev") {
-        document.getElementById("adminMenuOptions").style.display = "block";
-      }
-      if (role === "dev") {
-        document.getElementById("devMenuOptions").style.display = "block";
-      }
-
-      demarrerCamera();
-      chargerDerniereVersionTag();
-    }
+    function initialiserInterface
 
     // 3. SCAN & FICHE MATÉRIEL
     function demarrerCamera() {
@@ -825,9 +808,21 @@
     }
 
     function chercherMateriel(id) {
-      const cleanId = (id || "").trim();
+      let cleanId = (id || "").trim();
       if (!cleanId) return;
 
+      // Si le QR code scanné est une URL complète (ex: https://...index.html?id=DM7_001)
+      if (cleanId.includes("id=")) {
+        try {
+          const urlObj = new URL(cleanId);
+          cleanId = urlObj.searchParams.get("id") || cleanId;
+        } catch (e) {
+          // Secours si URL mal formée
+          cleanId = cleanId.split("id=")[1].split("&")[0];
+        }
+      }
+
+      // On inscrit UNIQUEMENT le vrai ID propre dans le champ texte
       document.getElementById("inputId").value = cleanId;
 
       fetch(`${SCRIPT_URL}?action=getItem&id=${encodeURIComponent(cleanId)}`)

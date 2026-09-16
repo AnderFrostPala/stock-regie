@@ -105,6 +105,41 @@
     .btn-accept { background: var(--status-dispo); color: #fff; }
     .btn-refuse { background: var(--status-sorti); color: #fff; }
 
+    /* TABLEAUX ET LISTES PRÊTS EXTERNES */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+    .prets-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84em;
+      text-align: left;
+    }
+    .prets-table th {
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 6px;
+      font-size: 0.78em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .prets-table td {
+      padding: 10px 6px;
+      border-bottom: 1px solid #1f2430;
+      color: #cbd5e1;
+    }
+    .badge-retard {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 800;
+      margin-left: 4px;
+    }
+
     /* TABLEAU DES COMPTES */
     .user-stat-row {
       background: #090a0d; border: 1px solid var(--border); border-radius: 10px;
@@ -146,9 +181,9 @@
   <!-- MODAL CODE MAÎTRE ADMIN -->
   <div id="adminPassModal" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(13,15,18,0.95); z-index:3000; display:flex; align-items:center; justify-content:center; padding:16px;">
     <div class="card" style="max-width:380px; width:100%; text-align:center; background:var(--bg-surface-elevated);">
-      <div style="font-size:2.8em; margin-bottom:8px;"></div>
+      <div style="font-size:2.8em; margin-bottom:8px;">🔐</div>
       <h3 style="margin-top:0;">Accès Administration</h3>
-      <p style="font-size:0.88em; color:var(--text-muted); margin-bottom:16px;">Saisissez le mot de passe :</p>
+      <p style="font-size:0.88em; color:var(--text-muted); margin-bottom:16px;">Saisissez le mot de passe maître :</p>
       <input type="password" id="adminPassInput" placeholder="Mot de passe..." style="text-align:center; margin-bottom:14px; letter-spacing:2px;">
       <button type="button" onclick="validerMotDePasseMaster()" class="btn-submit" style="background:#dc2626;">Déverrouiller l'accès</button>
       <a href="index.html" style="display:block; margin-top:14px; font-size:0.82em; color:var(--text-muted); text-decoration:none;">&larr; Retour</a>
@@ -161,16 +196,18 @@
       <img src="logo-dnmade.png" alt="Logo DNMADe" class="brand-logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
       <div id="logoFallback" class="brand-fallback" style="display:none;">TurboStock</div>
       <div class="brand-text">
-        <h1></h1>
-        <span></span>
+        <h1>Administration</h1>
+        <span>TurboStock System</span>
       </div>
     </div>
     <a href="index.html" class="btn-quit">Quitter &rarr;</a>
   </header>
 
+  <!-- NAVIGATION -->
   <nav class="quick-nav">
     <a href="index.html">Scan</a>
     <a href="autonomie.html">Autonomie</a>
+    <a href="pret-externe.html" style="color:var(--status-amber);">Prêt Matériel</a>
     <a href="dashboard.html">Parc Matériel</a>
     <a href="reservation.html">Réservations</a>
     <a href="admin.html" class="active">Pannel admin</a>
@@ -185,7 +222,17 @@
     <div id="listeDemandesAuto"></div>
   </div>
 
-  <!-- BLOC 2 : CRÉATION D'UN UTILISATEUR -->
+  <!-- BLOC 2 : SORTIES HORS ÉTABLISSEMENT (PRÊTS MAISON) -->
+  <div class="card" style="border-left: 5px solid #f87171;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0; color:#f87171;">Matériel sorti hors établissement</h3>
+      <button type="button" onclick="chargerPretsExternes()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:5px 10px; border-radius:5px; font-size:0.78em; cursor:pointer;">Rafraîchir ↻</button>
+    </div>
+    <div id="loadingPretsExternes" style="text-align:center; padding:12px; font-size:0.88em; color:var(--text-muted);">Vérification des sorties extérieures...</div>
+    <div id="listePretsExternes" class="table-responsive"></div>
+  </div>
+
+  <!-- BLOC 3 : CRÉATION D'UN UTILISATEUR -->
   <div class="card">
     <h3>Ajouter un Utilisateur</h3>
     <form onsubmit="creerUtilisateur(event)">
@@ -213,7 +260,7 @@
     </form>
   </div>
 
-  <!-- BLOC 3 : TABLEAU D'ACTIVITÉ & GESTION DES COMPTES -->
+  <!-- BLOC 4 : TABLEAU D'ACTIVITÉ & GESTION DES COMPTES -->
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
       <h3 style="margin:0;">Activité des Comptes et Réservations en cours</h3>
@@ -227,18 +274,16 @@
   </div>
 
   <script>
-    // COLLE TON URL APPS SCRIPT ICI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let rawStats = [];
-    const localRole = localStorage.getItem("regie_role") || "etudiant";
 
-  // Autoriser à la fois admin ET dev
-const userRole = localStorage.getItem("regie_role");
-if (userRole !== "admin" && userRole !== "dev") {
-  alert("Accès réservé aux administrateurs.");
-  window.location.href = "index.html";
-}
+    // 1. CONTRÔLE D'ACCÈS AU RÔLE LOCAL
+    const userRole = localStorage.getItem("regie_role");
+    if (userRole !== "admin" && userRole !== "dev") {
+      alert("Accès réservé aux administrateurs.");
+      window.location.href = "index.html";
+    }
 
     // 2. VÉRIFICATION DU MOT DE PASSE MAÎTRE
     function validerMotDePasseMaster() {
@@ -251,6 +296,7 @@ if (userRole !== "admin" && userRole !== "dev") {
           if (res.success) {
             document.getElementById("adminPassModal").style.display = "none";
             chargerDemandesAutonomie();
+            chargerPretsExternes();
             chargerStats();
           } else {
             alert(res.message || "Mot de passe maître incorrect.");
@@ -322,7 +368,76 @@ if (userRole !== "admin" && userRole !== "dev") {
       .catch(err => alert("Erreur réseau : " + err));
     }
 
-    // 4. TABLEAU DE SUPERVISION & SUPPRESSION DE COMPTES
+    // 4. GESTION DES PRÊTS EXTERNES (MAISON)
+    function chargerPretsExternes() {
+      const loader = document.getElementById("loadingPretsExternes");
+      const conteneur = document.getElementById("listePretsExternes");
+      loader.style.display = "block";
+      conteneur.innerHTML = "";
+
+      fetch(`${SCRIPT_URL}?action=getPretsExternes`)
+        .then(r => r.json())
+        .then(res => {
+          loader.style.display = "none";
+          if (res.success && res.prets) {
+            afficherPretsExternes(res.prets);
+          } else {
+            conteneur.innerHTML = '<div style="font-size:0.86em; color:var(--text-muted); padding:10px 0;">Aucun matériel actuellement sorti hors établissement.</div>';
+          }
+        })
+        .catch(() => {
+          loader.style.display = "none";
+          conteneur.innerHTML = '<div style="font-size:0.86em; color:var(--status-sorti); padding:10px 0;">Impossible de récupérer les sorties extérieures.</div>';
+        });
+    }
+
+    function afficherPretsExternes(prets) {
+      const conteneur = document.getElementById("listePretsExternes");
+      if (prets.length === 0) {
+        conteneur.innerHTML = '<div style="font-size:0.86em; color:var(--text-muted); padding:10px 0;">✅ Aucun matériel en sortie extérieure pour le moment.</div>';
+        return;
+      }
+
+      const aujourdhui = new Date().toISOString().split("T")[0];
+
+      let html = `
+        <table class="prets-table">
+          <thead>
+            <tr>
+              <th>Matériel</th>
+              <th>Emprunteur</th>
+              <th>Projet / Motif</th>
+              <th>Retour prévu</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      prets.forEach(p => {
+        const estEnRetard = p.dateRetour && p.dateRetour < aujourdhui;
+        const styleDate = estEnRetard ? 'color:var(--status-sorti); font-weight:800;' : 'color:var(--status-dispo); font-weight:700;';
+
+        html += `
+          <tr>
+            <td>
+              <strong style="color:#fff;">${p.nomMateriel || p.idMateriel}</strong><br>
+              <span class="code-tag">${p.idMateriel}</span>
+            </td>
+            <td><strong style="color:#fff;">${p.user}</strong></td>
+            <td style="color:#cbd5e1;">${p.motif || "-"}</td>
+            <td>
+              <span style="${styleDate}">${p.dateRetour || "Non définie"}</span>
+              ${estEnRetard ? '<span class="badge-retard">RETARD</span>' : ''}
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      conteneur.innerHTML = html;
+    }
+
+    // 5. TABLEAU DE SUPERVISION DES COMPTES
     function chargerStats() {
       document.getElementById("loadingStats").style.display = "block";
       document.getElementById("listeComptes").innerHTML = "";
@@ -415,7 +530,7 @@ if (userRole !== "admin" && userRole !== "dev") {
       .catch(err => alert("Erreur réseau : " + err));
     }
 
-    // 5. CRÉATION D'UN UTILISATEUR
+    // 6. CRÉATION D'UN UTILISATEUR
     function creerUtilisateur(e) {
       e.preventDefault();
       const nom = document.getElementById("newNom").value.trim();
@@ -459,9 +574,11 @@ if (userRole !== "admin" && userRole !== "dev") {
         btn.innerText = "Enregistrer l'utilisateur";
       });
     }
-    // Chargement automatique au démarrage si déjà authentifié
+
+    // Chargement automatique au démarrage si la modal est fermée/non requise
     window.addEventListener("DOMContentLoaded", () => {
       chargerDemandesAutonomie();
+      chargerPretsExternes();
       chargerStats();
     });
   </script>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurboStock — Sortie Extérieure</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=JetBrains+Mono:wght@700&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0;
+      background: #0d0f12;
+      color: #f1f3f7;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 480px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #292e3b;
+      padding-bottom: 12px;
+    }
+    .btn-back {
+      color: #8b949e;
+      text-decoration: none;
+      font-size: 0.9em;
+      font-weight: 700;
+    }
+    .card {
+      background: #171a21;
+      border: 1px solid #292e3b;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.8em;
+      font-weight: 700;
+      color: #8b949e;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 11px;
+      border-radius: 8px;
+      border: 1px solid #292e3b;
+      background: #0d0f12;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.9em;
+      margin-bottom: 14px;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+    .charte-box {
+      background: #090a0d;
+      border: 1px solid #292e3b;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.8em;
+      line-height: 1.45;
+      color: #cbd5e1;
+      margin-bottom: 14px;
+    }
+    .check-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 13px;
+      background: #e62b33;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.95em;
+      cursor: pointer;
+    }
+    .btn-submit:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h2 style="margin:0; font-size:1.15em;">🏠 Prêt Extérieur / Maison</h2>
+      <a href="index.html" class="btn-back">← Retour</a>
+    </div>
+
+    <form id="pretForm" onsubmit="soumettrePret(event)">
+      <div class="card">
+        <label>Matériel emprunté (ID ou nom)</label>
+        <input type="text" id="idMateriel" placeholder="Ex: DM7_001 ou scannez" required>
+
+        <label>Projet / Motif de la sortie</label>
+        <input type="text" id="motif" placeholder="Ex: Tournage court-métrage plateau ext." required>
+
+        <label>Date de retour impérative</label>
+        <input type="date" id="dateRetour" required>
+      </div>
+
+      <div class="card">
+        <label>Règlement & Responsabilité</label>
+        <div class="charte-box">
+          <strong>Engagement de l'emprunteur :</strong><br>
+          • Le matériel reste sous votre entière responsabilité jusqu'à son retour au stock.<br>
+          • Interdiction de stocker le matériel dans un véhicule stationné la nuit.<br>
+          • Tout dysfonctionnement, casse ou perte doit être signalé immédiatement à la régie.<br>
+          • Le retour doit se faire complet (câbles, housses, accessoires).
+        </div>
+
+        <div class="check-row">
+          <input type="checkbox" id="checkEngagement" style="width:20px; height:20px; accent-color:#e62b33; cursor:pointer;" required>
+          <label for="checkEngagement" style="font-size:0.82em; color:#fff; cursor:pointer; text-transform:none; margin:0;">
+            J'atteste sur l'honneur avoir lu ce règlement et m'engage à restituer le matériel intact dans les délais.
+          </label>
+        </div>
+
+        <button type="submit" id="btnSubmit" class="btn-submit">Valider la sortie extérieure</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/library/d/1bXbeEu9Zm3XEo-J2L3eqA9ADxS5nKTZ39H5lUl5tFxz3siGiI1cQJysf/35";
+    const user = localStorage.getItem("regie_user");
+
+    if (!user) {
+      alert("Veuillez d'abord vous connecter sur TurboStock.");
+      window.location.href = "index.html";
+    }
+
+    // Pré-remplissage si paramètre ?id= dans l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("id")) {
+      document.getElementById("idMateriel").value = urlParams.get("id");
+    }
+
+    // Par défaut date du lendemain
+    const demain = new Date();
+    demain.setDate(demain.getDate() + 1);
+    document.getElementById("dateRetour").value = demain.toISOString().split("T")[0];
+
+    function soumettrePret(e) {
+      e.preventDefault();
+      const btn = document.getElementById("btnSubmit");
+      btn.disabled = true;
+      btn.innerText = "Validation en cours...";
+
+      const payload = {
+        action: "creerPretExterne",
+        idMateriel: document.getElementById("idMateriel").value.trim(),
+        motif: document.getElementById("motif").value.trim(),
+        dateRetour: document.getElementById("dateRetour").value,
+        user: user
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert("✅ Prêt extérieur enregistré ! Prenez soin du matériel.");
+        window.location.href = "index.html";
+      })
+      .catch(err => {
+        alert("Erreur réseau : " + err);
+        btn.disabled = false;
+        btn.innerText = "Valider la sortie extérieure";
+      });
+    }
+  </script>
+</body>
+</html>

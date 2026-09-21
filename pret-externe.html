@@ -98,7 +98,59 @@
   </style>
 </head>
 <body>
+  <!-- OVERLAY MAINTENANCE / EN CONSTRUCTION -->
+  <div id="maintenanceOverlay" style="
+    position: fixed;
+    inset: 0;
+    background: #0d0f12;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+  ">
+    <div style="
+      background: #171a21;
+      border: 1px solid #292e3b;
+      border-radius: 16px;
+      padding: 32px 24px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    ">
+      <div style="font-size: 3rem; margin-bottom: 12px;">🚧</div>
+      <span style="
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      ">En cours de déploiement</span>
+      
+      <h2 style="color: #fff; margin: 16px 0 8px 0; font-size: 1.25rem;">Fonctionnalité en travaux</h2>
+      <p style="color: #8b949e; font-size: 0.88rem; line-height: 1.5; margin: 0 0 24px 0;">
+        Le module de sortie hors établissement fait l'objet d'ajustements techniques et réglementaires avant son ouverture officielle.
+      </p>
 
+      <a href="index.html" style="
+        display: block;
+        background: #e62b33;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 800;
+        font-size: 0.9rem;
+        padding: 12px;
+        border-radius: 8px;
+        transition: opacity 0.15s ease;
+      ">← Retour à l'accueil</a>
+    </div>
+  </div>
   <div class="container">
     <div class="header">
       <h2 style="margin:0; font-size:1.15em;">🏠 Prêt Extérieur / Maison</h2>

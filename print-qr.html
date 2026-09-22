@@ -63,6 +63,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: space-between;
       text-align: center;
     }
 
@@ -80,26 +81,28 @@
       font-size: 0.62em;
       font-weight: 800;
       line-height: 1.1;
-      height: 2.2em;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
+      width: 100%;
+      white-space: nowrap;
       overflow: hidden;
-      word-break: break-word;
-      margin-bottom: 2px;
+      text-overflow: ellipsis;
+      margin-bottom: 3px;
+      padding: 0 2px;
     }
 
     .label-qr-wrap {
-      width: 70px;
-      height: 70px;
+      width: 68px;
+      height: 68px;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
+      margin: 1px 0;
     }
     .label-qr-wrap canvas,
     .label-qr-wrap img {
-      width: 70px !important;
-      height: 70px !important;
+      width: 68px !important;
+      height: 68px !important;
+      display: block;
     }
 
     .label-id {
@@ -111,13 +114,16 @@
       padding: 1px 3px;
       border-radius: 3px;
       margin-top: 2px;
-      word-break: break-all;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    /* --- PARAMÈTRES D'IMPRESSION STRICTS A4 --- */
+    /* --- PARAMÈTRES D'IMPRESSION A4 --- */
     @page {
       size: A4 portrait;
-      margin: 8mm 6mm 8mm 6mm; /* Marges réelles papier */
+      margin: 6mm 5mm;
     }
 
     @media print {
@@ -132,30 +138,49 @@
       }
       .labels-grid {
         display: grid !important;
-        grid-template-columns: repeat(6, 31mm) !important; /* 6 colonnes de 31mm = 186mm sur 198mm dispo */
-        gap: 2mm 2.2mm !important;
+        grid-template-columns: repeat(6, 32mm) !important;
+        gap: 2mm 1.5mm !important;
         justify-content: center !important;
         max-width: none !important;
         margin: 0 auto !important;
         width: 100% !important;
       }
       .label-card {
-        width: 31mm !important;
-        height: 32mm !important; /* Hauteur fixe : 8 rangées rentrent pile par page (8 x 34mm = 272mm) */
+        width: 32mm !important;
+        height: 35mm !important;
         border: 0.5px dashed #9ca3af !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
-        padding: 1.5mm 1mm !important;
-        overflow: hidden !important;
+        padding: 2mm 1mm 1.5mm 1mm !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+      }
+      .label-header {
+        font-size: 5pt !important;
+        margin-bottom: 0.5mm !important;
+      }
+      .label-nom {
+        font-size: 6.5pt !important;
+        line-height: 1 !important;
+        margin-bottom: 1mm !important;
       }
       .label-qr-wrap {
-        width: 19mm !important;
-        height: 19mm !important;
+        width: 18mm !important;
+        height: 18mm !important;
+        flex-shrink: 0 !important;
+        margin: 0.5mm 0 !important;
       }
       .label-qr-wrap canvas,
       .label-qr-wrap img {
-        width: 19mm !important;
-        height: 19mm !important;
+        width: 18mm !important;
+        height: 18mm !important;
+      }
+      .label-id {
+        font-size: 5.5pt !important;
+        padding: 0.5mm 1mm !important;
+        margin-top: 0.5mm !important;
       }
     }
   </style>
@@ -164,8 +189,8 @@
 
   <div class="no-print">
     <div>
-      <strong>Planche d'impression TurboStock (48 étiquettes / page A4)</strong>
-      <div style="font-size:0.75em; color:#666;">Dans Chrome : réglez les Marges sur « Aucune » ou « Par défaut »</div>
+      <strong>Planche d'impression TurboStock (Mini & Espacement Net)</strong>
+      <div style="font-size:0.75em; color:#666;">Dans Chrome : réglez les Marges sur « Aucune » ou « Minimales »</div>
     </div>
     <button class="btn-print" onclick="window.print()">🖨️ Imprimer les étiquettes</button>
   </div>
@@ -214,8 +239,10 @@
           const urlScan = `https://anderfrostpala.github.io/stock-regie/index.html?id=${encodeURIComponent(item.id)}`;
 
           card.innerHTML = `
-            <div class="label-header">TurboStock</div>
-            <div class="label-nom" title="${item.nom || nomCourt}">${nomCourt}</div>
+            <div>
+              <div class="label-header">TurboStock</div>
+              <div class="label-nom" title="${item.nom || nomCourt}">${nomCourt}</div>
+            </div>
             <div class="label-qr-wrap" id="${qrBoxId}"></div>
             <div class="label-id">${item.id}</div>
           `;
@@ -223,8 +250,8 @@
 
           new QRCode(document.getElementById(qrBoxId), {
             text: urlScan,
-            width: 70,
-            height: 70,
+            width: 68,
+            height: 68,
             colorDark: "#000000",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.M

@@ -762,20 +762,19 @@
       document.documentElement.style.setProperty('--status-blue-light', savedThemeColor);
     }
 
-    // --- MOTEUR AUDIO & VIBRATION HAPTIQUE (TYPE DOUCHETTE / SCANNER) ---
+// --- Bip caisse de supermarché (Web Audio API) ---
     let audioCtx = null;
 
     function emettreBipScanner(type = "success") {
-      // 1. Déclenchement de la vibration du téléphone
+      // Vibration tactile franche
       if ("vibrate" in navigator) {
         if (type === "success") {
-          navigator.vibrate(75); // Impulsion courte et nette
+          navigator.vibrate(85);
         } else {
-          navigator.vibrate([60, 40, 60]); // Double vibration en cas d'erreur
+          navigator.vibrate([70, 50, 70]);
         }
       }
 
-      // 2. Génération du signal sonore type scannette (Web Audio API)
       try {
         if (!audioCtx) {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -792,24 +791,29 @@
         const now = audioCtx.currentTime;
 
         if (type === "success") {
-          // Bip aigu court et incisif (1750 Hz pendant 80 ms)
+          // Fréquence exacte du bip de caisse supermarché (~2489 Hz - Ré#7)
           osc.type = "sine";
-          osc.frequency.setValueAtTime(1750, now);
-          gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.frequency.setValueAtTime(2489, now);
+
+          // Volume amplifié au maximum sans saturation
+          gain.gain.setValueAtTime(0.85, now);
+          // Coupe nette et franche au bout de 95 ms
+          gain.gain.setValueAtTime(0.85, now + 0.090);
+          gain.gain.linearRampToValueAtTime(0.0001, now + 0.095);
+
           osc.start(now);
-          osc.stop(now + 0.08);
+          osc.stop(now + 0.095);
         } else {
-          // Son plus grave pour signaler une anomalie
-          osc.type = "sawtooth";
+          // Bip grave en cas d'erreur
+          osc.type = "triangle";
           osc.frequency.setValueAtTime(320, now);
-          gain.gain.setValueAtTime(0.25, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+          gain.gain.setValueAtTime(0.7, now);
+          gain.gain.linearRampToValueAtTime(0.001, now + 0.16);
           osc.start(now);
           osc.stop(now + 0.16);
         }
       } catch (e) {
-        // Fallback silencieux si l'audio n'est pas autorisé par l'OS
+        // En cas de restriction navigateur
       }
     }
 

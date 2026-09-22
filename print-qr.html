@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TurboStock — Impression Étiquettes QR (Mini & Noms Courts)</title>
+  <title>TurboStock — Impression Étiquettes QR</title>
   
-  <!-- Bibliothèque QR Code locale et autonome -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,17 +12,20 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 
   <style>
-    * { box-sizing: border-box; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+    }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      margin: 0;
-      padding: 10px;
       background: #f1f3f7;
       color: #000;
+      padding: 10px;
     }
     
     .no-print {
-      max-width: 1000px;
+      max-width: 900px;
       margin: 0 auto 15px auto;
       background: #fff;
       padding: 12px 18px;
@@ -37,7 +39,7 @@
       background: #e62b33;
       color: #fff;
       border: none;
-      padding: 8px 16px;
+      padding: 10px 18px;
       border-radius: 6px;
       font-weight: 800;
       font-size: 0.9em;
@@ -47,7 +49,7 @@
     /* Grille écran */
     .labels-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 6px;
       max-width: 1050px;
       margin: 0 auto;
@@ -62,22 +64,21 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      box-sizing: border-box;
     }
 
     .label-header {
-      font-size: 0.5em;
+      font-size: 0.48em;
       font-weight: 800;
       color: #e62b33;
       text-transform: uppercase;
       letter-spacing: 0.2px;
-      margin-bottom: 1px;
+      line-height: 1;
+      margin-bottom: 2px;
     }
 
     .label-nom {
-      font-size: 0.65em;
+      font-size: 0.62em;
       font-weight: 800;
-      margin: 0 0 2px 0;
       line-height: 1.1;
       height: 2.2em;
       display: -webkit-box;
@@ -85,64 +86,76 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
       word-break: break-word;
+      margin-bottom: 2px;
     }
 
     .label-qr-wrap {
-      width: 75px;
-      height: 75px;
+      width: 70px;
+      height: 70px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 1px 0;
     }
     .label-qr-wrap canvas,
     .label-qr-wrap img {
-      width: 75px !important;
-      height: 75px !important;
+      width: 70px !important;
+      height: 70px !important;
     }
 
     .label-id {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.62em;
+      font-size: 0.58em;
       font-weight: 700;
       background: #f1f3f7;
       border: 1px solid #d1d5db;
-      padding: 1px 4px;
+      padding: 1px 3px;
       border-radius: 3px;
-      margin-top: 1px;
+      margin-top: 2px;
       word-break: break-all;
     }
 
-    /* RÈGLES D'IMPRESSION COMPACTES (A4 PORTRAIT) */
+    /* --- PARAMÈTRES D'IMPRESSION STRICTS A4 --- */
     @page {
       size: A4 portrait;
-      margin: 8mm 6mm;
+      margin: 8mm 6mm 8mm 6mm; /* Marges réelles papier */
     }
 
     @media print {
-      body {
-        background: #fff;
-        padding: 0;
+      html, body {
+        background: #fff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
       }
       .no-print {
         display: none !important;
       }
-      /* Flexbox dense évitant les sauts de page artificiels du moteur Grid */
       .labels-grid {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        justify-content: flex-start !important;
-        gap: 3mm 2mm !important;
-        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: repeat(6, 31mm) !important; /* 6 colonnes de 31mm = 186mm sur 198mm dispo */
+        gap: 2mm 2.2mm !important;
+        justify-content: center !important;
         max-width: none !important;
+        margin: 0 auto !important;
+        width: 100% !important;
       }
       .label-card {
-        width: 19.2% !important; /* 5 étiquettes par rangée */
-        border: 0.6px dashed #9ca3af !important;
+        width: 31mm !important;
+        height: 32mm !important; /* Hauteur fixe : 8 rangées rentrent pile par page (8 x 34mm = 272mm) */
+        border: 0.5px dashed #9ca3af !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
-        margin: 0 !important;
-        padding: 2mm 1mm !important;
+        padding: 1.5mm 1mm !important;
+        overflow: hidden !important;
+      }
+      .label-qr-wrap {
+        width: 19mm !important;
+        height: 19mm !important;
+      }
+      .label-qr-wrap canvas,
+      .label-qr-wrap img {
+        width: 19mm !important;
+        height: 19mm !important;
       }
     }
   </style>
@@ -151,8 +164,8 @@
 
   <div class="no-print">
     <div>
-      <strong>Planche d'impression TurboStock (Format Dense & Noms Courts)</strong>
-      <div style="font-size:0.75em; color:#666;">Optimisé pour 45-50 étiquettes par page A4</div>
+      <strong>Planche d'impression TurboStock (48 étiquettes / page A4)</strong>
+      <div style="font-size:0.75em; color:#666;">Dans Chrome : réglez les Marges sur « Aucune » ou « Par défaut »</div>
     </div>
     <button class="btn-print" onclick="window.print()">🖨️ Imprimer les étiquettes</button>
   </div>
@@ -210,8 +223,8 @@
 
           new QRCode(document.getElementById(qrBoxId), {
             text: urlScan,
-            width: 75,
-            height: 75,
+            width: 70,
+            height: 70,
             colorDark: "#000000",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.M

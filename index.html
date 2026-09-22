@@ -47,7 +47,7 @@
       padding-bottom: 74px;
     }
 
-    /* TOAST FEEDBACK RAPIDE (Remplace les popups alert) */
+    /* TOAST FEEDBACK RAPIDE */
     #quickToast {
       position: fixed;
       top: 18px;
@@ -762,59 +762,125 @@
       document.documentElement.style.setProperty('--status-blue-light', savedThemeColor);
     }
 
-// --- Bip caisse de supermarché (Web Audio API) ---
+    // --- MOTEUR AUDIO (WEB AUDIO API) & VIBRATION HAPTIQUE ---
     let audioCtx = null;
 
-    function emettreBipScanner(type = "success") {
-      // Vibration tactile franche
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // 1. Bip lors du SCAN d'un QR code (caisse supermarché ~2489 Hz)
+    function emettreBipScan() {
       if ("vibrate" in navigator) {
-        if (type === "success") {
-          navigator.vibrate(85);
-        } else {
-          navigator.vibrate([70, 50, 70]);
-        }
+        navigator.vibrate(85);
       }
-
       try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === "suspended") {
-          audioCtx.resume();
-        }
-
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(ctx.destination);
 
-        const now = audioCtx.currentTime;
+        const now = ctx.currentTime;
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(2489, now);
 
-        if (type === "success") {
-          // Fréquence exacte du bip de caisse supermarché (~2489 Hz - Ré#7)
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(2489, now);
+        gain.gain.setValueAtTime(0.85, now);
+        gain.gain.setValueAtTime(0.85, now + 0.088);
+        gain.gain.linearRampToValueAtTime(0.0001, now + 0.095);
 
-          // Volume amplifié au maximum sans saturation
-          gain.gain.setValueAtTime(0.85, now);
-          // Coupe nette et franche au bout de 95 ms
-          gain.gain.setValueAtTime(0.85, now + 0.090);
-          gain.gain.linearRampToValueAtTime(0.0001, now + 0.095);
+        osc.start(now);
+        osc.stop(now + 0.095);
+      } catch (e) {}
+    }
 
-          osc.start(now);
-          osc.stop(now + 0.095);
-        } else {
-          // Bip grave en cas d'erreur
-          osc.type = "triangle";
-          osc.frequency.setValueAtTime(320, now);
-          gain.gain.setValueAtTime(0.7, now);
-          gain.gain.linearRampToValueAtTime(0.001, now + 0.16);
-          osc.start(now);
-          osc.stop(now + 0.16);
-        }
-      } catch (e) {
-        // En cas de restriction navigateur
+    // 2. Bip lors de la VALIDATION D'UNE ACTION (Double tonalité montante 1760 Hz -> 2637 Hz)
+    function emettreBipActionValidee() {
+      if ("vibrate" in navigator) {
+        navigator.vibrate(110);
       }
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+
+        // Première note (1760 Hz - La6)
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+
+        osc1.type = "sine";
+        osc1.frequency.setValueAtTime(1760, now);
+        gain1.gain.setValueAtTime(0.75, now);
+        gain1.gain.linearRampToValueAtTime(0.0001, now + 0.07);
+        osc1.start(now);
+        osc1.stop(now + 0.07);
+
+        // Seconde note plus aiguë (2637 Hz - Mi7)
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+
+        osc2.type = "sine";
+        osc2.frequency.setValueAtTime(2637, now + 0.06);
+        gain2.gain.setValueAtTime(0.85, now + 0.06);
+        gain2.gain.linearRampToValueAtTime(0.0001, now + 0.15);
+        osc2.start(now + 0.06);
+        osc2.stop(now + 0.15);
+      } catch (e) {}
+    }
+
+    // 3. Bip d'erreur
+    function emettreBipErreur() {
+      if ("vibrate" in navigator) {
+        navigator.vibrate([70, 50, 70]);
+      }
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        const now = ctx.currentTime;
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(320, now);
+        gain.gain.setValueAtTime(0.75, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.16);
+        osc.start(now);
+        osc.stop(now + 0.16);
+      } catch (e) {}
+    }
+
+    // --- FONCTION DE DÉFILEMENT ROBUSTE POUR SMARTPHONE ---
+    function scrollerVersElement(elementId) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            const rect = el.getBoundingClientRect();
+            const absoluteY = window.pageYOffset + rect.top - 18;
+
+            try {
+              el.scrollIntoView({ behavior: "smooth", block: "start" });
+            } catch (e) {}
+
+            window.scrollTo({
+              top: absoluteY,
+              behavior: "smooth"
+            });
+          }, 140);
+        });
+      });
     }
 
     // Notification toast non intrusive
@@ -967,15 +1033,16 @@
         .then(r => r.json())
         .then(res => {
           if (!res.success) {
-            emettreBipScanner("error");
+            emettreBipErreur();
             afficherToast(res.message || "Équipement non trouvé", true);
             return;
           }
-          emettreBipScanner("success");
+          // Bip spécifique de scan réussi
+          emettreBipScan();
           afficherFicheMateriel(res);
         })
         .catch(err => {
-          emettreBipScanner("error");
+          emettreBipErreur();
           afficherToast("Erreur réseau", true);
         });
     }
@@ -1036,11 +1103,8 @@
 
       document.getElementById("zoneLieuSortie").style.display = "none";
 
-      // Défilement automatique fluide vers les boutons d'action
-      setTimeout(() => {
-        const cible = document.getElementById("actionsButtonsGrid") || card;
-        cible.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 120);
+      // Défilement automatique vers les boutons d'action
+      scrollerVersElement("actionsButtonsGrid");
     }
 
     function ouvrirZoneSortie() {
@@ -1058,7 +1122,7 @@
       const resteEnStock = Math.max(0, totalPhysique - dejaSorti);
 
       if (resteEnStock <= 0) {
-        emettreBipScanner("error");
+        emettreBipErreur();
         afficherToast("Tout le lot est déjà sorti", true);
         return;
       }
@@ -1082,9 +1146,8 @@
         document.getElementById("selectLieu").focus();
       }
 
-      setTimeout(() => {
-        zoneSortie.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 80);
+      // Défilement direct vers le formulaire de sortie ouvert
+      scrollerVersElement("btnConfirmerSortie");
     }
 
     function gererChangementLieu(val) {
@@ -1122,7 +1185,7 @@
       const qteChoisie = parseInt(document.getElementById("inputQteSortie").value, 10) || 1;
 
       if (qteChoisie <= 0 || qteChoisie > resteEnStock) {
-        emettreBipScanner("error");
+        emettreBipErreur();
         afficherToast(`Quantité max : ${resteEnStock}`, true);
         return;
       }
@@ -1158,7 +1221,7 @@
 
       const qteARendre = parseInt(reponse, 10);
       if (isNaN(qteARendre) || qteARendre <= 0 || qteARendre > totalSorti) {
-        emettreBipScanner("error");
+        emettreBipErreur();
         afficherToast(`Quantité invalide (1 - ${totalSorti})`, true);
         return;
       }
@@ -1196,14 +1259,13 @@
         body: JSON.stringify(payload)
       })
       .then(() => {
-        // Déclenchement instantané du bip de scannette et de la vibration
-        emettreBipScanner("success");
+        // Bip spécifique de validation d'action
+        emettreBipActionValidee();
 
         if (actionType === "RETOUR") {
           const locCible = currentItem.locNominale || "Stock Régie";
           afficherConfirmationRangement(locCible);
         } else {
-          // Toast discret et reset immédiat pour scanner l'élément suivant
           afficherToast(actionType === "SORTIE" ? `Sortie validée vers ${lieu}` : "Action enregistrée !");
           
           setTimeout(() => {
@@ -1219,7 +1281,7 @@
         }
       })
       .catch(err => {
-        emettreBipScanner("error");
+        emettreBipErreur();
         afficherToast("Erreur enregistrement", true);
         if (btnSortie) {
           btnSortie.disabled = false;

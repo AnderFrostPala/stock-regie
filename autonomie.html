@@ -4,71 +4,309 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TurboStock - Autonomie</title>
+
+  <!-- CONFIGURATION PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#171a21">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <script src="https://unpkg.com/html5-qrcode"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     * { box-sizing: border-box; }
     :root {
       --bg-body: #0d0f12;
       --bg-surface: #171a21;
       --bg-surface-elevated: #20242e;
-      --border: #2e3442;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --border: #292e3b;
+      --text-main: #f1f3f7;
+      --text-muted: #8b949e;
       --status-dispo: #10b981;
       --status-sorti: #ef4444;
+      --status-sav: #f59e0b;
       --status-blue: #38bdf8;
-      --status-amber: #f59e0b;
+      --status-purple: #a78bfa;
     }
+
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      margin: 0 auto; max-width: 580px; background: var(--bg-body);
-      color: var(--text-main); padding: 16px; -webkit-font-smoothing: antialiased;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      margin: 0 auto;
+      max-width: 540px;
+      background: var(--bg-body);
+      color: var(--text-main);
+      padding: 14px;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 50px;
     }
+
     .app-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
     }
-    .quick-nav { display: flex; gap: 6px; margin-bottom: 14px; }
+
+    .quick-nav {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
     .quick-nav a {
-      flex: 1; text-align: center; padding: 8px 4px; border-radius: 6px;
-      background: var(--bg-surface); border: 1px solid var(--border);
-      color: var(--text-muted); text-decoration: none; font-size: 0.8em; font-weight: 700;
+      flex: 1;
+      min-width: 75px;
+      text-align: center;
+      padding: 7px 4px;
+      border-radius: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.78em;
+      font-weight: 700;
     }
-    .quick-nav a.active { color: #fff; background: var(--bg-surface-elevated); border-color: #64748b; }
+    .quick-nav a.active {
+      color: #fff;
+      background: var(--bg-surface-elevated);
+      border-color: #4b5563;
+    }
+
     .card {
-      background: var(--bg-surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 16px; margin-bottom: 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
-    h3 { margin-top: 0; margin-bottom: 10px; font-size: 1.1em; color: #fff; font-weight: 800; }
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.05em;
+      color: #fff;
+      font-weight: 800;
+    }
+
     select, input[type="text"] {
-      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);
-      background: #090a0d; color: #fff; font-size: 14px; font-family: inherit; margin-bottom: 10px;
+      width: 100%;
+      padding: 11px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #090a0d;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
     }
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--status-blue);
+    }
+
     .btn-action {
-      width: 100%; padding: 14px; border: none; border-radius: 8px;
-      font-weight: 800; font-size: 1em; cursor: pointer; font-family: inherit;
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.95em;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s ease, transform 0.08s ease;
     }
-    .btn-green { background: var(--status-dispo); color: #fff; }
-    .btn-red { background: var(--status-sorti); color: #fff; }
-    .code-tag {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.85em; font-weight: 800;
-      color: var(--status-blue); background: #000; padding: 2px 6px; border-radius: 4px;
+    .btn-action:active { transform: scale(0.98); }
+    .btn-action:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      filter: grayscale(1);
     }
-    .basket-item {
-      background: #090a0d; border: 1px solid var(--border); border-radius: 8px;
-      padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+    .btn-green { background: #059669; color: #fff; }
+    .btn-amber { background: var(--status-sav); color: #000; }
+
+    code, .code-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      background: #090a0d;
+      border: 1px solid #232731;
+      color: var(--status-blue);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82em;
+    }
+
+    /* CARTE ITEM AVEC LA MÊME DA QUE PARC MATÉRIEL */
+    .item-da-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--status-dispo);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      animation: fadeIn 0.15s ease-out;
+    }
+    .item-info-main {
+      flex: 1;
+      min-width: 0;
+    }
+    .item-title {
+      font-weight: 800;
+      font-size: 0.9em;
+      color: #fff;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-sub {
+      font-size: 0.76em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .btn-del-item {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: var(--status-sorti);
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* MODALE CHECK-LIST RANGEMENT */
+    .checklist-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 12, 16, 0.85);
+      backdrop-filter: blur(5px);
+      z-index: 5000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+    .checklist-modal {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 35px rgba(0,0,0,0.7);
+      overflow: hidden;
+    }
+    .checklist-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: #1c202a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .checklist-body {
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .checklist-item {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s ease;
+    }
+    .checklist-item.checked {
+      border-color: var(--status-dispo);
+      background: rgba(16, 185, 129, 0.07);
+    }
+    .checklist-loc-badge {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px dashed var(--status-dispo);
+      color: #34d399;
+      font-weight: 800;
+      font-size: 0.78em;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .custom-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #4b5563;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 13px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .checklist-item.checked .custom-checkbox {
+      background: var(--status-dispo);
+      border-color: var(--status-dispo);
+    }
+
+    #quickToast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-60px);
+      background: #10b981;
+      color: #fff;
+      font-size: 0.85em;
+      font-weight: 800;
+      padding: 9px 18px;
+      border-radius: 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.25s ease;
+    }
+    #quickToast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #quickToast.err { background: var(--status-sorti); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
+  <div id="quickToast">✅ Matériel scanné</div>
+
   <header class="app-header">
     <div>
       <h1 style="margin:0; font-size:1.1em; font-weight:800; color:#fff;">Mode Autonomie</h1>
-      <span style="font-size:0.75em; color:var(--status-amber); font-weight:700; text-transform:uppercase;"></span>
+      <span style="font-size:0.75em; color:var(--status-amber); font-weight:700; text-transform:uppercase;">Sorties groupées & Rangement</span>
     </div>
     <div style="font-size:0.85em; color:var(--text-muted);">👤 <strong id="userName" style="color:#fff;">...</strong></div>
   </header>
@@ -80,26 +318,28 @@
     <a href="dashboard.html">Parc Matériel</a>
   </nav>
 
-  <!-- CAS 1 : SESSION EN COURS -> BOUTON DE RANGEMENT DU LOT ENTIER -->
+  <!-- CAS 1 : SESSION EN COURS -->
   <div id="vueSessionActive" class="card" style="display:none; border-left:5px solid var(--status-amber);">
-    <h3 style="color:var(--status-amber);">Session Autonomie en cours</h3>
-    <p style="font-size:0.88em; color:var(--text-muted); margin:4px 0 12px 0;">
-      Lieu : <strong id="activeLieu" style="color:#fff;">-</strong><br>
-      Démarrée le : <strong id="activeDate" style="color:#fff;">-</strong>
+    <h3 style="color:var(--status-amber); margin-bottom:4px;">Session Autonomie en cours</h3>
+    <p style="font-size:0.85em; color:var(--text-muted); margin:0 0 12px 0;">
+      Lieu : <strong id="activeLieu" style="color:#fff;">-</strong> &bull; Démarrée le : <strong id="activeDate" style="color:#fff;">-</strong>
     </p>
 
-    <div style="font-size:0.85em; font-weight:700; margin-bottom:6px;">Matériel sorti dans ce lot :</div>
-    <div id="listeItemsActifs" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;"></div>
+    <div style="font-size:0.82em; font-weight:800; color:#cbd5e1; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.4px;">
+      Matériel emprunté dans cette session :
+    </div>
+    
+    <div id="listeItemsActifs" style="display:flex; flex-direction:column; gap:6px; margin-bottom:14px;"></div>
 
-    <button type="button" class="btn-action btn-green" onclick="cloturerSessionAutonomie()">
-      📦 Ranger tout le lot au stock
+    <button type="button" class="btn-action btn-green" onclick="ouvrirChecklistRangement()">
+      📦 Ranger le matériel au stock
     </button>
   </div>
 
   <!-- CAS 2 : PAS DE SESSION -> CRÉATION DU LOT PAR SCAN -->
   <div id="vueNouvelleSession">
     <div class="card">
-      <h3>1. Lieu de travail</h3>
+      <h3>1. Lieu de destination</h3>
       <select id="selectLieuAuto">
         <option value="Atelier A">Atelier A</option>
         <option value="Atelier B">Atelier B</option>
@@ -113,28 +353,56 @@
     </div>
 
     <div class="card">
-      <h3>2. Scanner le matériel du lot</h3>
-      <div id="reader" style="width:100%; border-radius:8px; overflow:hidden; background:#000;"></div>
+      <h3>2. Scanner les équipements</h3>
+      <div id="reader"></div>
 
       <div style="display:flex; gap:6px; margin-top:10px;">
-        <input type="text" id="manualInput" placeholder="Saisie manuelle d'un ID..." style="margin:0;">
+        <input type="text" id="manualInput" placeholder="Saisie manuelle ID...">
         <button type="button" onclick="ajouterAuLot(document.getElementById('manualInput').value)" style="padding:0 14px; background:#2e3440; border:1px solid var(--border); color:#fff; border-radius:8px; font-weight:700; cursor:pointer;">Ajouter</button>
       </div>
     </div>
 
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h3 style="margin:0;">Équipements du lot</h3>
-        <span id="compteurLot" style="font-size:0.85em; font-weight:800; color:var(--status-blue);">0 élément(s)</span>
+        <h3 style="margin:0;">Matériel prêt à sortir</h3>
+        <span id="compteurLot" style="font-size:0.82em; font-weight:800; color:var(--status-blue);">0 élément</span>
       </div>
 
       <div id="panierLot">
-        <div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:12px;">Scannez vos machines pour constituer le lot.</div>
+        <div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:16px;">
+          Scannez vos machines pour constituer le lot.
+        </div>
       </div>
 
       <button type="button" id="btnValiderLot" class="btn-action btn-green" onclick="validerDepartAutonomie()" style="margin-top:12px; display:none;">
-        Valider la sortie du lot
+        Valider la sortie groupée
       </button>
+    </div>
+  </div>
+
+  <!-- MODALE INTERACTIVE DE CONTRÔLE AVANT RANGEMENT -->
+  <div id="checklistOverlay" class="checklist-overlay">
+    <div class="checklist-modal">
+      <div class="checklist-header">
+        <div>
+          <h3 style="margin:0; font-size:1em;">Contrôle de Rangement</h3>
+          <span style="font-size:0.75em; color:var(--text-muted);">Cochez chaque matériel remis à sa place</span>
+        </div>
+        <button type="button" onclick="fermerChecklistRangement()" style="background:none; border:none; color:#94a3b8; font-size:1.4em; cursor:pointer;">&times;</button>
+      </div>
+
+      <div class="checklist-body" id="checklistContainer">
+        <!-- Rempli dynamiquement -->
+      </div>
+
+      <div style="padding:14px; border-top:1px solid var(--border); background:#171a21;">
+        <div id="checkProgressTxt" style="font-size:0.8em; color:var(--text-muted); text-align:center; margin-bottom:8px; font-weight:700;">
+          0 / 0 validé(s)
+        </div>
+        <button type="button" id="btnConfirmCloture" class="btn-action btn-green" disabled onclick="cloturerSessionAutonomieDefinitive()">
+          ✅ Valider le rangement complet
+        </button>
+      </div>
     </div>
   </div>
 
@@ -143,11 +411,40 @@
     const user = localStorage.getItem("regie_user") || "Inconnu";
     document.getElementById("userName").innerText = user;
 
-    let lotIds = [];
+    let lotObjets = []; // Stocke les objets complets : { id, nom, categorie, locNominale }
     let sessionActiveData = null;
     let html5QrCode = null;
+    let isScanLocked = false;
+    let audioCtx = null;
 
-    // 1. Vérifier si l'élève a déjà une autonomie en cours
+    // --- SONS & VIBRATIONS ---
+    function biperScan() {
+      if ("vibrate" in navigator) navigator.vibrate(80);
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        osc.frequency.setValueAtTime(2489, now);
+        gain.gain.setValueAtTime(0.8, now);
+        gain.gain.linearRampToValueAtTime(0.0001, now + 0.09);
+        osc.start(now);
+        osc.stop(now + 0.09);
+      } catch (e) {}
+    }
+
+    function afficherToast(msg, isErr = false) {
+      const t = document.getElementById("quickToast");
+      t.innerText = msg;
+      if (isErr) t.classList.add("err"); else t.classList.remove("err");
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2000);
+    }
+
+    // 1. Initialisation & Vérification session active
     verifierSessionEnCours();
 
     function verifierSessionEnCours() {
@@ -160,7 +457,8 @@
           } else {
             demarrerScanner();
           }
-        });
+        })
+        .catch(() => demarrerScanner());
     }
 
     function afficherSessionActive() {
@@ -173,39 +471,88 @@
 
       const container = document.getElementById("listeItemsActifs");
       container.innerHTML = "";
-      sessionActiveData.items.forEach(id => {
-        container.innerHTML += `<span class="code-tag">${id}</span>`;
+
+      // On affiche les cartes du matériel en cours
+      sessionActiveData.items.forEach(item => {
+        const id = (typeof item === "string") ? item : item.id;
+        const nom = (typeof item === "object" && item.nom) ? item.nom : id;
+        const loc = (typeof item === "object" && item.locNominale) ? item.locNominale : "Stock Régie";
+
+        container.innerHTML += `
+          <div class="item-da-card" style="border-left-color: var(--status-amber);">
+            <div class="item-info-main">
+              <div class="item-title">${nom}</div>
+              <div class="item-sub">
+                <span class="code-tag">${id}</span>
+                <span>Rangement : <strong style="color:#fff;">${loc}</strong></span>
+              </div>
+            </div>
+          </div>
+        `;
       });
     }
 
-    // 2. Scanner pour nouveau lot
+    // 2. Scanner caméra
     function demarrerScanner() {
       html5QrCode = new Html5Qrcode("reader");
       html5QrCode.start(
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 220, height: 220 } },
         (decodedText) => {
+          if (isScanLocked) return;
+          isScanLocked = true;
           ajouterAuLot(decodedText);
+          setTimeout(() => { isScanLocked = false; }, 1800);
         }
       ).catch(() => {});
     }
 
-    function ajouterAuLot(id) {
-      const cleanId = (id || "").trim().toUpperCase();
+    function ajouterAuLot(brutId) {
+      let cleanId = (brutId || "").trim();
       if (!cleanId) return;
+
+      if (cleanId.includes("id=")) {
+        try {
+          const urlObj = new URL(cleanId);
+          cleanId = urlObj.searchParams.get("id") || cleanId;
+        } catch (e) {
+          cleanId = cleanId.split("id=")[1].split("&")[0];
+        }
+      }
+
       document.getElementById("manualInput").value = "";
 
-      if (lotIds.includes(cleanId)) {
-        alert("Cet équipement est déjà dans votre lot.");
+      if (lotObjets.some(it => it.id === cleanId)) {
+        afficherToast("Déjà présent dans le lot", true);
         return;
       }
 
-      lotIds.push(cleanId);
-      majPanier();
+      // Requête pour récupérer les infos de la DA (Nom, Catégorie, Emplacement nominal)
+      fetch(`${SCRIPT_URL}?action=getItem&id=${encodeURIComponent(cleanId)}`)
+        .then(r => r.json())
+        .then(res => {
+          if (!res.success) {
+            afficherToast(res.message || "Matériel non trouvé", true);
+            return;
+          }
+
+          biperScan();
+          afficherToast("Ajouté au lot !");
+
+          lotObjets.push({
+            id: res.id,
+            nom: res.nom || res.designation || res.id,
+            categorie: res.categorie || "Matériel",
+            locNominale: res.locNominale || res.localisation || "Stock Régie"
+          });
+
+          majPanier();
+        })
+        .catch(() => afficherToast("Erreur réseau", true));
     }
 
     function retirerDuLot(id) {
-      lotIds = lotIds.filter(item => item !== id);
+      lotObjets = lotObjets.filter(it => it.id !== id);
       majPanier();
     }
 
@@ -214,10 +561,10 @@
       const btn = document.getElementById("btnValiderLot");
       const compteur = document.getElementById("compteurLot");
 
-      compteur.innerText = `${lotIds.length} élément(s)`;
+      compteur.innerText = `${lotObjets.length} élément(s)`;
 
-      if (lotIds.length === 0) {
-        conteneur.innerHTML = '<div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:12px;">Scannez vos machines pour constituer le lot.</div>';
+      if (lotObjets.length === 0) {
+        conteneur.innerHTML = '<div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:16px;">Scannez vos machines pour constituer le lot.</div>';
         btn.style.display = "none";
         return;
       }
@@ -225,12 +572,18 @@
       btn.style.display = "block";
       conteneur.innerHTML = "";
 
-      lotIds.forEach(id => {
+      lotObjets.forEach(it => {
         const div = document.createElement("div");
-        div.className = "basket-item";
+        div.className = "item-da-card";
         div.innerHTML = `
-          <span class="code-tag">${id}</span>
-          <button type="button" onclick="retirerDuLot('${id}')" style="background:none; border:none; color:var(--status-sorti); font-weight:800; cursor:pointer;">✕</button>
+          <div class="item-info-main">
+            <div class="item-title">${it.nom}</div>
+            <div class="item-sub">
+              <span class="code-tag">${it.id}</span>
+              <span>&bull; ${it.categorie}</span>
+            </div>
+          </div>
+          <button type="button" class="btn-del-item" onclick="retirerDuLot('${it.id}')" title="Retirer">✕</button>
         `;
         conteneur.appendChild(div);
       });
@@ -238,11 +591,13 @@
 
     function validerDepartAutonomie() {
       const lieu = document.getElementById("selectLieuAuto").value;
-      if (lotIds.length === 0) return;
+      if (lotObjets.length === 0) return;
 
       const btn = document.getElementById("btnValiderLot");
       btn.disabled = true;
       btn.innerText = "Validation du lot...";
+
+      const idsOnly = lotObjets.map(it => it.id);
 
       fetch(SCRIPT_URL, {
         method: "POST",
@@ -252,16 +607,97 @@
           actionType: "START_AUTONOMIE",
           user: user,
           lieu: lieu,
-          ids: lotIds
+          ids: idsOnly
         })
       }).then(() => {
-        alert("Lot validé ! Bon travail en autonomie.");
+        alert("Sortie validée ! Bon travail en autonomie.");
         location.reload();
+      }).catch(err => {
+        alert("Erreur de validation : " + err);
+        btn.disabled = false;
       });
     }
 
-    function cloturerSessionAutonomie() {
-      if (!confirm("Confirmez-vous que tout le matériel a été rangé au stock ?")) return;
+    // 3. RANGEMENT AVEC CHECK-LIST INTERACTIVE
+    let checkStates = {};
+
+    function ouvrirChecklistRangement() {
+      const overlay = document.getElementById("checklistOverlay");
+      const container = document.getElementById("checklistContainer");
+      container.innerHTML = "";
+      checkStates = {};
+
+      const items = sessionActiveData.items || [];
+
+      items.forEach((item, index) => {
+        const id = (typeof item === "string") ? item : item.id;
+        const nom = (typeof item === "object" && item.nom) ? item.nom : id;
+        const loc = (typeof item === "object" && item.locNominale) ? item.locNominale : "Stock Régie";
+
+        checkStates[id] = false;
+
+        const row = document.createElement("div");
+        row.className = "checklist-item";
+        row.id = `check-row-${index}`;
+        row.onclick = () => toggleCheck(id, index);
+
+        row.innerHTML = `
+          <div class="custom-checkbox" id="check-box-${index}"></div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:800; font-size:0.88em; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${nom}</div>
+            <code style="font-size:0.75em; color:var(--text-muted);">${id}</code>
+          </div>
+          <div class="checklist-loc-badge">
+            <span style="font-size:0.7em; display:block; opacity:0.8; font-weight:600;">RANGEMENT</span>
+            ${loc}
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      overlay.style.display = "flex";
+      majEtatValidation();
+    }
+
+    function toggleCheck(id, index) {
+      checkStates[id] = !checkStates[id];
+      const row = document.getElementById(`check-row-${index}`);
+      const box = document.getElementById(`check-box-${index}`);
+
+      if (checkStates[id]) {
+        row.classList.add("checked");
+        box.innerText = "✓";
+        if ("vibrate" in navigator) navigator.vibrate(35);
+      } else {
+        row.classList.remove("checked");
+        box.innerText = "";
+      }
+
+      majEtatValidation();
+    }
+
+    function majEtatValidation() {
+      const total = Object.keys(checkStates).length;
+      const coches = Object.values(checkStates).filter(v => v === true).length;
+
+      document.getElementById("checkProgressTxt").innerText = `${coches} / ${total} équipement(s) vérifié(s) et rangé(s)`;
+
+      const btn = document.getElementById("btnConfirmCloture");
+      if (coches === total && total > 0) {
+        btn.disabled = false;
+      } else {
+        btn.disabled = true;
+      }
+    }
+
+    function fermerChecklistRangement() {
+      document.getElementById("checklistOverlay").style.display = "none";
+    }
+
+    function cloturerSessionAutonomieDefinitive() {
+      const btn = document.getElementById("btnConfirmCloture");
+      btn.disabled = true;
+      btn.innerText = "Clôture en cours...";
 
       fetch(SCRIPT_URL, {
         method: "POST",
@@ -273,8 +709,11 @@
           sessionRow: sessionActiveData.row
         })
       }).then(() => {
-        alert("Session clôturée ! Tout le matériel est à nouveau disponible au stock.");
+        alert("Session clôturée avec succès ! Tout le matériel est rangé.");
         location.reload();
+      }).catch(err => {
+        alert("Erreur : " + err);
+        btn.disabled = false;
       });
     }
   </script>

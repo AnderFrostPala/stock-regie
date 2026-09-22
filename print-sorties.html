@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>TurboStock — Impression Étiquettes (Matériel Sorti)</title>
+  
+  <!-- Bibliothèque QR Code locale et autonome -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0;
+      padding: 10px;
+      background: #f1f3f7;
+      color: #000;
+    }
+    
+    .no-print {
+      max-width: 1000px;
+      margin: 0 auto 15px auto;
+      background: #fff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-print {
+      background: #e62b33;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.9em;
+      cursor: pointer;
+    }
+
+    /* GRILLE COMPACTE POUR MINI-ÉTIQUETTES (Format 5 colonnes) */
+    .labels-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+
+    .label-card {
+      border: 1px dashed #6b7280;
+      background: #fff;
+      padding: 6px 4px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .label-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 0 4px;
+      margin-bottom: 2px;
+    }
+    .label-header {
+      font-size: 0.55em;
+      font-weight: 800;
+      color: #e62b33;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .label-zone {
+      font-size: 0.5em;
+      font-weight: 800;
+      background: #e5e7eb;
+      color: #1f2937;
+      padding: 1px 4px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .label-nom {
+      font-size: 0.65em;
+      font-weight: 800;
+      margin: 0 0 3px 0;
+      line-height: 1.1;
+      height: 2.2em;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ZONE QR CODE RÉDUITE (22mm / 80px) */
+    .label-qr-wrap {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2px 0;
+    }
+    .label-qr-wrap canvas,
+    .label-qr-wrap img {
+      width: 80px !important;
+      height: 80px !important;
+    }
+
+    .label-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68em;
+      font-weight: 700;
+      background: #f1f3f7;
+      border: 1px solid #d1d5db;
+      padding: 1px 4px;
+      border-radius: 3px;
+      margin-top: 2px;
+      word-break: break-all;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+      .no-print {
+        display: none;
+      }
+      .labels-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+        max-width: none;
+        width: 100%;
+      }
+      .label-card {
+        border: 0.8px dashed #9ca3af;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print">
+    <div>
+      <strong>Planche TurboStock — Matériel Sorti uniquement (46 étiquettes)</strong>
+      <div style="font-size:0.75em; color:#666;">Atelier A • Atelier B • Studio Lumière</div>
+    </div>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimer les 46 étiquettes</button>
+  </div>
+
+  <div class="labels-grid" id="container"></div>
+
+  <script>
+    // Liste exhaustive des 46 éléments sortis
+    const sorties = [
+      // ATELIER A
+      { id: "ADJ_PARLED_001", nom: "ADJ 7 PZ Par Led", zone: "Atelier A" },
+      { id: "ADJ_PARLED_002", nom: "ADJ 7 PZ Par Led", zone: "Atelier A" },
+      { id: "ROBE_WASH_001", nom: "Robe 300 Led wash", zone: "Atelier A" },
+      { id: "ROBE_WASH_002", nom: "Robe 300 Led wash", zone: "Atelier A" },
+      { id: "ROBE_COLORSPOT_001", nom: "Robe colorspot 250 AT", zone: "Atelier A" },
+      { id: "ROBE_COLORSPOT_002", nom: "Robe colorspot 250 AT", zone: "Atelier A" },
+      { id: "ADJ_001", nom: "ADJ Profile", zone: "Atelier A" },
+      { id: "ERA_150_Wash_001", nom: "Martin ERA 150 Wash", zone: "Atelier A" },
+      { id: "ERA_150_Wash_002", nom: "Martin ERA 150 Wash", zone: "Atelier A" },
+      { id: "ERA_150_Wash_003", nom: "Martin ERA 150 Wash", zone: "Atelier A" },
+      { id: "ERA_150_Wash_004", nom: "Martin ERA 150 Wash", zone: "Atelier A" },
+      { id: "Doublette_LOT", nom: "Doublette (x2)", zone: "Atelier A" },
+      { id: "Power_Truecon_LOT", nom: "TrueCon Link (x5)", zone: "Atelier A" },
+      { id: "Schuko_LOT", nom: "TrueCon 16A Schuko (x5)", zone: "Atelier A" },
+      { id: "PC1602M_LOT", nom: "P16A 2m (x1)", zone: "Atelier A" },
+      { id: "PC1605M_LOT", nom: "P16A 5m (x2)", zone: "Atelier A" },
+      { id: "PC1610M_LOT", nom: "P16A 10m (x2)", zone: "Atelier A" },
+      { id: "PC1620M__LOT", nom: "P16A 15/20m (x1)", zone: "Atelier A" },
+      { id: "DMX5_1_LOT", nom: "DMX 1m 5p (x3)", zone: "Atelier A" },
+      { id: "DMX3_1_LOT", nom: "DMX 1m 3p (x1)", zone: "Atelier A" },
+      { id: "DMX5_5_LOT", nom: "DMX 5m 5p (x2)", zone: "Atelier A" },
+      { id: "DMX3_5_LOT", nom: "DMX 5m 3p (x2)", zone: "Atelier A" },
+      { id: "DMX5_10_LOT", nom: "DMX 10m 5p (x4)", zone: "Atelier A" },
+
+      // ATELIER B
+      { id: "DMX5_20_LOT", nom: "DMX 50/20m 5p (x1)", zone: "Atelier B" },
+      { id: "Sabot32_LOT", nom: "Sabot 32A (x2)", zone: "Atelier B" },
+      { id: "ADBC_001", nom: "ADB cantor", zone: "Atelier B" },
+      { id: "ADBL_001", nom: "ADB Liberty", zone: "Atelier B" },
+      { id: "CYCLI_001", nom: "Cyclo 2K Ciné", zone: "Atelier B" },
+      { id: "CYCLI_002", nom: "Cyclo 2K Ciné", zone: "Atelier B" },
+      { id: "CYCLI_003", nom: "Cyclo 2K Ciné", zone: "Atelier B" },
+      { id: "CYCLI_004", nom: "Cyclo 1K", zone: "Atelier B" },
+      { id: "PC_001", nom: "Fresnel 2k (PC Lutin)", zone: "Atelier B" },
+      { id: "PC_002", nom: "Fresnel 2k (PC Lutin)", zone: "Atelier B" },
+      { id: "PC_003", nom: "Fresnel 2k (PC Lutin)", zone: "Atelier B" },
+      { id: "PC_004", nom: "Fresnel 2k (PC Lutin)", zone: "Atelier B" },
+      { id: "PC_005", nom: "Fresnel 1k (PC Lutin)", zone: "Atelier B" },
+      { id: "PC_006", nom: "Fresnel 1k (PC Lutin)", zone: "Atelier B" },
+      { id: "PC_007", nom: "Fresnel 1k (PC Lutin)", zone: "Atelier B" },
+      { id: "PC_008", nom: "Fresnel 1k (PC Lutin)", zone: "Atelier B" },
+      { id: "DEC613_001", nom: "Fresnel 1k (Découpe SX613)", zone: "Atelier B" },
+      { id: "DEC613_002", nom: "Fresnel 1k (Découpe SX613)", zone: "Atelier B" },
+      { id: "DEC613_003", nom: "Fresnel 1k (Découpe SX613)", zone: "Atelier B" },
+      { id: "DEC613_004", nom: "Fresnel 1k (Découpe SX613)", zone: "Atelier B" },
+      { id: "CRO_CG_LOT", nom: "Crochets Ciné (x12)", zone: "Atelier B" },
+      { id: "TRUSS_CGT_LOT", nom: "Crochets lourds (x5)", zone: "Atelier B" },
+
+      // STUDIO LUMIÈRE
+      { id: "PLAT_PAPILLON_LOT", nom: "Platine pour pont (x2)", zone: "Stud Lum" }
+    ];
+
+    const container = document.getElementById("container");
+
+    sorties.forEach((item, index) => {
+      const card = document.createElement("div");
+      card.className = "label-card";
+
+      const qrBoxId = `qrcode-${index}`;
+      const urlScan = `https://anderfrostpala.github.io/stock-regie/index.html?id=${encodeURIComponent(item.id)}`;
+
+      card.innerHTML = `
+        <div class="label-top">
+          <span class="label-header">TurboStock</span>
+          <span class="label-zone">${item.zone}</span>
+        </div>
+        <div class="label-nom">${item.nom}</div>
+        <div class="label-qr-wrap" id="${qrBoxId}"></div>
+        <div class="label-id">${item.id}</div>
+      `;
+      container.appendChild(card);
+
+      new QRCode(document.getElementById(qrBoxId), {
+        text: urlScan,
+        width: 80,
+        height: 80,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    });
+  </script>
+</body>
+</html>

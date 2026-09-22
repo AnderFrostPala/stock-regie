@@ -4,19 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TurboStock - Autonomie</title>
-
+  
   <!-- CONFIGURATION PWA -->
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#171a21">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
 
   <script src="https://unpkg.com/html5-qrcode"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
   <style>
     * { box-sizing: border-box; }
     :root {
@@ -26,22 +27,23 @@
       --border: #292e3b;
       --text-main: #f1f3f7;
       --text-muted: #8b949e;
+      
       --status-dispo: #10b981;
       --status-sorti: #ef4444;
-      --status-sav: #f59e0b;
       --status-blue: #38bdf8;
+      --status-amber: #f59e0b;
       --status-purple: #a78bfa;
     }
 
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       margin: 0 auto;
       max-width: 540px;
       background: var(--bg-body);
       color: var(--text-main);
       padding: 14px;
       -webkit-font-smoothing: antialiased;
-      padding-bottom: 50px;
+      padding-bottom: 60px;
     }
 
     .app-header {
@@ -52,7 +54,7 @@
       margin-bottom: 12px;
       border-bottom: 1px solid var(--border);
     }
-
+    
     .quick-nav {
       display: flex;
       gap: 6px;
@@ -61,7 +63,7 @@
     }
     .quick-nav a {
       flex: 1;
-      min-width: 75px;
+      min-width: 80px;
       text-align: center;
       padding: 7px 4px;
       border-radius: 6px;
@@ -71,6 +73,7 @@
       text-decoration: none;
       font-size: 0.78em;
       font-weight: 700;
+      transition: color 0.15s ease;
     }
     .quick-nav a.active {
       color: #fff;
@@ -94,7 +97,7 @@
       font-weight: 800;
     }
 
-    select, input[type="text"] {
+    select, input[type="text"], input[type="number"] {
       width: 100%;
       padding: 11px;
       border-radius: 8px;
@@ -118,33 +121,46 @@
       font-size: 0.95em;
       cursor: pointer;
       font-family: inherit;
-      transition: opacity 0.15s ease, transform 0.08s ease;
+      letter-spacing: 0.2px;
+      transition: opacity 0.2s, transform 0.08s;
     }
     .btn-action:active { transform: scale(0.98); }
     .btn-action:disabled {
-      opacity: 0.35;
+      opacity: 0.4;
       cursor: not-allowed;
       filter: grayscale(1);
     }
-    .btn-green { background: #059669; color: #fff; }
-    .btn-amber { background: var(--status-sav); color: #000; }
+    .btn-green { background: var(--status-dispo); color: #fff; }
+    .btn-amber { background: var(--status-amber); color: #000; }
+    .btn-red   { background: var(--status-sorti); color: #fff; }
 
-    code, .code-tag {
+    .code-tag {
       font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78em;
       font-weight: 700;
+      color: var(--status-blue);
       background: #090a0d;
       border: 1px solid #232731;
-      color: var(--status-blue);
       padding: 2px 6px;
       border-radius: 4px;
-      font-size: 0.82em;
     }
 
-    /* CARTE ITEM AVEC LA MÊME DA QUE PARC MATÉRIEL */
-    .item-da-card {
-      background: var(--bg-surface-elevated);
+    .badge-lot {
+      background: rgba(167, 139, 250, 0.2);
+      color: var(--status-purple);
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.68em;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    /* CARTE ITEM PANIER (DA PARC MATÉRIEL) */
+    .basket-card {
+      background: #0f1217;
       border: 1px solid var(--border);
-      border-left: 4px solid var(--status-dispo);
+      border-left: 4px solid var(--status-blue);
       border-radius: 8px;
       padding: 10px 12px;
       margin-bottom: 8px;
@@ -152,111 +168,90 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      animation: fadeIn 0.15s ease-out;
     }
-    .item-info-main {
+    .basket-card.is-lot {
+      border-left-color: var(--status-purple);
+    }
+    .basket-info {
       flex: 1;
       min-width: 0;
     }
-    .item-title {
+    .basket-nom {
       font-weight: 800;
       font-size: 0.9em;
       color: #fff;
-      margin-bottom: 2px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      margin-bottom: 3px;
     }
-    .item-sub {
-      font-size: 0.76em;
+    .basket-meta {
+      font-size: 0.78em;
       color: var(--text-muted);
       display: flex;
       align-items: center;
       gap: 6px;
       flex-wrap: wrap;
     }
-    .btn-del-item {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.25);
+    .basket-del {
+      background: none;
+      border: none;
       color: var(--status-sorti);
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      font-weight: 800;
+      font-size: 1.2em;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 4px 8px;
+      line-height: 1;
     }
 
-    /* MODALE CHECK-LIST RANGEMENT */
-    .checklist-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(10, 12, 16, 0.85);
-      backdrop-filter: blur(5px);
-      z-index: 5000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 14px;
-    }
-    .checklist-modal {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      width: 100%;
-      max-width: 480px;
-      max-height: 88vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 16px 35px rgba(0,0,0,0.7);
-      overflow: hidden;
-    }
-    .checklist-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      background: #1c202a;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .checklist-body {
-      padding: 14px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .checklist-item {
-      background: var(--bg-surface-elevated);
+    /* CHECKLIST DE RANGEMENT NOMINAL */
+    .checklist-row {
+      background: #0f1217;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       cursor: pointer;
-      user-select: none;
-      transition: border-color 0.15s ease;
+      transition: all 0.15s ease;
     }
-    .checklist-item.checked {
-      border-color: var(--status-dispo);
-      background: rgba(16, 185, 129, 0.07);
+    .checklist-row:hover {
+      border-color: #3b4252;
     }
-    .checklist-loc-badge {
+    .checklist-row.checked {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    .checklist-left {
+      flex: 1;
+      min-width: 0;
+    }
+    .checklist-nom {
+      font-size: 0.88em;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+    .checklist-right {
+      text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .loc-nominal-box {
       background: rgba(16, 185, 129, 0.15);
-      border: 1px dashed var(--status-dispo);
+      border: 1px solid rgba(16, 185, 129, 0.3);
       color: #34d399;
       font-weight: 800;
       font-size: 0.78em;
       padding: 4px 8px;
       border-radius: 6px;
-      text-align: right;
-      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
-    .custom-checkbox {
+    .custom-check {
       width: 22px;
       height: 22px;
       border-radius: 6px;
@@ -264,49 +259,59 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 900;
-      font-size: 13px;
-      color: #fff;
+      font-size: 0.8em;
+      color: transparent;
+      transition: all 0.12s ease;
       flex-shrink: 0;
     }
-    .checklist-item.checked .custom-checkbox {
+    .checklist-row.checked .custom-check {
       background: var(--status-dispo);
       border-color: var(--status-dispo);
+      color: #fff;
     }
 
+    /* TOAST */
     #quickToast {
       position: fixed;
-      top: 16px;
+      top: 18px;
       left: 50%;
       transform: translateX(-50%) translateY(-60px);
       background: #10b981;
       color: #fff;
-      font-size: 0.85em;
+      font-size: 0.88em;
       font-weight: 800;
-      padding: 9px 18px;
+      padding: 10px 20px;
       border-radius: 30px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       z-index: 9999;
       opacity: 0;
-      transition: all 0.25s ease;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    #quickToast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    #quickToast.err { background: var(--status-sorti); }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-4px); }
-      to { opacity: 1; transform: translateY(0); }
+    #quickToast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    #quickToast.toast-error {
+      background: var(--status-sorti);
     }
   </style>
 </head>
 <body>
 
-  <div id="quickToast">✅ Matériel scanné</div>
+  <!-- TOAST FEEDBACK RAPIDE -->
+  <div id="quickToast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">Action effectuée</span>
+  </div>
 
   <header class="app-header">
     <div>
       <h1 style="margin:0; font-size:1.1em; font-weight:800; color:#fff;">Mode Autonomie</h1>
-      <span style="font-size:0.75em; color:var(--status-amber); font-weight:700; text-transform:uppercase;">Sorties groupées & Rangement</span>
+      <span style="font-size:0.75em; color:var(--status-amber); font-weight:700; text-transform:uppercase;">Sortie groupée & Rangement</span>
     </div>
     <div style="font-size:0.85em; color:var(--text-muted);">👤 <strong id="userName" style="color:#fff;">...</strong></div>
   </header>
@@ -314,32 +319,61 @@
   <nav class="quick-nav">
     <a href="index.html">Scan</a>
     <a href="autonomie.html" class="active">Autonomie</a>
+    <a href="pret-externe.html">Prêt</a>
     <a href="reservation.html">Réservations</a>
     <a href="dashboard.html">Parc Matériel</a>
   </nav>
 
   <!-- CAS 1 : SESSION EN COURS -->
   <div id="vueSessionActive" class="card" style="display:none; border-left:5px solid var(--status-amber);">
-    <h3 style="color:var(--status-amber); margin-bottom:4px;">Session Autonomie en cours</h3>
-    <p style="font-size:0.85em; color:var(--text-muted); margin:0 0 12px 0;">
-      Lieu : <strong id="activeLieu" style="color:#fff;">-</strong> &bull; Démarrée le : <strong id="activeDate" style="color:#fff;">-</strong>
-    </p>
-
-    <div style="font-size:0.82em; font-weight:800; color:#cbd5e1; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.4px;">
-      Matériel emprunté dans cette session :
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+      <div>
+        <h3 style="color:var(--status-amber); margin:0 0 4px 0;">Session en cours</h3>
+        <p style="font-size:0.84em; color:var(--text-muted); margin:0;">
+          Lieu : <strong id="activeLieu" style="color:#fff;">-</strong><br>
+          Démarrée le : <strong id="activeDate" style="color:#fff;">-</strong>
+        </p>
+      </div>
+      <span id="badgeNbItemsActifs" class="badge-lot" style="font-size:0.8em; padding:3px 8px;">0 items</span>
     </div>
-    
-    <div id="listeItemsActifs" style="display:flex; flex-direction:column; gap:6px; margin-bottom:14px;"></div>
 
-    <button type="button" class="btn-action btn-green" onclick="ouvrirChecklistRangement()">
-      📦 Ranger le matériel au stock
-    </button>
+    <!-- ÉTAPE A : APERÇU DE LA SESSION -->
+    <div id="blocApercuSession">
+      <div style="font-size:0.82em; font-weight:700; margin-bottom:8px; color:#cbd5e1;">Matériel sorti dans ce lot :</div>
+      <div id="listeItemsActifs" style="margin-bottom:16px;"></div>
+
+      <button type="button" class="btn-action btn-amber" onclick="ouvrirChecklistRangement()">
+        📦 Ranger le matériel au stock
+      </button>
+    </div>
+
+    <!-- ÉTAPE B : CHECKLIST DE RANGEMENT AVEC LOCALISATION NOMINALE -->
+    <div id="blocChecklistRangement" style="display:none;">
+      <div style="background:#090a0d; border:1px solid var(--border); padding:10px 12px; border-radius:8px; margin-bottom:14px; font-size:0.84em; color:var(--text-muted);">
+        ⚠️ <strong style="color:#fff;">Vérification de rangement :</strong> Cochez chaque équipement une fois déposé à son emplacement nominal indiqué à droite.
+      </div>
+
+      <div id="conteneurChecklist"></div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin:14px 0 10px 0; font-size:0.85em; font-weight:800;">
+        <span style="color:var(--text-muted);">Validation des retours :</span>
+        <span id="txtProgressionCheck" style="color:var(--status-amber);">0 / 0</span>
+      </div>
+
+      <button type="button" id="btnValiderCloture" class="btn-action btn-green" disabled onclick="executerClotureSession()">
+        ✅ Valider le rangement complet
+      </button>
+
+      <button type="button" onclick="annulerChecklistRangement()" style="width:100%; background:none; border:none; color:var(--text-muted); font-size:0.82em; font-weight:700; cursor:pointer; margin-top:8px;">
+        Annuler
+      </button>
+    </div>
   </div>
 
-  <!-- CAS 2 : PAS DE SESSION -> CRÉATION DU LOT PAR SCAN -->
+  <!-- CAS 2 : PAS DE SESSION -> SCAN & CRÉATION DU LOT -->
   <div id="vueNouvelleSession">
     <div class="card">
-      <h3>1. Lieu de destination</h3>
+      <h3>1. Lieu de travail</h3>
       <select id="selectLieuAuto">
         <option value="Atelier A">Atelier A</option>
         <option value="Atelier B">Atelier B</option>
@@ -349,60 +383,35 @@
         <option value="Studio Son">Studio Son</option>
         <option value="D00">D00</option>
         <option value="D07">D07</option>
+        <option value="Stock Régie">Stock Régie</option>
       </select>
     </div>
 
     <div class="card">
-      <h3>2. Scanner les équipements</h3>
-      <div id="reader"></div>
+      <h3>2. Scanner les matériels du lot</h3>
+      <div id="reader" style="width:100%; border-radius:8px; overflow:hidden; background:#000;"></div>
 
       <div style="display:flex; gap:6px; margin-top:10px;">
-        <input type="text" id="manualInput" placeholder="Saisie manuelle ID...">
-        <button type="button" onclick="ajouterAuLot(document.getElementById('manualInput').value)" style="padding:0 14px; background:#2e3440; border:1px solid var(--border); color:#fff; border-radius:8px; font-weight:700; cursor:pointer;">Ajouter</button>
+        <input type="text" id="manualInput" placeholder="Saisie manuelle d'un ID..." style="margin:0;">
+        <button type="button" onclick="ajouterParInputManuel()" style="padding:0 16px; background:#2e3440; border:1px solid var(--border); color:#fff; border-radius:8px; font-weight:700; cursor:pointer;">Ajouter</button>
       </div>
     </div>
 
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h3 style="margin:0;">Matériel prêt à sortir</h3>
-        <span id="compteurLot" style="font-size:0.82em; font-weight:800; color:var(--status-blue);">0 élément</span>
+        <h3 style="margin:0;">Équipements sélectionnés</h3>
+        <span id="compteurLot" style="font-size:0.85em; font-weight:800; color:var(--status-blue);">0 élément(s)</span>
       </div>
 
       <div id="panierLot">
         <div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:16px;">
-          Scannez vos machines pour constituer le lot.
+          Scannez vos projecteurs, micros ou câbles pour constituer votre lot.
         </div>
       </div>
 
       <button type="button" id="btnValiderLot" class="btn-action btn-green" onclick="validerDepartAutonomie()" style="margin-top:12px; display:none;">
-        Valider la sortie groupée
+        Valider la sortie du lot
       </button>
-    </div>
-  </div>
-
-  <!-- MODALE INTERACTIVE DE CONTRÔLE AVANT RANGEMENT -->
-  <div id="checklistOverlay" class="checklist-overlay">
-    <div class="checklist-modal">
-      <div class="checklist-header">
-        <div>
-          <h3 style="margin:0; font-size:1em;">Contrôle de Rangement</h3>
-          <span style="font-size:0.75em; color:var(--text-muted);">Cochez chaque matériel remis à sa place</span>
-        </div>
-        <button type="button" onclick="fermerChecklistRangement()" style="background:none; border:none; color:#94a3b8; font-size:1.4em; cursor:pointer;">&times;</button>
-      </div>
-
-      <div class="checklist-body" id="checklistContainer">
-        <!-- Rempli dynamiquement -->
-      </div>
-
-      <div style="padding:14px; border-top:1px solid var(--border); background:#171a21;">
-        <div id="checkProgressTxt" style="font-size:0.8em; color:var(--text-muted); text-align:center; margin-bottom:8px; font-weight:700;">
-          0 / 0 validé(s)
-        </div>
-        <button type="button" id="btnConfirmCloture" class="btn-action btn-green" disabled onclick="cloturerSessionAutonomieDefinitive()">
-          ✅ Valider le rangement complet
-        </button>
-      </div>
     </div>
   </div>
 
@@ -411,40 +420,97 @@
     const user = localStorage.getItem("regie_user") || "Inconnu";
     document.getElementById("userName").innerText = user;
 
-    let lotObjets = []; // Stocke les objets complets : { id, nom, categorie, locNominale }
+    let panierItems = []; // [{ id, nom, cat, qte, isLot, locNominale }]
     let sessionActiveData = null;
+    let itemsSessionDetailles = []; // Objets complets avec localisation nominale
+    let checklistStatus = {}; // { id: boolean }
     let html5QrCode = null;
     let isScanLocked = false;
-    let audioCtx = null;
 
-    // --- SONS & VIBRATIONS ---
-    function biperScan() {
-      if ("vibrate" in navigator) navigator.vibrate(80);
+    // --- AUDIO & HAPTIQUE ---
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      return audioCtx;
+    }
+
+    function emettreBipScan() {
+      if ("vibrate" in navigator) navigator.vibrate(85);
       try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === "suspended") audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        const now = audioCtx.currentTime;
+        gain.connect(ctx.destination);
+        osc.type = "sine";
         osc.frequency.setValueAtTime(2489, now);
-        gain.gain.setValueAtTime(0.8, now);
-        gain.gain.linearRampToValueAtTime(0.0001, now + 0.09);
+        gain.gain.setValueAtTime(0.85, now);
+        gain.gain.linearRampToValueAtTime(0.0001, now + 0.095);
         osc.start(now);
-        osc.stop(now + 0.09);
+        osc.stop(now + 0.095);
       } catch (e) {}
     }
 
-    function afficherToast(msg, isErr = false) {
-      const t = document.getElementById("quickToast");
-      t.innerText = msg;
-      if (isErr) t.classList.add("err"); else t.classList.remove("err");
-      t.classList.add("show");
-      setTimeout(() => t.classList.remove("show"), 2000);
+    function emettreBipAction() {
+      if ("vibrate" in navigator) navigator.vibrate(110);
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.type = "sine";
+        osc1.frequency.setValueAtTime(1760, now);
+        gain1.gain.setValueAtTime(0.75, now);
+        gain1.gain.linearRampToValueAtTime(0.0001, now + 0.07);
+        osc1.start(now);
+        osc1.stop(now + 0.07);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.type = "sine";
+        osc2.frequency.setValueAtTime(2637, now + 0.06);
+        gain2.gain.setValueAtTime(0.85, now + 0.06);
+        gain2.gain.linearRampToValueAtTime(0.0001, now + 0.15);
+        osc2.start(now + 0.06);
+        osc2.stop(now + 0.15);
+      } catch (e) {}
     }
 
-    // 1. Initialisation & Vérification session active
+    function emettreBipErreur() {
+      if ("vibrate" in navigator) navigator.vibrate([70, 50, 70]);
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(320, now);
+        gain.gain.setValueAtTime(0.75, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.16);
+        osc.start(now);
+        osc.stop(now + 0.16);
+      } catch (e) {}
+    }
+
+    function afficherToast(msg, estErreur = false) {
+      const toast = document.getElementById("quickToast");
+      document.getElementById("toastIcon").innerText = estErreur ? "⚠️" : "✅";
+      document.getElementById("toastMsg").innerText = msg;
+      if (estErreur) toast.classList.add("toast-error");
+      else toast.classList.remove("toast-error");
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2000);
+    }
+
+    // --- 1. INITIALISATION & VÉRIFICATION DES SESSIONS EN COURS ---
     verifierSessionEnCours();
 
     function verifierSessionEnCours() {
@@ -453,7 +519,7 @@
         .then(res => {
           if (res.success && res.active) {
             sessionActiveData = res.session;
-            afficherSessionActive();
+            chargerDetailsItemsSession(sessionActiveData.items);
           } else {
             demarrerScanner();
           }
@@ -461,243 +527,151 @@
         .catch(() => demarrerScanner());
     }
 
-    function afficherSessionActive() {
+    // Récupère les fiches complètes des items sortis pour avoir la localisation nominale
+    function chargerDetailsItemsSession(idsArray) {
       document.getElementById("vueNouvelleSession").style.display = "none";
       const vue = document.getElementById("vueSessionActive");
       vue.style.display = "block";
 
       document.getElementById("activeLieu").innerText = sessionActiveData.lieu;
       document.getElementById("activeDate").innerText = sessionActiveData.dateDebut;
+      document.getElementById("badgeNbItemsActifs").innerText = `${idsArray.length} item(s)`;
 
+      const container = document.getElementById("listeItemsActifs");
+      container.innerHTML = `<div style="color:var(--text-muted); font-size:0.84em;">Chargement des fiches...</div>`;
+
+      // Requête pour obtenir les infos de stock complètes (dont Localisation Nominal)
+      fetch(`${SCRIPT_URL}?action=getAll`)
+        .then(r => r.json())
+        .then(res => {
+          itemsSessionDetailles = [];
+          const allItems = res.items || [];
+          
+          idsArray.forEach(rawId => {
+            // Supporte les identifiants avec mention de lot ex: "DMX5_1_LOT (x3)"
+            const cleanId = rawId.split(" ")[0].trim();
+            const match = allItems.find(it => it.id === cleanId);
+            itemsSessionDetailles.push({
+              rawId: rawId,
+              id: cleanId,
+              nom: match ? (match.nom || match.designation) : cleanId,
+              cat: match ? match.categorie : "",
+              locNominale: (match && match.locNominale && match.locNominale !== "-") ? match.locNominale : (match ? match.localisation : "Stock Régie")
+            });
+          });
+
+          afficherApercuSession();
+        })
+        .catch(() => {
+          // Fallback direct avec les IDs
+          itemsSessionDetailles = idsArray.map(id => ({
+            rawId: id,
+            id: id.split(" ")[0],
+            nom: id,
+            cat: "",
+            locNominale: "Stock Régie"
+          }));
+          afficherApercuSession();
+        });
+    }
+
+    function afficherApercuSession() {
       const container = document.getElementById("listeItemsActifs");
       container.innerHTML = "";
 
-      // On affiche les cartes du matériel en cours
-      sessionActiveData.items.forEach(item => {
-        const id = (typeof item === "string") ? item : item.id;
-        const nom = (typeof item === "object" && item.nom) ? item.nom : id;
-        const loc = (typeof item === "object" && item.locNominale) ? item.locNominale : "Stock Régie";
-
-        container.innerHTML += `
-          <div class="item-da-card" style="border-left-color: var(--status-amber);">
-            <div class="item-info-main">
-              <div class="item-title">${nom}</div>
-              <div class="item-sub">
-                <span class="code-tag">${id}</span>
-                <span>Rangement : <strong style="color:#fff;">${loc}</strong></span>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    // 2. Scanner caméra
-    function demarrerScanner() {
-      html5QrCode = new Html5Qrcode("reader");
-      html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 220, height: 220 } },
-        (decodedText) => {
-          if (isScanLocked) return;
-          isScanLocked = true;
-          ajouterAuLot(decodedText);
-          setTimeout(() => { isScanLocked = false; }, 1800);
-        }
-      ).catch(() => {});
-    }
-
-    function ajouterAuLot(brutId) {
-      let cleanId = (brutId || "").trim();
-      if (!cleanId) return;
-
-      if (cleanId.includes("id=")) {
-        try {
-          const urlObj = new URL(cleanId);
-          cleanId = urlObj.searchParams.get("id") || cleanId;
-        } catch (e) {
-          cleanId = cleanId.split("id=")[1].split("&")[0];
-        }
-      }
-
-      document.getElementById("manualInput").value = "";
-
-      if (lotObjets.some(it => it.id === cleanId)) {
-        afficherToast("Déjà présent dans le lot", true);
-        return;
-      }
-
-      // Requête pour récupérer les infos de la DA (Nom, Catégorie, Emplacement nominal)
-      fetch(`${SCRIPT_URL}?action=getItem&id=${encodeURIComponent(cleanId)}`)
-        .then(r => r.json())
-        .then(res => {
-          if (!res.success) {
-            afficherToast(res.message || "Matériel non trouvé", true);
-            return;
-          }
-
-          biperScan();
-          afficherToast("Ajouté au lot !");
-
-          lotObjets.push({
-            id: res.id,
-            nom: res.nom || res.designation || res.id,
-            categorie: res.categorie || "Matériel",
-            locNominale: res.locNominale || res.localisation || "Stock Régie"
-          });
-
-          majPanier();
-        })
-        .catch(() => afficherToast("Erreur réseau", true));
-    }
-
-    function retirerDuLot(id) {
-      lotObjets = lotObjets.filter(it => it.id !== id);
-      majPanier();
-    }
-
-    function majPanier() {
-      const conteneur = document.getElementById("panierLot");
-      const btn = document.getElementById("btnValiderLot");
-      const compteur = document.getElementById("compteurLot");
-
-      compteur.innerText = `${lotObjets.length} élément(s)`;
-
-      if (lotObjets.length === 0) {
-        conteneur.innerHTML = '<div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:16px;">Scannez vos machines pour constituer le lot.</div>';
-        btn.style.display = "none";
-        return;
-      }
-
-      btn.style.display = "block";
-      conteneur.innerHTML = "";
-
-      lotObjets.forEach(it => {
+      itemsSessionDetailles.forEach(item => {
+        const isLot = item.rawId.includes("_LOT") || item.rawId.includes("(x");
         const div = document.createElement("div");
-        div.className = "item-da-card";
+        div.className = `basket-card ${isLot ? 'is-lot' : ''}`;
         div.innerHTML = `
-          <div class="item-info-main">
-            <div class="item-title">${it.nom}</div>
-            <div class="item-sub">
-              <span class="code-tag">${it.id}</span>
-              <span>&bull; ${it.categorie}</span>
+          <div class="basket-info">
+            <div class="basket-nom">${item.nom}</div>
+            <div class="basket-meta">
+              <span class="code-tag">${item.rawId}</span>
+              ${isLot ? '<span class="badge-lot">LOT</span>' : ''}
+              <span>Nominal : <strong>${item.locNominale}</strong></span>
             </div>
           </div>
-          <button type="button" class="btn-del-item" onclick="retirerDuLot('${it.id}')" title="Retirer">✕</button>
         `;
-        conteneur.appendChild(div);
+        container.appendChild(div);
       });
     }
 
-    function validerDepartAutonomie() {
-      const lieu = document.getElementById("selectLieuAuto").value;
-      if (lotObjets.length === 0) return;
-
-      const btn = document.getElementById("btnValiderLot");
-      btn.disabled = true;
-      btn.innerText = "Validation du lot...";
-
-      const idsOnly = lotObjets.map(it => it.id);
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          actionType: "START_AUTONOMIE",
-          user: user,
-          lieu: lieu,
-          ids: idsOnly
-        })
-      }).then(() => {
-        alert("Sortie validée ! Bon travail en autonomie.");
-        location.reload();
-      }).catch(err => {
-        alert("Erreur de validation : " + err);
-        btn.disabled = false;
-      });
-    }
-
-    // 3. RANGEMENT AVEC CHECK-LIST INTERACTIVE
-    let checkStates = {};
-
+    // --- 2. CHECKLIST DE RANGEMENT NOMINAL AVEC COCHES OBLIGATOIRES ---
     function ouvrirChecklistRangement() {
-      const overlay = document.getElementById("checklistOverlay");
-      const container = document.getElementById("checklistContainer");
-      container.innerHTML = "";
-      checkStates = {};
+      document.getElementById("blocApercuSession").style.display = "none";
+      document.getElementById("blocChecklistRangement").style.display = "block";
 
-      const items = sessionActiveData.items || [];
+      const conteneur = document.getElementById("conteneurChecklist");
+      conteneur.innerHTML = "";
+      checklistStatus = {};
 
-      items.forEach((item, index) => {
-        const id = (typeof item === "string") ? item : item.id;
-        const nom = (typeof item === "object" && item.nom) ? item.nom : id;
-        const loc = (typeof item === "object" && item.locNominale) ? item.locNominale : "Stock Régie";
-
-        checkStates[id] = false;
+      itemsSessionDetailles.forEach((item, index) => {
+        checklistStatus[item.rawId] = false;
 
         const row = document.createElement("div");
-        row.className = "checklist-item";
+        row.className = "checklist-row";
         row.id = `check-row-${index}`;
-        row.onclick = () => toggleCheck(id, index);
+        row.onclick = () => basculerCheck(item.rawId, index);
 
         row.innerHTML = `
-          <div class="custom-checkbox" id="check-box-${index}"></div>
-          <div style="flex:1; min-width:0;">
-            <div style="font-weight:800; font-size:0.88em; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${nom}</div>
-            <code style="font-size:0.75em; color:var(--text-muted);">${id}</code>
+          <div class="checklist-left">
+            <div class="checklist-nom">${item.nom}</div>
+            <div style="font-size:0.75em; color:var(--text-muted); font-family:'JetBrains Mono', monospace;">${item.rawId}</div>
           </div>
-          <div class="checklist-loc-badge">
-            <span style="font-size:0.7em; display:block; opacity:0.8; font-weight:600;">RANGEMENT</span>
-            ${loc}
+          <div class="checklist-right">
+            <div class="loc-nominal-box">📍 ${item.locNominale}</div>
+            <div class="custom-check" id="check-box-${index}">✓</div>
           </div>
         `;
-        container.appendChild(row);
+        conteneur.appendChild(row);
       });
 
-      overlay.style.display = "flex";
-      majEtatValidation();
+      mettreAJourCompteurChecklist();
     }
 
-    function toggleCheck(id, index) {
-      checkStates[id] = !checkStates[id];
+    function basculerCheck(id, index) {
+      checklistStatus[id] = !checklistStatus[id];
       const row = document.getElementById(`check-row-${index}`);
-      const box = document.getElementById(`check-box-${index}`);
-
-      if (checkStates[id]) {
+      
+      if (checklistStatus[id]) {
         row.classList.add("checked");
-        box.innerText = "✓";
-        if ("vibrate" in navigator) navigator.vibrate(35);
+        if ("vibrate" in navigator) navigator.vibrate(40);
       } else {
         row.classList.remove("checked");
-        box.innerText = "";
       }
 
-      majEtatValidation();
+      mettreAJourCompteurChecklist();
     }
 
-    function majEtatValidation() {
-      const total = Object.keys(checkStates).length;
-      const coches = Object.values(checkStates).filter(v => v === true).length;
+    function mettreAJourCompteurChecklist() {
+      const total = itemsSessionDetailles.length;
+      const coches = Object.values(checklistStatus).filter(Boolean).length;
+      const btn = document.getElementById("btnValiderCloture");
+      const txt = document.getElementById("txtProgressionCheck");
 
-      document.getElementById("checkProgressTxt").innerText = `${coches} / ${total} équipement(s) vérifié(s) et rangé(s)`;
+      txt.innerText = `${coches} / ${total} rangé(s)`;
 
-      const btn = document.getElementById("btnConfirmCloture");
       if (coches === total && total > 0) {
+        txt.style.color = "var(--status-dispo)";
         btn.disabled = false;
+        btn.innerText = "✅ Confirmer le rangement de tout le stock";
       } else {
+        txt.style.color = "var(--status-amber)";
         btn.disabled = true;
+        btn.innerText = `Cochez tous les items (${coches}/${total})`;
       }
     }
 
-    function fermerChecklistRangement() {
-      document.getElementById("checklistOverlay").style.display = "none";
+    function annulerChecklistRangement() {
+      document.getElementById("blocChecklistRangement").style.display = "none";
+      document.getElementById("blocApercuSession").style.display = "block";
     }
 
-    function cloturerSessionAutonomieDefinitive() {
-      const btn = document.getElementById("btnConfirmCloture");
+    function executerClotureSession() {
+      const btn = document.getElementById("btnValiderCloture");
       btn.disabled = true;
-      btn.innerText = "Clôture en cours...";
+      btn.innerText = "Enregistrement du retour...";
 
       fetch(SCRIPT_URL, {
         method: "POST",
@@ -709,10 +683,169 @@
           sessionRow: sessionActiveData.row
         })
       }).then(() => {
-        alert("Session clôturée avec succès ! Tout le matériel est rangé.");
-        location.reload();
+        emettreBipAction();
+        afficherToast("Tout le matériel a été validé au stock !");
+        setTimeout(() => location.reload(), 800);
       }).catch(err => {
-        alert("Erreur : " + err);
+        emettreBipErreur();
+        alert("Erreur de connexion : " + err);
+        btn.disabled = false;
+      });
+    }
+
+    // --- 3. SCAN & CONSTITUTION DU NOUVEAU LOT (DA DU PARC MATÉRIEL) ---
+    function demarrerScanner() {
+      html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        (decodedText) => {
+          if (isScanLocked) return;
+          isScanLocked = true;
+          traiterAjoutCode(decodedText);
+          setTimeout(() => { isScanLocked = false; }, 1800);
+        }
+      ).catch(() => {});
+    }
+
+    function ajouterParInputManuel() {
+      const input = document.getElementById("manualInput");
+      const val = input.value.trim();
+      if (!val) return;
+      input.value = "";
+      traiterAjoutCode(val);
+    }
+
+    function traiterAjoutCode(rawCode) {
+      let cleanId = rawCode.trim();
+      if (cleanId.includes("id=")) {
+        try {
+          const urlObj = new URL(cleanId);
+          cleanId = urlObj.searchParams.get("id") || cleanId;
+        } catch (e) {
+          cleanId = cleanId.split("id=")[1].split("&")[0];
+        }
+      }
+      cleanId = cleanId.toUpperCase();
+
+      if (panierItems.some(it => it.id === cleanId)) {
+        emettreBipErreur();
+        afficherToast("Équipement déjà présent dans le lot", true);
+        return;
+      }
+
+      // Récupération des infos de l'item depuis le serveur
+      fetch(`${SCRIPT_URL}?action=getItem&id=${encodeURIComponent(cleanId)}`)
+        .then(r => r.json())
+        .then(res => {
+          if (!res.success) {
+            emettreBipErreur();
+            afficherToast(res.message || "Équipement non trouvé", true);
+            return;
+          }
+
+          const qteDispo = parseInt(res.qteStock || res.qte || 1, 10) || 1;
+          const isLot = (cleanId.includes("_LOT") || cleanId.endsWith("LOT") || qteDispo > 1);
+
+          let qtePrelevee = 1;
+          if (isLot) {
+            const saisie = prompt(`📦 Matériel en LOT : ${res.nom}\nCombien d'unités prenez-vous ? (max dispo: ${qteDispo}) :`, "1");
+            if (saisie === null) return;
+            qtePrelevee = parseInt(saisie, 10);
+            if (isNaN(qtePrelevee) || qtePrelevee <= 0 || qtePrelevee > qteDispo) {
+              emettreBipErreur();
+              afficherToast(`Quantité invalide (1 - ${qteDispo})`, true);
+              return;
+            }
+          }
+
+          emettreBipScan();
+
+          panierItems.push({
+            id: cleanId,
+            nom: res.nom || res.designation || cleanId,
+            cat: res.categorie || "",
+            qteChoisie: qtePrelevee,
+            isLot: isLot,
+            locNominale: res.locNominale || res.localisation || "Stock Régie"
+          });
+
+          afficherPanier();
+          afficherToast(`${res.nom} ajouté !`);
+        })
+        .catch(() => {
+          emettreBipErreur();
+          afficherToast("Erreur lors de la récupération", true);
+        });
+    }
+
+    function retirerDuPanier(id) {
+      panierItems = panierItems.filter(it => it.id !== id);
+      afficherPanier();
+    }
+
+    function afficherPanier() {
+      const conteneur = document.getElementById("panierLot");
+      const btn = document.getElementById("btnValiderLot");
+      const compteur = document.getElementById("compteurLot");
+
+      compteur.innerText = `${panierItems.length} équipement(s)`;
+
+      if (panierItems.length === 0) {
+        conteneur.innerHTML = '<div style="font-size:0.85em; color:var(--text-muted); text-align:center; padding:16px;">Scannez vos machines pour constituer le lot.</div>';
+        btn.style.display = "none";
+        return;
+      }
+
+      btn.style.display = "block";
+      conteneur.innerHTML = "";
+
+      panierItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = `basket-card ${item.isLot ? 'is-lot' : ''}`;
+        div.innerHTML = `
+          <div class="basket-info">
+            <div class="basket-nom">${item.nom}</div>
+            <div class="basket-meta">
+              <span class="code-tag">${item.id}</span>
+              ${item.isLot ? `<span class="badge-lot">LOT (x${item.qteChoisie})</span>` : ''}
+              <span>${item.cat}</span>
+            </div>
+          </div>
+          <button type="button" class="basket-del" onclick="retirerDuPanier('${item.id}')">✕</button>
+        `;
+        conteneur.appendChild(div);
+      });
+    }
+
+    function validerDepartAutonomie() {
+      const lieu = document.getElementById("selectLieuAuto").value;
+      if (panierItems.length === 0) return;
+
+      const btn = document.getElementById("btnValiderLot");
+      btn.disabled = true;
+      btn.innerText = "Enregistrement du lot...";
+
+      // Prépare les IDs formatés (ex: "DMX5_1_LOT (x3)") pour les lots
+      const formattedIds = panierItems.map(it => it.isLot ? `${it.id} (x${it.qteChoisie})` : it.id);
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          actionType: "START_AUTONOMIE",
+          user: user,
+          lieu: lieu,
+          ids: formattedIds
+        })
+      }).then(() => {
+        emettreBipAction();
+        afficherToast("Sortie du lot validée !");
+        setTimeout(() => location.reload(), 700);
+      }).catch(err => {
+        emettreBipErreur();
+        alert("Erreur réseau : " + err);
         btn.disabled = false;
       });
     }

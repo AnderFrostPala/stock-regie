@@ -325,6 +325,18 @@
       background: linear-gradient(90deg, rgba(245,158,11,0.09) 0%, var(--bg-surface) 60%) !important;
     }
 
+    .badge-lot {
+      background: rgba(139, 92, 246, 0.2);
+      color: #a78bfa;
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 0.72em;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
     .badge-static-resa {
       background: rgba(59,130,246,0.2);
       color: #60a5fa;
@@ -636,8 +648,11 @@
     <div id="cardDetails" class="card" style="display:none;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:8px;">
         <div>
-          <h3 id="itemNom" style="margin:0; font-size:1.15em; color:#fff;">-</h3>
-          <div style="margin-top:4px;">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+            <h3 id="itemNom" style="margin:0; font-size:1.15em; color:#fff;">-</h3>
+            <span id="badgeLot" class="badge-lot" style="display:none;">LOT</span>
+          </div>
+          <div>
             <code id="itemId">-</code> &bull; <span id="itemCat" style="font-size:0.8em; color:var(--text-muted);">-</span>
           </div>
         </div>
@@ -652,6 +667,9 @@
         <div style="margin-bottom:5px;">État : <strong id="itemStatutTxt">-</strong></div>
         <div style="margin-bottom:5px; color:#cbd5e1;">Lieu actuel : <strong id="itemLieu" style="color:#fff;">-</strong></div>
         <div style="margin-bottom:5px; color:#cbd5e1;">Détenteur : <strong id="itemUser" style="color:#fff;">-</strong></div>
+        <div id="ligneQte" style="display:none; margin-bottom:5px; color:#cbd5e1;">
+          Quantité totale : <strong id="itemQteTxt" style="color:#a78bfa;">-</strong>
+        </div>
         <div id="lignePanne" style="display:none; color:var(--status-sorti); font-weight:700; margin-top:6px;">
           ⚠️ Panne : <span id="itemPanne">-</span>
         </div>
@@ -747,22 +765,21 @@
   </div>
 
   <script>
-    // URL Web App Google Apps Script
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let currentItem = null;
     let html5QrCode = null;
+    let isScanLocked = false; // Verrou anti-bip multiple en rafale
 
     let user = localStorage.getItem("regie_user");
     let role = localStorage.getItem("regie_role") || "etudiant";
 
-    // Application de la couleur enregistrée si existante
     const savedThemeColor = localStorage.getItem("regie_theme_color");
     if (savedThemeColor) {
       document.documentElement.style.setProperty('--status-blue-light', savedThemeColor);
     }
 
-    // --- MOTEUR AUDIO (WEB AUDIO API) & VIBRATION HAPTIQUE ---
+    // --- MOTEUR AUDIO (WEB AUDIO API) ---
     let audioCtx = null;
 
     function getAudioContext() {
@@ -775,7 +792,7 @@
       return audioCtx;
     }
 
-    // 1. Bip lors du SCAN d'un QR code (caisse supermarché ~2489 Hz)
+    // Bip Scan (Caisse supermarché ~2489 Hz)
     function emettreBipScan() {
       if ("vibrate" in navigator) {
         navigator.vibrate(85);
@@ -800,7 +817,7 @@
       } catch (e) {}
     }
 
-    // 2. Bip lors de la VALIDATION D'UNE ACTION (Double tonalité montante 1760 Hz -> 2637 Hz)
+    // Bip Validation d'Action (Double tonalité montante)
     function emettreBipActionValidee() {
       if ("vibrate" in navigator) {
         navigator.vibrate(110);
@@ -809,12 +826,10 @@
         const ctx = getAudioContext();
         const now = ctx.currentTime;
 
-        // Première note (1760 Hz - La6)
         const osc1 = ctx.createOscillator();
         const gain1 = ctx.createGain();
         osc1.connect(gain1);
         gain1.connect(ctx.destination);
-
         osc1.type = "sine";
         osc1.frequency.setValueAtTime(1760, now);
         gain1.gain.setValueAtTime(0.75, now);
@@ -822,12 +837,10 @@
         osc1.start(now);
         osc1.stop(now + 0.07);
 
-        // Seconde note plus aiguë (2637 Hz - Mi7)
         const osc2 = ctx.createOscillator();
         const gain2 = ctx.createGain();
         osc2.connect(gain2);
         gain2.connect(ctx.destination);
-
         osc2.type = "sine";
         osc2.frequency.setValueAtTime(2637, now + 0.06);
         gain2.gain.setValueAtTime(0.85, now + 0.06);
@@ -837,7 +850,6 @@
       } catch (e) {}
     }
 
-    // 3. Bip d'erreur
     function emettreBipErreur() {
       if ("vibrate" in navigator) {
         navigator.vibrate([70, 50, 70]);
@@ -859,21 +871,14 @@
       } catch (e) {}
     }
 
-    // --- FONCTION DE DÉFILEMENT ROBUSTE POUR SMARTPHONE ---
     function scrollerVersElement(elementId) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setTimeout(() => {
             const el = document.getElementById(elementId);
             if (!el) return;
-
             const rect = el.getBoundingClientRect();
             const absoluteY = window.pageYOffset + rect.top - 18;
-
-            try {
-              el.scrollIntoView({ behavior: "smooth", block: "start" });
-            } catch (e) {}
-
             window.scrollTo({
               top: absoluteY,
               behavior: "smooth"
@@ -883,7 +888,6 @@
       });
     }
 
-    // Notification toast non intrusive
     function afficherToast(message, estErreur = false) {
       const toast = document.getElementById("quickToast");
       const icon = document.getElementById("toastIcon");
@@ -901,7 +905,6 @@
       }, 2000);
     }
 
-    // 1. CHARGEMENT DU BANDEAU D'ALERTE ROUGE
     verifierBandeauAlerte();
 
     function verifierBandeauAlerte() {
@@ -918,7 +921,6 @@
         .catch(() => {});
     }
 
-    // 2. AUTHENTIFICATION & INITIALISATION
     if (!user) {
       document.getElementById("authModal").style.display = "flex";
     } else {
@@ -993,7 +995,6 @@
       demarrerCamera();
       chargerDerniereVersionTag();
 
-      // DÉTECTION SCAN CAMERA EXTERNE (?id=...)
       const urlParams = new URLSearchParams(window.location.search);
       const idAuto = urlParams.get("id");
       if (idAuto) {
@@ -1001,14 +1002,17 @@
       }
     }
 
-    // 3. SCAN & FICHE MATÉRIEL
     function demarrerCamera() {
       html5QrCode = new Html5Qrcode("reader");
       html5QrCode.start(
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 220, height: 220 } },
         (decodedText) => {
+          // VERROUILLAGE ANTI-RAFALE : Empêche les bips et requêtes multiples
+          if (isScanLocked) return;
+          isScanLocked = true;
           chercherMateriel(decodedText);
+          setTimeout(() => { isScanLocked = false; }, 1800);
         }
       ).catch(() => {});
     }
@@ -1017,7 +1021,6 @@
       let cleanId = (id || "").trim();
       if (!cleanId) return;
 
-      // Nettoyage si le scan lit l'URL complète
       if (cleanId.includes("id=")) {
         try {
           const urlObj = new URL(cleanId);
@@ -1037,7 +1040,6 @@
             afficherToast(res.message || "Équipement non trouvé", true);
             return;
           }
-          // Bip spécifique de scan réussi
           emettreBipScan();
           afficherFicheMateriel(res);
         })
@@ -1047,16 +1049,44 @@
         });
     }
 
+    // Récupération fiable de la quantité (gère qte, qteStock, quantite)
+    function obtenirQuantiteItem(item) {
+      const q = item.qteStock || item.qte || item.quantite || item['Qté Stock'] || 1;
+      return parseInt(q, 10) || 1;
+    }
+
+    // Détection fiable des lots
+    function estUnLot(item) {
+      const id = (item.id || "").toUpperCase();
+      const qte = obtenirQuantiteItem(item);
+      return id.includes("_LOT") || id.endsWith("LOT") || qte > 1;
+    }
+
     function afficherFicheMateriel(item) {
       currentItem = item;
       const card = document.getElementById("cardDetails");
       card.style.display = "block";
 
-      document.getElementById("itemNom").innerText = item.nom;
+      document.getElementById("itemNom").innerText = item.nom || item.designation || "-";
       document.getElementById("itemId").innerText = item.id;
       document.getElementById("itemCat").innerText = `${item.categorie || ""} (${item.sousCategorie || ""})`;
       document.getElementById("itemLieu").innerText = item.localisation || "Stock";
       document.getElementById("itemUser").innerText = (item.emprunteur && item.emprunteur !== "-") ? item.emprunteur : "-";
+
+      // Badge LOT
+      const badgeLot = document.getElementById("badgeLot");
+      const ligneQte = document.getElementById("ligneQte");
+      const isLot = estUnLot(item);
+      const totalQte = obtenirQuantiteItem(item);
+
+      if (isLot) {
+        badgeLot.style.display = "inline-block";
+        ligneQte.style.display = "block";
+        document.getElementById("itemQteTxt").innerText = `${totalQte} unité(s) au total`;
+      } else {
+        badgeLot.style.display = "none";
+        ligneQte.style.display = "none";
+      }
 
       const btnDoc = document.getElementById("btnDoc");
       if (item.docUrl && item.docUrl.startsWith("http")) {
@@ -1103,18 +1133,18 @@
 
       document.getElementById("zoneLieuSortie").style.display = "none";
 
-      // Défilement automatique vers les boutons d'action
       scrollerVersElement("actionsButtonsGrid");
     }
 
     function ouvrirZoneSortie() {
-      const totalPhysique = parseInt(currentItem.qte, 10) || 1;
+      const isLot = estUnLot(currentItem);
+      const totalPhysique = obtenirQuantiteItem(currentItem);
       const statut = (currentItem.statut || "");
 
       let dejaSorti = 0;
       if (statut.toLowerCase() === "sorti") {
         dejaSorti = totalPhysique;
-      } else if (statut.includes("Partiel")) {
+      } else if (statut.includes("Partiel") || statut.includes("partiel")) {
         const m = statut.match(/\((\d+)\//);
         if (m) dejaSorti = parseInt(m[1], 10);
       }
@@ -1123,7 +1153,7 @@
 
       if (resteEnStock <= 0) {
         emettreBipErreur();
-        afficherToast("Tout le lot est déjà sorti", true);
+        afficherToast("Tout le matériel est déjà sorti", true);
         return;
       }
 
@@ -1133,11 +1163,12 @@
       const zoneQte = document.getElementById("zoneQuantiteSortie");
       const inputQte = document.getElementById("inputQteSortie");
 
-      if (totalPhysique > 1) {
+      // AFFICHE LE NOMBRE SI C'EST UN LOT (MÊME AVEC QTÉ=1 OU INDÉFINIE)
+      if (isLot || totalPhysique > 1) {
         zoneQte.style.display = "block";
-        inputQte.max = resteEnStock;
+        inputQte.max = resteEnStock > 0 ? resteEnStock : 999;
         inputQte.value = 1;
-        document.getElementById("txtQteMax").innerText = `/ ${resteEnStock} restant(s) au stock`;
+        document.getElementById("txtQteMax").innerText = `/ ${resteEnStock} dispo(s)`;
         inputQte.focus();
         inputQte.select();
       } else {
@@ -1146,7 +1177,6 @@
         document.getElementById("selectLieu").focus();
       }
 
-      // Défilement direct vers le formulaire de sortie ouvert
       scrollerVersElement("btnConfirmerSortie");
     }
 
@@ -1172,41 +1202,45 @@
         }
       }
 
-      const totalPhysique = parseInt(currentItem.qte, 10) || 1;
+      const totalPhysique = obtenirQuantiteItem(currentItem);
+      const isLot = estUnLot(currentItem);
       const statut = (currentItem.statut || "");
       let dejaSorti = 0;
       if (statut.toLowerCase() === "sorti") dejaSorti = totalPhysique;
-      else if (statut.includes("Partiel")) {
+      else if (statut.includes("Partiel") || statut.includes("partiel")) {
         const m = statut.match(/\((\d+)\//);
         if (m) dejaSorti = parseInt(m[1], 10);
       }
       const resteEnStock = Math.max(0, totalPhysique - dejaSorti);
 
-      const qteChoisie = parseInt(document.getElementById("inputQteSortie").value, 10) || 1;
-
-      if (qteChoisie <= 0 || qteChoisie > resteEnStock) {
-        emettreBipErreur();
-        afficherToast(`Quantité max : ${resteEnStock}`, true);
-        return;
+      let qteChoisie = 1;
+      if (isLot || totalPhysique > 1) {
+        qteChoisie = parseInt(document.getElementById("inputQteSortie").value, 10) || 1;
+        if (qteChoisie <= 0 || (resteEnStock > 0 && qteChoisie > resteEnStock)) {
+          emettreBipErreur();
+          afficherToast(`Quantité max : ${resteEnStock}`, true);
+          return;
+        }
       }
 
       executerAction("Sorti", lieuFinal, "-", qteChoisie, "SORTIE");
     }
 
     function confirmerRetourDirect() {
-      const qteTotale = parseInt(currentItem.qte, 10) || 1;
+      const totalPhysique = obtenirQuantiteItem(currentItem);
+      const isLot = estUnLot(currentItem);
       const statut = (currentItem.statut || "");
       const locNominale = currentItem.locNominale || "Stock Régie";
 
-      if (qteTotale === 1) {
+      if (!isLot && totalPhysique === 1) {
         executerAction("Dispo", locNominale, "-", 1, "RETOUR");
         return;
       }
 
       let totalSorti = 0;
       if (statut.toLowerCase() === "sorti") {
-        totalSorti = qteTotale;
-      } else if (statut.includes("Partiel")) {
+        totalSorti = totalPhysique;
+      } else if (statut.includes("Partiel") || statut.includes("partiel")) {
         const m = statut.match(/\((\d+)\//);
         if (m) totalSorti = parseInt(m[1], 10);
       }
@@ -1216,7 +1250,7 @@
         return;
       }
 
-      const reponse = prompt(`Combien d'unités retournez-vous au stock ? (${totalSorti} actuellement dehors) :`, totalSorti);
+      const reponse = prompt(`Combien d'unités retournez-vous au stock ? (${totalSorti} actuellement sorti) :`, totalSorti);
       if (reponse === null) return;
 
       const qteARendre = parseInt(reponse, 10);
@@ -1259,14 +1293,13 @@
         body: JSON.stringify(payload)
       })
       .then(() => {
-        // Bip spécifique de validation d'action
         emettreBipActionValidee();
 
         if (actionType === "RETOUR") {
           const locCible = currentItem.locNominale || "Stock Régie";
           afficherConfirmationRangement(locCible);
         } else {
-          afficherToast(actionType === "SORTIE" ? `Sortie validée vers ${lieu}` : "Action enregistrée !");
+          afficherToast(actionType === "SORTIE" ? `Sortie validée (${qte}x) vers ${lieu}` : "Action enregistrée !");
           
           setTimeout(() => {
             document.getElementById("cardDetails").style.display = "none";
@@ -1303,7 +1336,6 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // 4. CHANGELOG DYNAMIQUE
     function chargerDerniereVersionTag() {
       fetch(`${SCRIPT_URL}?action=getChangelog`)
         .then(r => r.json())
@@ -1317,7 +1349,6 @@
 
     function ouvrirChangelog() {
       document.getElementById("changelogOverlay").style.display = "flex";
-      
       fetch(`${SCRIPT_URL}?action=getChangelog`)
         .then(r => r.json())
         .then(res => {
@@ -1365,7 +1396,6 @@
       });
     }
 
-    // 5. ENREGISTREMENT DU SERVICE WORKER (PWA)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')

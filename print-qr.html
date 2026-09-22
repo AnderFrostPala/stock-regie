@@ -1,18 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TurboStock — Impression Étiquettes QR (Mini)</title>
-  
-  <!-- Bibliothèque QR Code locale et autonome -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-
-  <style>
+<style>
     * { box-sizing: border-box; }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -44,11 +30,11 @@
       cursor: pointer;
     }
 
-    /* Grille 5 colonnes pour mini-étiquettes (20-25mm) */
+    /* Grille écran */
     .labels-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
+      gap: 6px;
       max-width: 1050px;
       margin: 0 auto;
     }
@@ -56,32 +42,30 @@
     .label-card {
       border: 1px dashed #6b7280;
       background: #fff;
-      padding: 6px 4px;
+      padding: 4px 2px;
       border-radius: 4px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      page-break-inside: avoid;
-      break-inside: avoid;
+      box-sizing: border-box;
     }
 
     .label-header {
-      font-size: 0.52em;
+      font-size: 0.5em;
       font-weight: 800;
       color: #e62b33;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
-      margin-bottom: 2px;
+      letter-spacing: 0.2px;
+      margin-bottom: 1px;
     }
 
-    /* Nom court et percutant */
     .label-nom {
-      font-size: 0.72em;
+      font-size: 0.65em;
       font-weight: 800;
-      margin: 0 0 3px 0;
-      line-height: 1.15;
-      max-height: 2.3em;
+      margin: 0 0 2px 0;
+      line-height: 1.1;
+      height: 2.2em;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -89,31 +73,36 @@
       word-break: break-word;
     }
 
-    /* Zone QR Code compacte (80x80 px ~ 22mm) */
     .label-qr-wrap {
-      width: 80px;
-      height: 80px;
+      width: 75px;
+      height: 75px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 2px 0;
+      margin: 1px 0;
     }
     .label-qr-wrap canvas,
     .label-qr-wrap img {
-      width: 80px !important;
-      height: 80px !important;
+      width: 75px !important;
+      height: 75px !important;
     }
 
     .label-id {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68em;
+      font-size: 0.62em;
       font-weight: 700;
       background: #f1f3f7;
       border: 1px solid #d1d5db;
-      padding: 1px 5px;
+      padding: 1px 4px;
       border-radius: 3px;
-      margin-top: 2px;
+      margin-top: 1px;
       word-break: break-all;
+    }
+
+    /* RÈGLES D'IMPRESSION CALIBRÉES POUR ÉCONOMISER LE PAPIER */
+    @page {
+      size: A4 portrait;
+      margin: 8mm 6mm; /* Marges réduites pour utiliser toute la feuille */
     }
 
     @media print {
@@ -122,100 +111,24 @@
         padding: 0;
       }
       .no-print {
-        display: none;
+        display: none !important;
       }
+      /* Flexbox dense au lieu de Grid pour supprimer les pages blanches prématurées */
       .labels-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 6px;
-        max-width: none;
-        width: 100%;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+        gap: 3mm 2mm !important;
+        width: 100% !important;
+        max-width: none !important;
       }
       .label-card {
-        border: 0.8px dashed #9ca3af;
+        width: 19.2% !important; /* Exactement 5 étiquettes par ligne */
+        border: 0.6px dashed #9ca3af !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin: 0 !important;
+        padding: 2mm 1mm !important;
       }
     }
   </style>
-</head>
-<body>
-
-  <div class="no-print">
-    <div>
-      <strong>Planche d'impression TurboStock (Noms courts)</strong>
-      <div style="font-size:0.75em; color:#666;">Optimisé pour anses de projecteurs et boîtes de matériel</div>
-    </div>
-    <button class="btn-print" onclick="window.print()">🖨️ Imprimer les étiquettes</button>
-  </div>
-
-  <div class="labels-grid" id="container">
-    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">Chargement du parc matériel...</div>
-  </div>
-
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
-
-    // Fonction pour extraire l'information essentielle
-    function extraireNomCourt(item) {
-      // 1. Si la référence courte existe dans la colonne Ref, on l'utilise directement
-      if (item.ref && item.ref.trim() !== "" && item.ref !== "-" && !item.ref.startsWith("_")) {
-        return item.ref.trim();
-      }
-
-      // 2. Sinon, on nettoie la désignation longue
-      let nom = (item.nom || item.designation || "").trim();
-      if (!nom) return item.id;
-
-      // Nettoyage des préfixes génériques
-      nom = nom.replace(/^(Console|Projecteur|Micro|Enceinte|Ampli|Câble dmx|Câble)\s+/i, "");
-
-      // Suppression des détails techniques superflus (ex: "24 in 6 OUT", "+ FLIGHT", "4in 3out")
-      nom = nom.split(/\s*(\+|\/|\(|\b\d+\s*in\b|\b\d+\s*out\b)/i)[0].trim();
-
-      return nom || item.id;
-    }
-
-    fetch(`${SCRIPT_URL}?action=getAll`)
-      .then(r => r.json())
-      .then(res => {
-        const container = document.getElementById("container");
-        container.innerHTML = "";
-        
-        if (!res.success || !res.items || res.items.length === 0) {
-          container.innerHTML = "<p>Aucun matériel trouvé dans la feuille.</p>";
-          return;
-        }
-
-        res.items.forEach((item, index) => {
-          if (!item.id || item.id === "_000") return;
-
-          const nomCourt = extraireNomCourt(item);
-
-          const card = document.createElement("div");
-          card.className = "label-card";
-
-          const qrBoxId = `qrcode-${index}`;
-          const urlScan = `https://anderfrostpala.github.io/stock-regie/index.html?id=${encodeURIComponent(item.id)}`;
-
-          card.innerHTML = `
-            <div class="label-header">TurboStock</div>
-            <div class="label-nom" title="${item.nom || nomCourt}">${nomCourt}</div>
-            <div class="label-qr-wrap" id="${qrBoxId}"></div>
-            <div class="label-id">${item.id}</div>
-          `;
-          container.appendChild(card);
-
-          new QRCode(document.getElementById(qrBoxId), {
-            text: urlScan,
-            width: 80,
-            height: 80,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.M
-          });
-        });
-      })
-      .catch(err => {
-        document.getElementById("container").innerHTML = `<p style="color:red">Erreur chargement : ${err}</p>`;
-      });
-  </script>
-</body>
-</html>

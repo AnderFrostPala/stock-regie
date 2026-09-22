@@ -581,12 +581,12 @@
       </button>
     </div>
 
-<nav class="quick-nav">
-  <a href="autonomie.html" style="color:var(--status-blue-light);">Gestion autonomie</a>
-  <a href="pret-externe.html" style="color:#f87171;">Prêt de Matériel</a>
-  <a href="reservation.html">Réservations</a>
-  <a href="dashboard.html">Parc Matériel</a>
-</nav>
+    <nav class="quick-nav">
+      <a href="autonomie.html" style="color:var(--status-blue-light);">Gestion autonomie</a>
+      <a href="pret-externe.html" style="color:#f87171;">Prêt de Matériel</a>
+      <a href="reservation.html">Réservations</a>
+      <a href="dashboard.html">Parc Matériel</a>
+    </nav>
 
     <!-- SCANNER & RECHERCHE -->
     <div class="card">
@@ -622,7 +622,7 @@
         </div>
       </div>
 
-      <div class="actions-grid">
+      <div class="actions-grid" id="actionsButtonsGrid">
         <button type="button" class="btn-cmd btn-sortie" onclick="ouvrirZoneSortie()">Sortie</button>
         <button type="button" class="btn-cmd btn-retour" onclick="confirmerRetourDirect()">Retour stock</button>
         <button type="button" class="btn-cmd btn-sav" onclick="declarerPanne()">Mise en SAV</button>
@@ -922,6 +922,12 @@
       }
 
       document.getElementById("zoneLieuSortie").style.display = "none";
+
+      // Défilement automatique fluide vers les boutons d'action
+      setTimeout(() => {
+        const cible = document.getElementById("actionsButtonsGrid") || card;
+        cible.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 120);
     }
 
     function ouvrirZoneSortie() {
@@ -961,6 +967,11 @@
         inputQte.value = 1;
         document.getElementById("selectLieu").focus();
       }
+
+      // Défilement direct vers le formulaire de sortie ouvert
+      setTimeout(() => {
+        zoneSortie.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 80);
     }
 
     function gererChangementLieu(val) {

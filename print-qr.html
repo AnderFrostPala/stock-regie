@@ -1,4 +1,18 @@
-<style>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurboStock — Impression Étiquettes QR (Mini & Noms Courts)</title>
+  
+  <!-- Bibliothèque QR Code locale et autonome -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
     * { box-sizing: border-box; }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -99,10 +113,10 @@
       word-break: break-all;
     }
 
-    /* RÈGLES D'IMPRESSION CALIBRÉES POUR ÉCONOMISER LE PAPIER */
+    /* RÈGLES D'IMPRESSION COMPACTES (A4 PORTRAIT) */
     @page {
       size: A4 portrait;
-      margin: 8mm 6mm; /* Marges réduites pour utiliser toute la feuille */
+      margin: 8mm 6mm;
     }
 
     @media print {
@@ -113,7 +127,7 @@
       .no-print {
         display: none !important;
       }
-      /* Flexbox dense au lieu de Grid pour supprimer les pages blanches prématurées */
+      /* Flexbox dense évitant les sauts de page artificiels du moteur Grid */
       .labels-grid {
         display: flex !important;
         flex-wrap: wrap !important;
@@ -123,7 +137,7 @@
         max-width: none !important;
       }
       .label-card {
-        width: 19.2% !important; /* Exactement 5 étiquettes par ligne */
+        width: 19.2% !important; /* 5 étiquettes par rangée */
         border: 0.6px dashed #9ca3af !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
@@ -132,3 +146,81 @@
       }
     }
   </style>
+</head>
+<body>
+
+  <div class="no-print">
+    <div>
+      <strong>Planche d'impression TurboStock (Format Dense & Noms Courts)</strong>
+      <div style="font-size:0.75em; color:#666;">Optimisé pour 45-50 étiquettes par page A4</div>
+    </div>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimer les étiquettes</button>
+  </div>
+
+  <div class="labels-grid" id="container">
+    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">Chargement du parc matériel...</div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+
+    function extraireNomCourt(item) {
+      if (item.ref && item.ref.trim() !== "" && item.ref !== "-" && !item.ref.startsWith("_")) {
+        return item.ref.trim();
+      }
+
+      let nom = (item.nom || item.designation || "").trim();
+      if (!nom) return item.id;
+
+      nom = nom.replace(/^(Console|Projecteur|Micro|Enceinte|Ampli|Câble dmx|Câble)\s+/i, "");
+      nom = nom.split(/\s*(\+|\/|\(|\b\d+\s*in\b|\b\d+\s*out\b)/i)[0].trim();
+
+      return nom || item.id;
+    }
+
+    fetch(`${SCRIPT_URL}?action=getAll`)
+      .then(r => r.json())
+      .then(res => {
+        const container = document.getElementById("container");
+        container.innerHTML = "";
+        
+        if (!res.success || !res.items || res.items.length === 0) {
+          container.innerHTML = "<p>Aucun matériel trouvé dans la feuille.</p>";
+          return;
+        }
+
+        res.items.forEach((item, index) => {
+          if (!item.id || item.id === "_000") return;
+
+          const nomCourt = extraireNomCourt(item);
+
+          const card = document.createElement("div");
+          card.className = "label-card";
+
+          const qrBoxId = `qrcode-${index}`;
+          const urlScan = `https://anderfrostpala.github.io/stock-regie/index.html?id=${encodeURIComponent(item.id)}`;
+
+          card.innerHTML = `
+            <div class="label-header">TurboStock</div>
+            <div class="label-nom" title="${item.nom || nomCourt}">${nomCourt}</div>
+            <div class="label-qr-wrap" id="${qrBoxId}"></div>
+            <div class="label-id">${item.id}</div>
+          `;
+          container.appendChild(card);
+
+          new QRCode(document.getElementById(qrBoxId), {
+            text: urlScan,
+            width: 75,
+            height: 75,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        });
+      })
+      .catch(err => {
+        document.getElementById("container").innerHTML = `<p style="color:red">Erreur chargement : ${err}</p>`;
+      });
+  </script>
+</body>
+</html>

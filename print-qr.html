@@ -2,14 +2,15 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>TurboStock — Impression Étiquettes QR Mini</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurboStock — Impression Étiquettes QR (Mini)</title>
   
   <!-- Bibliothèque QR Code locale et autonome -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 
   <style>
     * { box-sizing: border-box; }
@@ -22,7 +23,7 @@
     }
     
     .no-print {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto 15px auto;
       background: #fff;
       padding: 12px 18px;
@@ -43,12 +44,12 @@
       cursor: pointer;
     }
 
-    /* GRILLE COMPACTE POUR MINI-ÉTIQUETTES (Format 5 colonnes pour anses & housses) */
+    /* Grille 5 colonnes pour mini-étiquettes (20-25mm) */
     .labels-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 8px;
-      max-width: 1000px;
+      max-width: 1050px;
       margin: 0 auto;
     }
 
@@ -66,26 +67,29 @@
     }
 
     .label-header {
-      font-size: 0.5em;
+      font-size: 0.52em;
       font-weight: 800;
       color: #e62b33;
       text-transform: uppercase;
       letter-spacing: 0.3px;
       margin-bottom: 2px;
     }
+
+    /* Nom court et percutant */
     .label-nom {
-      font-size: 0.68em;
+      font-size: 0.72em;
       font-weight: 800;
-      margin: 0 0 4px 0;
-      line-height: 1.1;
-      height: 2.2em;
+      margin: 0 0 3px 0;
+      line-height: 1.15;
+      max-height: 2.3em;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      word-break: break-word;
     }
 
-    /* ZONE QR CODE RÉDUITE (22mm / 80px) */
+    /* Zone QR Code compacte (80x80 px ~ 22mm) */
     .label-qr-wrap {
       width: 80px;
       height: 80px;
@@ -102,13 +106,14 @@
 
     .label-id {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7em;
+      font-size: 0.68em;
       font-weight: 700;
       background: #f1f3f7;
       border: 1px solid #d1d5db;
-      padding: 1px 4px;
+      padding: 1px 5px;
       border-radius: 3px;
       margin-top: 2px;
+      word-break: break-all;
     }
 
     @media print {
@@ -135,8 +140,8 @@
 
   <div class="no-print">
     <div>
-      <strong>Planche d'impression TurboStock (Format Mini)</strong>
-      <div style="font-size:0.75em; color:#666;">Optimisé pour anses de projecteurs et housses</div>
+      <strong>Planche d'impression TurboStock (Noms courts)</strong>
+      <div style="font-size:0.75em; color:#666;">Optimisé pour anses de projecteurs et boîtes de matériel</div>
     </div>
     <button class="btn-print" onclick="window.print()">🖨️ Imprimer les étiquettes</button>
   </div>
@@ -147,6 +152,26 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
+
+    // Fonction pour extraire l'information essentielle
+    function extraireNomCourt(item) {
+      // 1. Si la référence courte existe dans la colonne Ref, on l'utilise directement
+      if (item.ref && item.ref.trim() !== "" && item.ref !== "-" && !item.ref.startsWith("_")) {
+        return item.ref.trim();
+      }
+
+      // 2. Sinon, on nettoie la désignation longue
+      let nom = (item.nom || item.designation || "").trim();
+      if (!nom) return item.id;
+
+      // Nettoyage des préfixes génériques
+      nom = nom.replace(/^(Console|Projecteur|Micro|Enceinte|Ampli|Câble dmx|Câble)\s+/i, "");
+
+      // Suppression des détails techniques superflus (ex: "24 in 6 OUT", "+ FLIGHT", "4in 3out")
+      nom = nom.split(/\s*(\+|\/|\(|\b\d+\s*in\b|\b\d+\s*out\b)/i)[0].trim();
+
+      return nom || item.id;
+    }
 
     fetch(`${SCRIPT_URL}?action=getAll`)
       .then(r => r.json())
@@ -162,6 +187,8 @@
         res.items.forEach((item, index) => {
           if (!item.id || item.id === "_000") return;
 
+          const nomCourt = extraireNomCourt(item);
+
           const card = document.createElement("div");
           card.className = "label-card";
 
@@ -170,13 +197,12 @@
 
           card.innerHTML = `
             <div class="label-header">TurboStock</div>
-            <div class="label-nom">${item.nom || "-"}</div>
+            <div class="label-nom" title="${item.nom || nomCourt}">${nomCourt}</div>
             <div class="label-qr-wrap" id="${qrBoxId}"></div>
             <div class="label-id">${item.id}</div>
           `;
           container.appendChild(card);
 
-          // Génération locale avec taille réduite à 80x80 pixels (~22mm)
           new QRCode(document.getElementById(qrBoxId), {
             text: urlScan,
             width: 80,

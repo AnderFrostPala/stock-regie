@@ -47,6 +47,35 @@
       padding-bottom: 74px;
     }
 
+    /* TOAST FEEDBACK RAPIDE (Remplace les popups alert) */
+    #quickToast {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-60px);
+      background: #10b981;
+      color: #fff;
+      font-size: 0.88em;
+      font-weight: 800;
+      padding: 10px 20px;
+      border-radius: 30px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #quickToast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    #quickToast.toast-error {
+      background: var(--status-sorti);
+    }
+
     /* BANDEAU D'ALERTE ROUGE DÉFILANT */
     #globalAlertBanner {
       display: none;
@@ -535,6 +564,12 @@
 </head>
 <body onclick="fermerMenuSiClicExterieur(event)">
 
+  <!-- TOAST FEEDBACK RAPIDE -->
+  <div id="quickToast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">Action effectuée</span>
+  </div>
+
   <!-- BANDEAU D'ALERTE ROUGE STICKY -->
   <div id="globalAlertBanner">
     <div class="alert-marquee-track" id="globalAlertText">
@@ -727,6 +762,75 @@
       document.documentElement.style.setProperty('--status-blue-light', savedThemeColor);
     }
 
+    // --- MOTEUR AUDIO & VIBRATION HAPTIQUE (TYPE DOUCHETTE / SCANNER) ---
+    let audioCtx = null;
+
+    function emettreBipScanner(type = "success") {
+      // 1. Déclenchement de la vibration du téléphone
+      if ("vibrate" in navigator) {
+        if (type === "success") {
+          navigator.vibrate(75); // Impulsion courte et nette
+        } else {
+          navigator.vibrate([60, 40, 60]); // Double vibration en cas d'erreur
+        }
+      }
+
+      // 2. Génération du signal sonore type scannette (Web Audio API)
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === "success") {
+          // Bip aigu court et incisif (1750 Hz pendant 80 ms)
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(1750, now);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else {
+          // Son plus grave pour signaler une anomalie
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(320, now);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+          osc.start(now);
+          osc.stop(now + 0.16);
+        }
+      } catch (e) {
+        // Fallback silencieux si l'audio n'est pas autorisé par l'OS
+      }
+    }
+
+    // Notification toast non intrusive
+    function afficherToast(message, estErreur = false) {
+      const toast = document.getElementById("quickToast");
+      const icon = document.getElementById("toastIcon");
+      const txt = document.getElementById("toastMsg");
+
+      icon.innerText = estErreur ? "⚠️" : "✅";
+      txt.innerText = message;
+
+      if (estErreur) toast.classList.add("toast-error");
+      else toast.classList.remove("toast-error");
+
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2000);
+    }
+
     // 1. CHARGEMENT DU BANDEAU D'ALERTE ROUGE
     verifierBandeauAlerte();
 
@@ -775,7 +879,7 @@
       const nom = document.getElementById("loginNom").value.trim();
       const pin = document.getElementById("loginPin").value.trim();
       if (!nom || !pin) {
-        alert("Veuillez remplir tous les champs.");
+        afficherToast("Veuillez remplir tous les champs", true);
         return;
       }
 
@@ -859,12 +963,17 @@
         .then(r => r.json())
         .then(res => {
           if (!res.success) {
-            alert(res.message || "Équipement non trouvé.");
+            emettreBipScanner("error");
+            afficherToast(res.message || "Équipement non trouvé", true);
             return;
           }
+          emettreBipScanner("success");
           afficherFicheMateriel(res);
         })
-        .catch(err => alert("Erreur de connexion : " + err));
+        .catch(err => {
+          emettreBipScanner("error");
+          afficherToast("Erreur réseau", true);
+        });
     }
 
     function afficherFicheMateriel(item) {
@@ -945,7 +1054,8 @@
       const resteEnStock = Math.max(0, totalPhysique - dejaSorti);
 
       if (resteEnStock <= 0) {
-        alert("Tout le lot est déjà sorti ! Aucun exemplaire disponible.");
+        emettreBipScanner("error");
+        afficherToast("Tout le lot est déjà sorti", true);
         return;
       }
 
@@ -968,7 +1078,6 @@
         document.getElementById("selectLieu").focus();
       }
 
-      // Défilement direct vers le formulaire de sortie ouvert
       setTimeout(() => {
         zoneSortie.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 80);
@@ -991,7 +1100,7 @@
       if (lieuFinal === "AUTRE") {
         lieuFinal = document.getElementById("inputLieuAutre").value.trim();
         if (!lieuFinal) {
-          alert("Veuillez préciser le nom du lieu.");
+          afficherToast("Précisez le lieu", true);
           return;
         }
       }
@@ -1009,7 +1118,8 @@
       const qteChoisie = parseInt(document.getElementById("inputQteSortie").value, 10) || 1;
 
       if (qteChoisie <= 0 || qteChoisie > resteEnStock) {
-        alert(`Quantité invalide. Vous ne pouvez pas prendre plus que les ${resteEnStock} unités restantes.`);
+        emettreBipScanner("error");
+        afficherToast(`Quantité max : ${resteEnStock}`, true);
         return;
       }
 
@@ -1035,7 +1145,7 @@
       }
 
       if (totalSorti <= 0) {
-        alert("Cet équipement est déjà entièrement au stock !");
+        afficherToast("Déjà au stock", true);
         return;
       }
 
@@ -1044,7 +1154,8 @@
 
       const qteARendre = parseInt(reponse, 10);
       if (isNaN(qteARendre) || qteARendre <= 0 || qteARendre > totalSorti) {
-        alert(`Quantité invalide. Doit être comprise entre 1 et ${totalSorti}.`);
+        emettreBipScanner("error");
+        afficherToast(`Quantité invalide (1 - ${totalSorti})`, true);
         return;
       }
 
@@ -1081,16 +1192,31 @@
         body: JSON.stringify(payload)
       })
       .then(() => {
+        // Déclenchement instantané du bip de scannette et de la vibration
+        emettreBipScanner("success");
+
         if (actionType === "RETOUR") {
           const locCible = currentItem.locNominale || "Stock Régie";
           afficherConfirmationRangement(locCible);
         } else {
-          alert("Action enregistrée !");
-          location.reload();
+          // Toast discret et reset immédiat pour scanner l'élément suivant
+          afficherToast(actionType === "SORTIE" ? `Sortie validée vers ${lieu}` : "Action enregistrée !");
+          
+          setTimeout(() => {
+            document.getElementById("cardDetails").style.display = "none";
+            document.getElementById("inputId").value = "";
+            currentItem = null;
+            if (btnSortie) {
+              btnSortie.disabled = false;
+              btnSortie.innerText = "Confirmer la sortie";
+            }
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }, 450);
         }
       })
       .catch(err => {
-        alert("Erreur réseau : " + err);
+        emettreBipScanner("error");
+        afficherToast("Erreur enregistrement", true);
         if (btnSortie) {
           btnSortie.disabled = false;
           btnSortie.innerText = "Confirmer la sortie";
@@ -1108,6 +1234,7 @@
       document.getElementById("cardDetails").style.display = "none";
       document.getElementById("inputId").value = "";
       currentItem = null;
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     // 4. CHANGELOG DYNAMIQUE

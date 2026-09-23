@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TurboStock - Parc Matériel </title>
+  <title>TurboStock - Parc Matériel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -35,7 +35,7 @@
       padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
     }
     .brand-group { display: flex; align-items: center; gap: 10px; }
-    .brand-logo { height: 80px; max-width: 600 px; object-fit: contain; }
+    .brand-logo { height: 80px; max-width: 600px; object-fit: contain; }
     .brand-fallback {
       background: #fff; color: #000; font-weight: 900; font-size: 0.65em;
       line-height: 1; padding: 5px 6px; border-radius: 4px;
@@ -120,27 +120,39 @@
       font-weight: 800; text-transform: uppercase;
     }
     .badge-dispo { background: rgba(16,185,129,0.15); color: #34d399; }
-    .badge-sorti { background: rgba(239,68,68,0.15); color: #f87171; }
+    .badge-sorti { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
     .badge-partiel { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
     .badge-sav { background: rgba(245,158,11,0.15); color: #fbbf24; }
     .badge-resa { background: rgba(59,130,246,0.2); color: #60a5fa; margin-left: 4px; }
     
     .meta-line { font-size: 0.8em; color: var(--text-muted); display: flex; justify-content: space-between; }
-    
-    /* DÉTAIL PAR EMPRUNTEUR (POUR LES LOTS) */
+
+    /* ENCART D'EMPRUNT UNIFIÉ (SORTIE COMPLÈTE & PARTIELLE SANS ÉMOJIS) */
     .emprunts-detail-box {
-      background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px;
-      padding: 8px 10px; margin-top: 4px; display: flex; flex-direction: column; gap: 5px; font-size: 0.8em;
+      background: #090b0e; border: 1px solid #232731; border-radius: 6px;
+      padding: 8px 12px; margin-top: 4px; display: flex; flex-direction: column; gap: 6px; font-size: 0.82em;
     }
     .emprunt-row {
-      display: flex; justify-content: space-between; align-items: center; gap: 6px;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
-    .badge-qte-chip {
+    .emprunt-user {
+      display: flex; align-items: center; gap: 8px; color: #f1f3f7; font-weight: 700;
+    }
+    
+    /* Pastilles de quantité selon le type de sortie */
+    .badge-qte-partiel {
       background: rgba(245,158,11,0.15); color: #fbbf24; font-family: 'JetBrains Mono', monospace;
-      font-weight: 700; padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(245,158,11,0.25);
+      font-weight: 700; padding: 1px 7px; border-radius: 4px; border: 1px solid rgba(245,158,11,0.3);
+      font-size: 0.85em;
     }
+    .badge-qte-sorti {
+      background: rgba(239,68,68,0.15); color: #f87171; font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; padding: 1px 7px; border-radius: 4px; border: 1px solid rgba(239,68,68,0.3);
+      font-size: 0.85em;
+    }
+    
     .emprunt-loc {
-      color: #94a3b8; font-size: 0.9em;
+      color: #94a3b8; font-weight: 600; text-align: right;
     }
 
     .btn-manual {
@@ -196,6 +208,7 @@
 
   <nav class="quick-nav">
     <a href="index.html">Scan</a>
+    <a href="autonomie.html">Autonomie</a>
     <a href="reservation.html">Réservations</a>
     <a href="dashboard.html" class="active">Parc Matériel</a>
   </nav>
@@ -236,7 +249,6 @@
   <div id="listeMateriel"></div>
 
   <script>
-    // COLLE TON URL APPS SCRIPT ICI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8qcBeM-V1sEBd8IX207mqJxyB_ibhrl_q7ST2uHCrgGPQOQ8CNyc5aogTBoZ1N1T/exec";
 
     let rawItems = [];
@@ -291,12 +303,12 @@
 
       const nbDispo = items.filter(i => {
         const s = (i.statut || "");
-        return s.toLowerCase().includes("dispo") || s.includes("Partiel");
+        return s.toLowerCase().includes("dispo") || s.includes("Partiel") || s.includes("partiel");
       }).length;
 
       const nbSorti = items.filter(i => {
         const s = (i.statut || "");
-        return s.toLowerCase().includes("sorti") || s.includes("Partiel");
+        return s.toLowerCase().includes("sorti") || s.includes("Partiel") || s.includes("partiel");
       }).length;
 
       const nbSav = items.filter(i => (i.statut || "").toLowerCase().includes("sav")).length;
@@ -340,7 +352,7 @@
         if (!matchTexte) return false;
 
         const st = (item.statut || "");
-        const estPartiel = st.includes("Partiel");
+        const estPartiel = st.includes("Partiel") || st.includes("partiel");
         const r = (item.statutResa || "").toLowerCase();
         const estResa = (r.includes("réservé") || r.includes("reserve")) && !r.includes("non");
 
@@ -358,17 +370,20 @@
 
       itemsFiltres.forEach(item => {
         const st = (item.statut || "");
-        const estPartiel = st.includes("Partiel");
+        const estPartiel = st.includes("Partiel") || st.includes("partiel");
+        const estSorti = st.toLowerCase().includes("sorti") && !estPartiel;
+        const estSav = st.toLowerCase().includes("sav");
+
         let carteClass = "is-dispo";
         let badgeHtml = '<span class="badge badge-dispo">Au stock</span>';
 
-        if (st.toLowerCase() === "sorti") {
+        if (estSorti) {
           carteClass = "is-sorti";
           badgeHtml = '<span class="badge badge-sorti">Sorti</span>';
         } else if (estPartiel) {
           carteClass = "is-partiel";
           badgeHtml = `<span class="badge badge-partiel">${item.statut}</span>`;
-        } else if (st.toLowerCase().includes("sav")) {
+        } else if (estSav) {
           carteClass = "is-sav";
           badgeHtml = '<span class="badge badge-sav">SAV</span>';
         }
@@ -380,12 +395,12 @@
           ? `<a href="${item.docUrl}" target="_blank" class="btn-manual">📄 Manuel</a>` : '';
 
         // Segments visuels pour quantité multiple (> 1)
-        const qteTotale = parseInt(item.qte, 10) || 1;
+        const qteTotale = parseInt(item.qteStock || item.qte, 10) || 1;
         let qteVisuelleHtml = "";
 
         if (qteTotale > 1) {
           let nbSortis = 0;
-          if (st.toLowerCase() === "sorti") {
+          if (estSorti) {
             nbSortis = qteTotale;
           } else if (estPartiel) {
             const match = st.match(/\((\d+)\//);
@@ -409,32 +424,66 @@
           `;
         }
 
-        // GESTION DÉTAILLÉE : QUI, COMBIEN, OÙ
+        // GESTION UNIFIÉE DE L'ENCART D'EMPRUNT (SORTI COMPLET & SORTI PARTIEL)
         const emprunteurStr = item.emprunteur || "-";
+        const lieuStr = item.localisation || "Stock";
         let detailEmpruntsHtml = "";
 
-        // Si lot partagé avec délimiteur "|" ou notation "(x..."
-        if (emprunteurStr !== "-" && (emprunteurStr.includes("|") || emprunteurStr.includes("(x"))) {
-          const parts = emprunteurStr.split("|").map(s => s.trim());
-          const rowsHtml = parts.map(p => {
-            // p ressemble à : "Léo Debelle-Membel (x3) @ Atelier A"
-            const match = p.match(/^(.*?)\s*\(x(\d+)\)\s*@\s*(.*)$/);
-            if (match) {
-              const nomP = match[1];
-              const qteP = match[2];
-              const lieuP = match[3];
-              return `
-                <div class="emprunt-row">
-                  <div>👤 <strong style="color:#fff;">${nomP}</strong> <span class="badge-qte-chip">${qteP} ex.</span></div>
-                  <div class="emprunt-loc">📍 ${lieuP}</div>
-                </div>
-              `;
-            } else {
-              return `<div class="emprunt-row"><span>👤 ${p}</span></div>`;
-            }
-          }).join("");
+        if (estPartiel || estSorti) {
+          const badgeClass = estPartiel ? "badge-qte-partiel" : "badge-qte-sorti";
 
-          detailEmpruntsHtml = `<div class="emprunts-detail-box">${rowsHtml}</div>`;
+          // Format multi-emprunteurs ou notation personnalisée
+          if (emprunteurStr !== "-" && (emprunteurStr.includes("|") || emprunteurStr.includes("(x"))) {
+            const parts = emprunteurStr.split("|").map(s => s.trim());
+            const rowsHtml = parts.map(p => {
+              const match = p.match(/^(.*?)\s*\(x(\d+)\)\s*@\s*(.*)$/);
+              if (match) {
+                const nomP = match[1];
+                const qteP = match[2];
+                const lieuP = match[3];
+                return `
+                  <div class="emprunt-row">
+                    <div class="emprunt-user">
+                      <span>${nomP}</span>
+                      <span class="${badgeClass}">${qteP} ex.</span>
+                    </div>
+                    <div class="emprunt-loc">${lieuP}</div>
+                  </div>
+                `;
+              } else {
+                return `
+                  <div class="emprunt-row">
+                    <div class="emprunt-user"><span>${p}</span></div>
+                    <div class="emprunt-loc">${lieuStr}</div>
+                  </div>
+                `;
+              }
+            }).join("");
+
+            detailEmpruntsHtml = `<div class="emprunts-detail-box">${rowsHtml}</div>`;
+          } else {
+            // Sortie simple unitaire ou de lot entier
+            let qteBadge = "";
+            if (estPartiel) {
+              const m = st.match(/\((\d+)\//);
+              if (m) qteBadge = `<span class="${badgeClass}">${m[1]} ex.</span>`;
+            } else if (qteTotale > 1) {
+              qteBadge = `<span class="${badgeClass}">${qteTotale} ex.</span>`;
+            }
+
+            const detenteur = (emprunteurStr && emprunteurStr !== "-") ? emprunteurStr : "DNMADE";
+            detailEmpruntsHtml = `
+              <div class="emprunts-detail-box">
+                <div class="emprunt-row">
+                  <div class="emprunt-user">
+                    <span>${detenteur}</span>
+                    ${qteBadge}
+                  </div>
+                  <div class="emprunt-loc">${lieuStr}</div>
+                </div>
+              </div>
+            `;
+          }
         }
 
         const div = document.createElement("div");
@@ -450,7 +499,7 @@
 
           ${detailEmpruntsHtml ? detailEmpruntsHtml : `
             <div class="meta-line">
-              <span>Lieu : <strong style="color:#fff;">${item.localisation || "Stock"}</strong></span>
+              <span>Lieu : <strong style="color:#fff;">${lieuStr}</strong></span>
               <span>${emprunteurStr !== '-' ? 'Par : <strong style="color:#fff;">' + emprunteurStr + '</strong>' : ''}</span>
             </div>
           `}

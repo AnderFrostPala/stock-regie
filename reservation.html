@@ -14,7 +14,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     * { box-sizing: border-box; }
@@ -23,16 +23,17 @@
       --bg-body: #0d0f12;
       --bg-surface: #171a21;
       --bg-surface-elevated: #20242e;
-      --border: #2e3442;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --border: #292e3b;
+      --text-main: #f1f3f7;
+      --text-muted: #8b949e;
 
       --status-dispo: #10b981;
       --status-sorti: #ef4444;
       --status-sav: #f59e0b;
-      --status-blue: #2563eb;
+      --status-blue: #3b82f6;
       --status-blue-light: #38bdf8;
       --status-amber: #f59e0b;
+      --status-purple: #a78bfa;
     }
 
     body {
@@ -115,73 +116,147 @@
       padding: 10px 14px; font-size: 0.84em; color: #fbbf24; margin-bottom: 14px;
     }
 
-    /* ACCORDÉONS PAR CATÉGORIE */
-    .accordion-group {
+    /* ACCORDÉONS CATÉGORIES PRINCIPALES */
+    .cat-group {
       border: 1px solid var(--border); border-radius: 10px;
-      margin-bottom: 8px; overflow: hidden; background: #0a0c10;
+      margin-bottom: 10px; overflow: hidden; background: #0a0c10;
     }
-    .accordion-header {
+    .cat-header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 12px 14px; background: var(--bg-surface-elevated);
-      cursor: pointer; user-select: none; font-weight: 800; font-size: 0.9em;
+      cursor: pointer; user-select: none; font-weight: 800; font-size: 0.92em;
     }
-    .accordion-header:hover { background: #262b37; }
-    .accordion-title { display: flex; align-items: center; gap: 8px; color: #fff; }
-    .accordion-badge {
+    .cat-header:hover { background: #262b37; }
+    .cat-title { display: flex; align-items: center; gap: 8px; color: #fff; }
+    .cat-badge {
       background: #11141c; border: 1px solid var(--border);
       padding: 2px 7px; border-radius: 12px; font-size: 0.78em; color: var(--text-muted);
     }
-    .accordion-arrow { transition: transform 0.2s ease; font-size: 0.8em; color: var(--text-muted); }
-    .accordion-group.open .accordion-arrow { transform: rotate(180deg); }
-    .accordion-content {
+    .cat-arrow { transition: transform 0.2s ease; font-size: 0.8em; color: var(--text-muted); }
+    .cat-group.open > .cat-header .cat-arrow { transform: rotate(180deg); }
+    .cat-content {
       display: none; padding: 10px; flex-direction: column; gap: 8px;
     }
-    .accordion-group.open .accordion-content { display: flex; }
+    .cat-group.open > .cat-content { display: flex; }
 
-    /* GROSSES TUILES TACTILES */
-    .big-item-card {
-      background: #12151d; border: 2px solid var(--border);
-      border-radius: 10px; padding: 12px 14px;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; cursor: pointer; user-select: none; transition: all 0.12s ease;
+    /* ACCORDÉONS SOUS-CATÉGORIES */
+    .subcat-group {
+      border: 1px solid #1e2430; border-radius: 8px;
+      overflow: hidden; background: #07080b; margin-bottom: 4px;
     }
-    .big-item-card:hover { border-color: #475569; }
-    .big-item-card.selected {
-      border-color: var(--status-dispo); background: rgba(16, 185, 129, 0.1);
+    .subcat-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 12px; background: #131720; cursor: pointer; user-select: none;
+      font-weight: 700; font-size: 0.84em; color: #cbd5e1;
     }
-    .item-main-info { display: flex; flex-direction: column; gap: 3px; flex: 1; }
-    .item-title { font-size: 0.98em; font-weight: 800; color: #fff; }
-    .item-meta {
-      display: flex; align-items: center; gap: 8px; font-size: 0.8em;
-      color: var(--text-muted); flex-wrap: wrap;
+    .subcat-header:hover { background: #1a202c; color: #fff; }
+    .subcat-arrow { transition: transform 0.2s ease; font-size: 0.75em; color: var(--text-muted); }
+    .subcat-group.open > .subcat-header .subcat-arrow { transform: rotate(180deg); }
+    .subcat-content {
+      display: none; padding: 8px; flex-direction: column; gap: 6px;
     }
-    .code-pill {
-      font-family: 'JetBrains Mono', monospace; font-weight: 800;
-      color: var(--status-blue-light); background: #000;
-      padding: 2px 6px; border-radius: 4px; border: 1px solid #1e293b;
-    }
-    .stock-badge { font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.75em; text-transform: uppercase; }
-    .stock-ok { background: rgba(16, 185, 129, 0.18); color: #34d399; }
-    .stock-busy { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+    .subcat-group.open > .subcat-content { display: flex; }
 
-    .big-checkbox {
-      width: 26px; height: 26px; border: 2px solid var(--border);
-      border-radius: 7px; display: flex; align-items: center;
-      justify-content: center; background: #000; font-size: 15px; color: transparent;
+    /* GROSSES ÉTIQUETTES NOIRES (DA PARC MATÉRIEL) */
+    .item-box {
+      background: #090a0d;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--status-dispo);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.12s ease;
+    }
+    .item-box:hover {
+      border-color: #3b4252;
+      background: #0f1217;
+    }
+    .item-box.is-busy {
+      border-left-color: var(--status-sorti);
+    }
+    .item-box.selected {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: var(--status-dispo);
+    }
+    .item-left {
+      flex: 1;
+      min-width: 0;
+    }
+    .item-nom {
+      font-size: 0.9em;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-tags {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76em;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+    .code-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--status-blue-light);
+      background: #000;
+      border: 1px solid #1f2532;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .badge-lot {
+      background: rgba(167, 139, 250, 0.2);
+      color: var(--status-purple);
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 0.9em;
+    }
+    .badge-stock {
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .stock-ok { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .stock-no { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+    .item-checkbox {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      font-size: 14px;
+      color: transparent;
       flex-shrink: 0;
     }
-    .big-item-card.selected .big-checkbox {
-      background: var(--status-dispo); border-color: var(--status-dispo); color: #fff;
+    .item-box.selected .item-checkbox {
+      background: var(--status-dispo);
+      border-color: var(--status-dispo);
+      color: #fff;
     }
 
     .btn-submit-resa {
-      width: 100%; padding: 15px; background: var(--status-blue);
+      width: 100%; padding: 14px; background: var(--status-blue);
       color: #fff; border: none; border-radius: 10px; font-weight: 800;
-      font-size: 1em; cursor: pointer; font-family: inherit; margin-top: 14px;
+      font-size: 0.95em; cursor: pointer; font-family: inherit; margin-top: 14px;
     }
     .btn-submit-resa:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* RÉSERVATIONS */
+    /* RÉSERVATIONS EN HAUT */
     .section-title {
       font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px;
       color: var(--text-muted); margin: 12px 0 8px 0; display: flex; align-items: center; gap: 6px;
@@ -225,6 +300,8 @@
   <nav class="quick-nav">
     <a href="index.html">Scan</a>
     <a href="autonomie.html">Autonomie</a>
+    <a href="pret-externe.html">Prêt</a>
+    <a href="reservation.html" class="active">Réservations</a>
     <a href="dashboard.html">Parc Matériel</a>
   </nav>
 
@@ -232,14 +309,14 @@
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h2>Mes Réservations en cours</h2>
-      <button type="button" onclick="chargerMesReservations()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:4px 8px; border-radius:6px; font-size:0.75em; cursor:pointer;">↻</button>
+      <button type="button" onclick="chargerMesReservations(true)" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:4px 8px; border-radius:6px; font-size:0.75em; cursor:pointer;">↻</button>
     </div>
 
     <div id="loadingUserResas" style="text-align:center; padding:14px; color:var(--text-muted); font-size:0.85em;">Récupération de vos réservations...</div>
 
     <div id="containerAttente" style="display:none;">
       <div class="section-title" style="color:#fbbf24;">
-        <span>⏳ En attente de validation(<span id="countAttente">0</span>)</span>
+        <span>⏳ En attente de validation (<span id="countAttente">0</span>)</span>
       </div>
       <div id="listAttente"></div>
     </div>
@@ -256,11 +333,11 @@
     </div>
   </div>
 
-  <!-- 2. FORMULAIRE DE DEMANDE AVEC ACCORDÉONS FLUIDES -->
+  <!-- 2. FORMULAIRE AVEC ACCORDÉONS CATÉGORIES & SOUS-CATÉGORIES -->
   <div class="card">
     <h2>Nouvelle Demande de Matériel</h2>
     <form onsubmit="soumettreReservation(event)">
-      <label>Projet </label>
+      <label>Projet</label>
       <input type="text" id="inputProjet" placeholder="ex: Scénographie Plateau / Autonomie Atelier B" oninput="verifierMotCleAutonomie(this.value)" required>
 
       <div id="bannerAutonomie" class="autonomie-banner">
@@ -281,7 +358,7 @@
       <label style="margin-top:6px;">Matériel sélectionné (<span id="countSelected" style="color:var(--status-dispo); font-weight:800;">0</span>) :</label>
       <input type="text" id="searchItemInput" placeholder="🔍 Filtrer par nom ou référence..." oninput="filtrerCatalogue()">
 
-      <!-- CONTENEUR DES ACCORDÉONS -->
+      <!-- CONTENEUR DES ACCORDÉONS CATÉGORIES & SOUS-CATÉGORIES -->
       <div id="accordionsContainer">
         <div style="text-align:center; padding:16px; color:var(--text-muted); font-size:0.85em;">Chargement du stock...</div>
       </div>
@@ -309,17 +386,24 @@
     document.getElementById("inputDateFin").min = today;
 
     window.addEventListener("DOMContentLoaded", () => {
-      // 1. Chargement immédiat du cache pour affichage instantané
-      const cachedStock = sessionStorage.getItem("regie_stock_cache");
-      if (cachedStock) {
+      // 1. CHARGEMENT IMMÉDIAT DU LOCALSTORAGE POUR ZÉRO LATENCE
+      const cached = localStorage.getItem("turbostock_materiel_cache");
+      if (cached) {
         try {
-          allCatalogueItems = JSON.parse(cachedStock);
+          allCatalogueItems = JSON.parse(cached);
           afficherCatalogueEnAccordeons(allCatalogueItems);
         } catch (e) {}
       }
 
-      // 2. Requêtes réseau
-      chargerCatalogue();
+      const cachedResas = localStorage.getItem(`turbostock_resas_${user}`);
+      if (cachedResas) {
+        try {
+          rendreReservations(JSON.parse(cachedResas));
+        } catch (e) {}
+      }
+
+      // 2. SYNCHRONISATION EN ARRIÈRE-PLAN
+      synchroniserCatalogue();
       chargerMesReservations();
     });
 
@@ -329,97 +413,131 @@
         (clean.includes("autonomie") || clean.includes("autonome")) ? "block" : "none";
     }
 
-  function chargerCatalogue() {
-  fetch(`${SCRIPT_URL}?action=getAll`)
-    .then(r => r.json())
-    .then(res => {
-      if (res.success && res.items) {
-        // Exclut tout le matériel dont le statut contient "sav" ou "panne"
-        allCatalogueItems = res.items.filter(item => {
-          const st = String(item.statut || "").toLowerCase();
-          return !st.includes("sav") && !st.includes("panne");
-        });
+    // Récupération réseau avec mise à jour du localStorage
+    function synchroniserCatalogue() {
+      fetch(`${SCRIPT_URL}?action=getAll`)
+        .then(r => r.json())
+        .then(res => {
+          if (res.success && res.items) {
+            allCatalogueItems = res.items.filter(item => {
+              const st = String(item.statut || "").toLowerCase();
+              return !st.includes("sav") && !st.includes("panne");
+            });
 
-        // Mise en cache sessionStorage pour la fluidité
-        sessionStorage.setItem("regie_stock_cache", JSON.stringify(allCatalogueItems));
-        afficherCatalogueEnAccordeons(allCatalogueItems);
-      }
-    })
-    .catch(() => {
-      if (!allCatalogueItems.length) {
-        document.getElementById("accordionsContainer").innerHTML = 
-          '<div style="text-align:center; padding:14px; color:#f87171;">Erreur réseau stock.</div>';
-      }
-    });
-}
+            // Enregistrement persistant dans le LocalStorage
+            localStorage.setItem("turbostock_materiel_cache", JSON.stringify(allCatalogueItems));
+            afficherCatalogueEnAccordeons(allCatalogueItems);
+          }
+        })
+        .catch(() => {
+          if (!allCatalogueItems.length) {
+            document.getElementById("accordionsContainer").innerHTML = 
+              '<div style="text-align:center; padding:14px; color:#f87171;">Stock indisponible hors ligne.</div>';
+          }
+        });
+    }
+
+    // AFFICHAGE CATÉGORIE > SOUS-CATÉGORIE > ÉTIQUETTES NOIRES
     function afficherCatalogueEnAccordeons(items) {
       const conteneur = document.getElementById("accordionsContainer");
       conteneur.innerHTML = "";
 
       if (!items || items.length === 0) {
-        conteneur.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted);">Aucun matériel trouvé.</div>';
+        conteneur.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted);">Aucun matériel disponible.</div>';
         return;
       }
 
-      // Regroupement par catégorie
-      const groupes = {};
+      // Regroupement hiérarchique Catégorie -> Sous-Catégorie
+      const arborescence = {};
       items.forEach(it => {
-        const cat = it.categorie || "Autres";
-        if (!groupes[cat]) groupes[cat] = [];
-        groupes[cat].push(it);
+        const cat = (it.categorie && it.categorie.trim()) || "Autres";
+        const subcat = (it.sousCategorie && it.sousCategorie.trim()) || "Général";
+
+        if (!arborescence[cat]) arborescence[cat] = {};
+        if (!arborescence[cat][subcat]) arborescence[cat][subcat] = [];
+        arborescence[cat][subcat].push(it);
       });
 
-      const categories = Object.keys(groupes).sort();
+      const categoriesTriees = Object.keys(arborescence).sort();
 
-      categories.forEach((cat, index) => {
-        const liste = groupes[cat];
-        const groupEl = document.createElement("div");
-        // Ouvre le premier accordéon par défaut
-        groupEl.className = `accordion-group ${index === 0 ? 'open' : ''}`;
+      categoriesTriees.forEach((cat, idxCat) => {
+        let totalItemsDansCat = 0;
+        Object.values(arborescence[cat]).forEach(arr => totalItemsDansCat += arr.length);
 
-        const header = document.createElement("div");
-        header.className = "accordion-header";
-        header.onclick = () => groupEl.classList.toggle("open");
+        const catGroup = document.createElement("div");
+        catGroup.className = `cat-group ${idxCat === 0 ? 'open' : ''}`;
 
-        header.innerHTML = `
-          <div class="accordion-title">
+        const catHeader = document.createElement("div");
+        catHeader.className = "cat-header";
+        catHeader.onclick = () => catGroup.classList.toggle("open");
+        catHeader.innerHTML = `
+          <div class="cat-title">
             <span>${cat}</span>
-            <span class="accordion-badge">${liste.length}</span>
+            <span class="cat-badge">${totalItemsDansCat}</span>
           </div>
-          <span class="accordion-arrow">▼</span>
+          <span class="cat-arrow">▼</span>
         `;
 
-        const content = document.createElement("div");
-        content.className = "accordion-content";
+        const catContent = document.createElement("div");
+        catContent.className = "cat-content";
 
-        liste.forEach(item => {
-          const isSelected = selectedItemIds.has(item.id);
-          const card = document.createElement("div");
-          card.className = `big-item-card ${isSelected ? 'selected' : ''}`;
-          card.onclick = (e) => {
+        const sousCatsTriees = Object.keys(arborescence[cat]).sort();
+
+        sousCatsTriees.forEach((subcat, idxSub) => {
+          const liste = arborescence[cat][subcat];
+
+          const subGroup = document.createElement("div");
+          subGroup.className = `subcat-group ${idxSub === 0 ? 'open' : ''}`;
+
+          const subHeader = document.createElement("div");
+          subHeader.className = "subcat-header";
+          subHeader.onclick = (e) => {
             e.stopPropagation();
-            toggleSelection(item.id, card);
+            subGroup.classList.toggle("open");
           };
-
-          const isDispo = (item.statut || "").toLowerCase().includes("dispo");
-
-          card.innerHTML = `
-            <div class="item-main-info">
-              <div class="item-title">${item.nom}</div>
-              <div class="item-meta">
-                <span class="code-pill">${item.id}</span>
-                <span class="stock-badge ${isDispo ? 'stock-ok' : 'stock-busy'}">${item.statut || "Dispo"}</span>
-                <span style="color:#64748b;">(Total: ${item.qte || 1})</span>
-              </div>
-            </div>
-            <div class="big-checkbox">${isSelected ? '✓' : ''}</div>
+          subHeader.innerHTML = `
+            <span>${subcat} (${liste.length})</span>
+            <span class="subcat-arrow">▼</span>
           `;
-          content.appendChild(card);
+
+          const subContent = document.createElement("div");
+          subContent.className = "subcat-content";
+
+          liste.forEach(item => {
+            const isSelected = selectedItemIds.has(item.id);
+            const isDispo = (item.statut || "").toLowerCase().includes("dispo");
+            const isLot = (item.id && (item.id.includes("_LOT") || item.id.endsWith("LOT"))) || (parseInt(item.qteStock || item.qte, 10) > 1);
+
+            const card = document.createElement("div");
+            card.className = `item-box ${isDispo ? '' : 'is-busy'} ${isSelected ? 'selected' : ''}`;
+            card.onclick = (e) => {
+              e.stopPropagation();
+              toggleSelection(item.id, card);
+            };
+
+            card.innerHTML = `
+              <div class="item-left">
+                <div class="item-nom">${item.nom || item.designation || "-"}</div>
+                <div class="item-tags">
+                  <span class="code-tag">${item.id}</span>
+                  ${isLot ? '<span class="badge-lot">LOT</span>' : ''}
+                  <span class="badge-stock ${isDispo ? 'stock-ok' : 'stock-no'}">${item.statut || "Dispo"}</span>
+                  <span>(Stock: ${item.qteStock || item.qte || 1})</span>
+                </div>
+              </div>
+              <div class="item-checkbox">${isSelected ? '✓' : ''}</div>
+            `;
+            subContent.appendChild(card);
+          });
+
+          subGroup.appendChild(subHeader);
+          subGroup.appendChild(subContent);
+          catContent.appendChild(subGroup);
         });
 
-        groupEl.appendChild(header);
-        groupEl.appendChild(content);
-        conteneur.appendChild(groupEl);
+        catGroup.appendChild(catHeader);
+        catGroup.appendChild(catContent);
+        conteneur.appendChild(catGroup);
       });
     }
 
@@ -427,11 +545,11 @@
       if (selectedItemIds.has(id)) {
         selectedItemIds.delete(id);
         cardElement.classList.remove("selected");
-        cardElement.querySelector(".big-checkbox").innerText = "";
+        cardElement.querySelector(".item-checkbox").innerText = "";
       } else {
         selectedItemIds.add(id);
         cardElement.classList.add("selected");
-        cardElement.querySelector(".big-checkbox").innerText = "✓";
+        cardElement.querySelector(".item-checkbox").innerText = "✓";
       }
       document.getElementById("countSelected").innerText = selectedItemIds.size;
     }
@@ -444,15 +562,16 @@
       }
 
       const filtered = allCatalogueItems.filter(it => 
-        (it.nom || "").toLowerCase().includes(q) || 
+        (it.nom || it.designation || "").toLowerCase().includes(q) || 
         (it.id || "").toLowerCase().includes(q) ||
-        (it.categorie || "").toLowerCase().includes(q)
+        (it.categorie || "").toLowerCase().includes(q) ||
+        (it.sousCategorie || "").toLowerCase().includes(q)
       );
 
       afficherCatalogueEnAccordeons(filtered);
 
-      // Ouvre automatiquement tous les tiroirs lors d'une recherche
-      document.querySelectorAll(".accordion-group").forEach(g => g.classList.add("open"));
+      // Dépliage automatique lors d'une recherche textuelle
+      document.querySelectorAll(".cat-group, .subcat-group").forEach(g => g.classList.add("open"));
     }
 
     function soumettreReservation(e) {
@@ -503,7 +622,7 @@
         btn.disabled = false;
         btn.innerText = "Envoyer la demande";
         afficherCatalogueEnAccordeons(allCatalogueItems);
-        chargerMesReservations();
+        chargerMesReservations(true);
       })
       .catch(err => {
         alert("Erreur réseau : " + err);
@@ -512,56 +631,69 @@
       });
     }
 
-    function chargerMesReservations() {
-      document.getElementById("loadingUserResas").style.display = "block";
-      document.getElementById("containerAttente").style.display = "none";
-      document.getElementById("containerValide").style.display = "none";
-      document.getElementById("emptyResasMsg").style.display = "none";
+    function chargerMesReservations(forcerActualisation = false) {
+      if (forcerActualisation) {
+        document.getElementById("loadingUserResas").style.display = "block";
+      }
 
       fetch(`${SCRIPT_URL}?action=getUserResas&demandeur=${encodeURIComponent(user)}`)
         .then(r => r.json())
         .then(res => {
           document.getElementById("loadingUserResas").style.display = "none";
-          if (!res.success || !res.reservations || res.reservations.length === 0) {
-            document.getElementById("emptyResasMsg").style.display = "block";
-            return;
-          }
-
-          const resasAttente = [];
-          const resasValidees = [];
-
-          res.reservations.forEach(r => {
-            const statut = String(r.validation || "Validé").trim().toLowerCase();
-            if (statut.includes("attente")) {
-              resasAttente.push(r);
-            } else {
-              resasValidees.push(r);
-            }
-          });
-
-          if (resasAttente.length > 0) {
-            document.getElementById("containerAttente").style.display = "block";
-            document.getElementById("countAttente").innerText = resasAttente.length;
-            const cont = document.getElementById("listAttente");
-            cont.innerHTML = "";
-            resasAttente.forEach(r => cont.appendChild(creerLigneReservation(r, true)));
-          }
-
-          if (resasValidees.length > 0) {
-            document.getElementById("containerValide").style.display = "block";
-            document.getElementById("countValide").innerText = resasValidees.length;
-            const cont = document.getElementById("listValide");
-            cont.innerHTML = "";
-            resasValidees.forEach(r => cont.appendChild(creerLigneReservation(r, false)));
-          }
-
-          if (resasAttente.length === 0 && resasValidees.length === 0) {
+          if (res.success && res.reservations) {
+            localStorage.setItem(`turbostock_resas_${user}`, JSON.stringify(res.reservations));
+            rendreReservations(res.reservations);
+          } else {
             document.getElementById("emptyResasMsg").style.display = "block";
           }
         })
         .catch(() => {
-          document.getElementById("loadingUserResas").innerText = "Erreur de connexion aux réservations.";
+          document.getElementById("loadingUserResas").style.display = "none";
         });
+    }
+
+    function rendreReservations(reservations) {
+      document.getElementById("loadingUserResas").style.display = "none";
+      document.getElementById("containerAttente").style.display = "none";
+      document.getElementById("containerValide").style.display = "none";
+      document.getElementById("emptyResasMsg").style.display = "none";
+
+      if (!reservations || reservations.length === 0) {
+        document.getElementById("emptyResasMsg").style.display = "block";
+        return;
+      }
+
+      const resasAttente = [];
+      const resasValidees = [];
+
+      reservations.forEach(r => {
+        const statut = String(r.validation || "Validé").trim().toLowerCase();
+        if (statut.includes("attente")) {
+          resasAttente.push(r);
+        } else {
+          resasValidees.push(r);
+        }
+      });
+
+      if (resasAttente.length > 0) {
+        document.getElementById("containerAttente").style.display = "block";
+        document.getElementById("countAttente").innerText = resasAttente.length;
+        const cont = document.getElementById("listAttente");
+        cont.innerHTML = "";
+        resasAttente.forEach(r => cont.appendChild(creerLigneReservation(r, true)));
+      }
+
+      if (resasValidees.length > 0) {
+        document.getElementById("containerValide").style.display = "block";
+        document.getElementById("countValide").innerText = resasValidees.length;
+        const cont = document.getElementById("listValide");
+        cont.innerHTML = "";
+        resasValidees.forEach(r => cont.appendChild(creerLigneReservation(r, false)));
+      }
+
+      if (resasAttente.length === 0 && resasValidees.length === 0) {
+        document.getElementById("emptyResasMsg").style.display = "block";
+      }
     }
 
     function creerLigneReservation(r, estEnAttente) {
@@ -576,12 +708,12 @@
             </span>
           </div>
           <strong style="color:#fff; font-size:0.95em;">${r.nom}</strong>
-          <span class="code-pill" style="font-size:0.75em; margin-left:4px;">${r.id}</span>
+          <span class="code-tag" style="font-size:0.75em; margin-left:4px;">${r.id}</span>
           <div style="font-size:0.82em; color:var(--text-muted); margin-top:3px;">
             Projet : <span style="color:#fff; font-weight:700;">${r.projet}</span> &bull; Du <strong>${r.debut}</strong> au <strong>${r.fin}</strong>
           </div>
         </div>
-        <button type="button" class="btn-cancel-resa" onclick="annulerReservation(${r.row}, '${r.nom.replace(/'/g, "\\'")}')">
+        <button type="button" class="btn-cancel-resa" onclick="annulerReservation(${r.row}, '${(r.nom || '').replace(/'/g, "\\'")}')">
           Annuler
         </button>
       `;
@@ -601,7 +733,7 @@
         })
       })
       .then(() => {
-        chargerMesReservations();
+        chargerMesReservations(true);
       })
       .catch(err => alert("Erreur réseau : " + err));
     }
